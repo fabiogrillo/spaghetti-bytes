@@ -1,5 +1,5 @@
 import React from "react";
-import { FaGithub, FaLinkedin, FaMedium, FaInstagram } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaMedium } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 const Footer = () => {
@@ -60,15 +60,6 @@ const Footer = () => {
             whileTap={{ scale: 0.9 }}
           >
             <FaMedium className="text-4xl text-charcoal" />
-          </motion.a>
-          <motion.a
-            href="https://www.instagram.com/fabio.grillo_"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.1, rotate: 10 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <FaInstagram className="text-4xl text-charcoal" />
           </motion.a>
         </motion.div>
       </nav>
