@@ -2,10 +2,11 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import Home from "./Pages/Home";
-import About from "./Pages/About";
 import Blog from "./Pages/Blog";
-import Contact from "./Pages/Contact";
+import Goals from "./Pages/Goals";
 import Footer from "./Components/Footer";
+import About from "./Pages/About";
+import Login from "./Pages/Login";
 
 function App() {
   return (
@@ -15,9 +16,10 @@ function App() {
         <div className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/goals" element={<Goals />} />
             <Route path="/blog" element={<Blog />} />
-            <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </div>
         <Footer />

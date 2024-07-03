@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { IoIosLogIn } from "react-icons/io";  // Importa l'icona di login
 
 const Navbar = () => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -29,8 +30,8 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/about" className="text-lapis-lazuli">
-                Who I am
+              <Link to="/goals" className="text-lapis-lazuli">
+                Goals
               </Link>
             </li>
             <li>
@@ -39,8 +40,8 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="text-lapis-lazuli">
-                Contacts
+              <Link to="/about" className="text-lapis-lazuli">
+                About
               </Link>
             </li>
             <li>
@@ -81,6 +82,11 @@ const Navbar = () => {
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
               </label>
+            </li>
+            <li>
+              <Link to="/login" className="text-lapis-lazuli flex items-center">
+                <IoIosLogIn className="text-2xl" />
+              </Link>
             </li>
           </ul>
         </div>
