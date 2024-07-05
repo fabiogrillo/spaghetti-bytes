@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { IoIosLogIn } from "react-icons/io";  // Importa l'icona di login
+import { IoIosLogIn } from "react-icons/io"; // Importa l'icona di login
 
-const Navbar = () => {
+const Navbar = ({ authenticated, username }) => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
   useEffect(() => {
@@ -84,9 +84,13 @@ const Navbar = () => {
               </label>
             </li>
             <li>
-              <Link to="/login" className="text-lapis-lazuli flex items-center">
-                <IoIosLogIn className="text-2xl" />
-              </Link>
+              {authenticated ? (
+                <span className="text">{username}</span>
+              ) : (
+                <Link to="/login">
+                  <IoIosLogIn className="text-2xl" />
+                </Link>
+              )}
             </li>
           </ul>
         </div>

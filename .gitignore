@@ -1,23 +1,41 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Node modules
+node_modules/
 
-# dependencies
-/node_modules
+# Yarn Plug'n'Play
 /.pnp
 .pnp.js
 
-# testing
-/coverage
+# Coverage directory used by tools like istanbul
+coverage/
 
-# production
-/build
+# Production build
+build/
+dist/
 
-# misc
+# Misc
 .DS_Store
+
+# Environment variables
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# Log files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Tailwind CSS build artifacts (if you are using Tailwind CSS)
+tailwind.css
+
+# Specific folders for client and server
+client/node_modules/
+client/build/
+client/dist/
+client/.env
+
+server/node_modules/
+server/dist/
+server/.env
