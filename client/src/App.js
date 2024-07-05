@@ -8,34 +8,30 @@ import Footer from "./Components/Footer";
 import About from "./Pages/About";
 import Login from "./Pages/Login";
 
-function App() {
+const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
+
   return (
     <Router>
-      <div className="App">
-        <Navbar authenticated={isAuthenticated} username={username} />
-        <div className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/about" element={<About />} />
-            <Route
-              path="/login"
-              element={
-                <Login
-                  setAuthenticated={setAuthenticated}
-                  setUsername={setUsername}
-                />
-              }
+      <Navbar authenticated={isAuthenticated} username={username} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/goals" element={<Goals />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/about" element={<About />} />
+        <Route
+          path="/login"
+          element={
+            <Login
+              setAuthenticated={setAuthenticated}
+              setUsername={setUsername}
             />
-          </Routes>
-        </div>
-        <Footer />
-      </div>
+          }
+        />
+      </Routes>
     </Router>
   );
-}
+};
 
 export default App;

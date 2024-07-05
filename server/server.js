@@ -101,7 +101,7 @@ app.post("/api/register", async (req, res) => {
 
 // Route di login
 app.post("/api/login", passport.authenticate("local"), (req, res) => {
-  res.json({ message: "Logged in successfully" });
+  res.json({ message: "Logged in successfully", username: req.user.username });
 });
 
 // Route di logout

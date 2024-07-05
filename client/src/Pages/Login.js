@@ -19,12 +19,13 @@ const Login = ({ setAuthenticated, setUsername }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        credentials: "include", // Importante per inviare i cookie di sessione
       });
 
       if (response.ok) {
         const data = await response.json();
         setAuthenticated(true);
-        setUsername(data.username); // Aggiorna il nome utente
+        setUsername(data.username);
         navigate("/"); // Redirige l'utente alla homepage dopo il login
       } else {
         const data = await response.json();
