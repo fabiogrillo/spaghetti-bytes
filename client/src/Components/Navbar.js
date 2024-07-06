@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { IoIosLogIn } from "react-icons/io"; // Importa l'icona di login
+import { IoIosLogIn, IoIosLogOut } from "react-icons/io";
+import { doLogout } from "../Api";
 
-const Navbar = ({ authenticated, username }) => {
+const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
   useEffect(() => {
@@ -14,12 +15,22 @@ const Navbar = ({ authenticated, username }) => {
     setTheme(theme === "light" ? "synthwave" : "light");
   };
 
+  const handleLogout = async () => {
+    try {
+      await doLogout();
+      setAuthenticated(false);
+      setUsername("");
+    } catch (err) {
+      console.error("Error during logout:", err);
+    }
+  };
+
   return (
     <header>
       <div className="navbar p-4 bg-base-100 shadow-xl">
         <div className="flex-1">
           <Link className="text-2xl font-bold" to="/">
-            Golden Bytes
+            Spaghetti Bytes
           </Link>
         </div>
         <div className="flex-none">
@@ -85,7 +96,10 @@ const Navbar = ({ authenticated, username }) => {
             </li>
             <li>
               {authenticated ? (
-                <span className="text">{username}</span>
+                <span className="flex items-center" onClick={handleLogout}>
+                  <span className="mr-2">{username}</span>
+                  <IoIosLogOut className="text-2xl cursor-pointer" />
+                </span>
               ) : (
                 <Link to="/login">
                   <IoIosLogIn className="text-2xl" />
