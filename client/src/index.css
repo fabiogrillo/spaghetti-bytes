@@ -2,11 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root, .App {
+html,
+body,
+#root,
+.App {
   height: 100%;
 }
 
 .App {
   display: flex;
   flex-direction: column;
+}
+
+.custom-quill .ql-container {
+  border: none !important;
+  border-radius: 12px !important;
+  /* Arrotonda i bordi */
+  background-color: transparent !important;
+  /* Rendi trasparente lo sfondo */
+  box-shadow: none !important;
+  /* Rimuove ombre se presenti */
+}
+
+.custom-quill .ql-toolbar {
+  border: none !important;
+  border-radius: 12px 12px 0 0 !important;
+  /* Arrotonda i bordi della toolbar */
+  background-color: transparent !important;
+  /* Rendi trasparente lo sfondo della toolbar */
+  box-shadow: none !important;
+  /* Rimuove ombre se presenti */
+}
+
+.custom-quill .ql-editor {
+  border-radius: 0 0 12px 12px !important;
+  /* Arrotonda i bordi dell'editor */
+  background-color: transparent !important;
+  /* Rendi trasparente lo sfondo dell'editor */
+  color: #000 !important;
+  /* Colore del testo */
+}
+
+.custom-quill .ql-toolbar button {
+  color: #000 !important;
+  /* Colore dei pulsanti della toolbar */
+}
+
+.custom-quill .ql-toolbar .ql-picker-label,
+.custom-quill .ql-toolbar .ql-picker-item {
+  color: #000 !important;
+  /* Colore delle etichette e degli elementi dei picker */
 }
