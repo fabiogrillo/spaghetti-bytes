@@ -8,7 +8,7 @@ import Footer from "./Components/Footer";
 import About from "./Pages/About";
 import Login from "./Pages/Login";
 import StoryManager from "./Pages/StoryManager";
-import StoryEditor from "./Components/Editor";
+import StoryPublisher from "./Pages/StoryPublisher";
 
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
@@ -27,7 +27,7 @@ const App = () => {
         <Route path="/goals" element={<Goals />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/about" element={<About />} />
-        <Route path="/editor" element={<StoryEditor />} />
+        <Route path="/editor" element={<StoryPublisher />} />
         <Route
           path="/manager"
           element={

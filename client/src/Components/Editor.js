@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 const Font = Quill.import("formats/font");
 Font.whitelist = ["sans-serif", "serif", "monospace"];
 Quill.register(Font, true);
+
 const StoryEditor = () => {
   const [value, setValue] = useState("");
 
@@ -35,13 +36,13 @@ const StoryEditor = () => {
 
   return (
     <motion.div
-      className="card w-full min-h-96 bg-carolina-blue p-6"
+      className="card bg-carolina-blue"
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ ease: "anticipate", duration: 1.5, x: { duration: 0.5 } }}
     >
       <ReactQuill
-        className="custom-quill bg-neutral-content text-slate-800 shadow-lg rounded-2xl"
+        className="custom-quill bg-neutral-content text-slate-800 shadow-lg rounded-2xl min-h-36"
         theme="snow"
         value={value}
         onChange={setValue}
