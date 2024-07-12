@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import Editor from "../Components/Editor";
-import { motion, useViewportScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { IoMdAdd } from "react-icons/io";
-import { FaCheck, FaTimes } from "react-icons/fa";
-import illustration1 from "../Assets/Images/droll-start-up-launch.gif";
+import { FaCheck, FaTimes, FaLinkedin, FaMedium } from "react-icons/fa";
+import illustration1 from "../Assets/Images/rondy-stickers-lettering-sticker-start-here.gif";
+import illustration2 from "../Assets/Images/beam-a-person-is-typing-on-a-laptop.gif";
+
 const StoryPublisher = () => {
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
@@ -13,8 +15,15 @@ const StoryPublisher = () => {
   const [shareOnLinkedIn, setShareOnLinkedIn] = useState(false);
   const [shareOnMedium, setShareOnMedium] = useState(false);
 
+  const maxTitleLength = 100;
+  const maxSummaryLength = 1000;
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (tags.length < 3) {
+      alert("Please add at least 3 tags.");
+      return;
+    }
     const articleData = {
       title,
       summary,
@@ -38,137 +47,171 @@ const StoryPublisher = () => {
     setTags(tags.filter((_, index) => index !== indexToRemove));
   };
 
-  const { scrollY } = useViewportScroll();
-
-  const scaleTitle = useTransform(scrollY, [0, 0.3, 0.4], [1, 0.8, 0.7]);
-  const opacityTitle = useTransform(
-    scrollY,
-    [0, 0.3, 0.4, 0.5],
-    [1, 0.7, 0.5, 0.9]
-  );
-
-  const scaleEditor = useTransform(scrollY, [0.2, 0.3, 0.8], [0.7, 1, 0.7]);
-  const opacityEditor = useTransform(scrollY, [300, 600], [1, 0.5]);
-
-  const scaleSummary = useTransform(scrollY, [600, 900], [1, 1.05]);
-  const opacitySummary = useTransform(scrollY, [600, 900], [1, 0.5]);
-
-  const scaleTags = useTransform(scrollY, [900, 1200], [1, 1.05]);
-  const opacityTags = useTransform(scrollY, [900, 1200], [1, 0.5]);
-
-  const scaleOptions = useTransform(scrollY, [1200, 1500], [1, 1.05]);
-  const opacityOptions = useTransform(scrollY, [1200, 1500], [1, 0.5]);
-
   return (
     <div className="container mx-auto p-4 space-y-8">
       <motion.div
-        className="text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
       >
-        <h1 className="text-2xl font-bold mb-4">
-          Let's write a new incredible story 🤩
-        </h1>
-        <p>
-          Choose the title and then start writing, remember to set the summary
-          up and decide whether to publish it on LinkedIn and/or Medium. Don't
-          forget about tags.
+        <div className="md:w-3/5 text-start space-y-6">
+          <h1 className="text-2xl font-bold mb-4">
+            Let's write a new incredible story 🤩
+          </h1>
+          <p>
+            Choose the title and then start writing, remember to set the summary
+            up and decide whether to publish it on LinkedIn and/or Medium. Don't
+            forget about tags.
+          </p>
+        </div>
+        <div className="flex flex-col items-center justify-center md:w-2/5">
+          <img src={illustration1} alt="Illustration Start" className="w-60" />
+          <p className="text-xs text-center mt-4 md:mt-0">
+            Illustration by{" "}
+            <a href="https://icons8.com/illustrations/author/ODexzOcCgAMh">
+              Finn Reville
+            </a>{" "}
+            from <a href="https://icons8.com/illustrations">Ouch!</a>
+          </p>
+        </div>
+      </motion.div>
+
+      <motion.div
+        className="form-control pt-8"
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1, duration: 1.2, ease: "easeOut" }}
+      >
+        <label className="label">
+          First start with an ashtonishing title for your story 😲 (Max 100
+          characters)
+        </label>
+        <input
+          type="text"
+          placeholder="Your title here..."
+          className="input input-bordered"
+          value={title}
+          maxLength={maxTitleLength}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <p className="text-right text-sm">
+          {title.length}/{maxTitleLength} characters
         </p>
       </motion.div>
 
       <motion.div
-        className="form-control"
-        style={{ scale: scaleTitle, opacity: opacityTitle }}
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5, duration: 1.2, ease: "easeOut" }}
+        className="pt-8"
       >
-        <label className="label">Title</label>
-        <input
-          type="text"
-          placeholder="Write the title here..."
-          className="input input-bordered"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      </motion.div>
-
-      <motion.div style={{ scale: scaleEditor, opacity: opacityEditor }}>
-        <p>Story</p>
+        <p className="pb-2">What is your story about?</p>
         <Editor value={content} onChange={setContent} />
       </motion.div>
 
       <motion.div
-        className="form-control"
-        style={{ scale: scaleSummary, opacity: opacitySummary }}
+        className="form-control pt-8"
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 2.0, duration: 1.2, ease: "easeOut" }}
       >
-        <label className="label">Summary</label>
+        <label className="label">
+          Briefly describe what you have already written (Max 1000 characters)
+        </label>
         <textarea
           placeholder="Summary"
           className="textarea textarea-bordered"
           value={summary}
+          maxLength={maxSummaryLength}
           onChange={(e) => setSummary(e.target.value)}
         />
+        <p className="text-right text-sm">
+          {summary.length}/{maxSummaryLength} characters
+        </p>
       </motion.div>
 
       <motion.div
-        className="form-control"
-        style={{ scale: scaleTags, opacity: opacityTags }}
+        className="form-control pt-8 flex flex-col md:flex-row"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.5, duration: 1.2, ease: "easeOut" }}
       >
-        <label className="label">Tags</label>
-        <div className="input-group space-x-4">
-          <input
-            type="text"
-            placeholder="New Tag"
-            className="input input-bordered"
-            value={newTag}
-            onChange={(e) => setNewTag(e.target.value)}
-          />
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleAddTag}
-          >
-            <IoMdAdd />
-          </button>
-        </div>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {tags.map((tag, index) => (
-            <div
-              key={index}
-              className="badge badge-md badge-primary flex items-center space-x-2"
+        <div className="w-full md:w-3/5">
+          <label className="label">Insert some tags (at least 3)</label>
+          <div className="input-group space-x-4">
+            <input
+              type="text"
+              placeholder="New Tag"
+              className="input input-bordered"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleAddTag}
             >
-              <span>{tag}</span>
-              <button onClick={() => handleRemoveTag(index)}>
-                <FaTimes />
-              </button>
-            </div>
-          ))}
+              <IoMdAdd />
+            </button>
+          </div>
+          <div className="flex flex-wrap mt-2 gap-2">
+            {tags.map((tag, index) => (
+              <div
+                key={index}
+                className="badge badge-md badge-primary flex items-center space-x-2"
+              >
+                <span>{tag}</span>
+                <button onClick={() => handleRemoveTag(index)}>
+                  <FaTimes />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="w-full md:w-2/5 flex flex-col items-center justify-center">
+          <img src={illustration2} alt="Illustration typing" className="w-full" />
+          <p className="text-xs text-center mt-4 md:mt-0">
+            Illustration by{" "}
+            <a href="https://icons8.com/illustrations/author/SBxHVFmfplnQ">
+              Vera Erm
+            </a>{" "}
+            from <a href="https://icons8.com/illustrations">Ouch!</a>
+          </p>
         </div>
       </motion.div>
 
-      <motion.div style={{ scale: scaleOptions, opacity: opacityOptions }}>
-        <div className="form-control">
-          <label className="cursor-pointer label">
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 3.0, duration: 1.2, ease: "easeOut" }}
+        className="pt-8"
+      >
+        <div className="form-control flex items-center space-x-2">
+          <FaLinkedin className="mr-2" />
+          <label className="cursor-pointer label flex items-center">
             <span className="label-text">Share on LinkedIn</span>
             <input
               type="checkbox"
-              className="toggle toggle-warning"
+              className="toggle toggle-warning ml-2"
               checked={shareOnLinkedIn}
               onChange={() => setShareOnLinkedIn(!shareOnLinkedIn)}
             />
           </label>
         </div>
-        <div className="form-control">
-          <label className="cursor-pointer label">
+        <div className="form-control flex items-center space-x-2">
+          <FaMedium className="mr-2" />
+          <label className="cursor-pointer label flex items-center">
             <span className="label-text">Share on Medium</span>
             <input
               type="checkbox"
-              className="toggle toggle-error"
+              className="toggle toggle-error ml-2"
               checked={shareOnMedium}
               onChange={() => setShareOnMedium(!shareOnMedium)}
             />
           </label>
         </div>
-        <div className="text-center">
+        <div className="text-center pt-8">
           <button
             type="submit"
             className="btn btn-success"

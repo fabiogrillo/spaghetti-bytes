@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, useViewportScroll, useTransform } from "framer-motion";
+import { motion, useTransform, useScroll } from "framer-motion";
 import { IoIosContact } from "react-icons/io";
 import { BsFillPatchQuestionFill } from "react-icons/bs";
 import { GoGoal } from "react-icons/go";
@@ -14,7 +14,7 @@ import illustrationContact from "../Assets/Images/bendy-customer-service-man-ans
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  const { scrollYProgress } = useViewportScroll();
+  const { scrollYProgress } = useScroll();
 
   // Hero animations
   const heroScale = useTransform(scrollYProgress, [0, 0.3, 0.4], [1, 0.8, 0.7]);
