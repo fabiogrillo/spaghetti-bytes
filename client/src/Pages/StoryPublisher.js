@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import Editor from "../Components/Editor";
+import StoryEditor from "../Components/StoryEditor";
 import { motion } from "framer-motion";
 import { IoMdAdd } from "react-icons/io";
 import { FaCheck, FaTimes, FaLinkedin, FaMedium } from "react-icons/fa";
 import illustration1 from "../Assets/Images/rondy-stickers-lettering-sticker-start-here.gif";
-import illustration2 from "../Assets/Images/beam-a-person-is-typing-on-a-laptop.gif";
 
 const StoryPublisher = () => {
   const [title, setTitle] = useState("");
@@ -15,16 +14,28 @@ const StoryPublisher = () => {
   const [shareOnLinkedIn, setShareOnLinkedIn] = useState(false);
   const [shareOnMedium, setShareOnMedium] = useState(false);
 
+  const [errors, setErrors] = useState({});
+
   const maxTitleLength = 100;
   const maxSummaryLength = 1000;
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const newErrors = {};
+    if (!title) newErrors.title = "Title is required";
+    if (!summary) newErrors.summary = "Summary is required";
+    if (tags.length < 3) newErrors.tags = "Please add at least 3 tags";
+    if (!content) newErrors.content = "Content is required";
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (tags.length < 3) {
-      alert("Please add at least 3 tags.");
+    const formErrors = validateForm();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
       return;
     }
-    const articleData = {
+    const storyData = {
       title,
       summary,
       tags,
@@ -32,14 +43,30 @@ const StoryPublisher = () => {
       shareOnLinkedIn,
       shareOnMedium,
     };
-    // Call the backend API to save the article
-    console.log("Article data:", articleData);
+
+    try {
+      const response = await fetch("/api/stories/publish", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(storyData),
+      });
+      if (response.ok) {
+        console.log("Story published succesfully");
+      } else {
+        console.log("Error publishing story");
+      }
+    } catch (error) {
+      console.log("Error", error);
+    }
   };
 
   const handleAddTag = () => {
     if (newTag && !tags.includes(newTag)) {
       setTags([...tags, newTag]);
       setNewTag("");
+      setErrors((prevErrors) => ({ ...prevErrors, tags: "" }));
     }
   };
 
@@ -93,8 +120,12 @@ const StoryPublisher = () => {
           className="input input-bordered"
           value={title}
           maxLength={maxTitleLength}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+          }}
         />
+        {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
         <p className="text-right text-sm">
           {title.length}/{maxTitleLength} characters
         </p>
@@ -107,7 +138,16 @@ const StoryPublisher = () => {
         className="pt-8"
       >
         <p className="pb-2">What is your story about?</p>
-        <Editor value={content} onChange={setContent} />
+        <StoryEditor
+          value={content}
+          onChange={(value) => {
+            setContent(value);
+            setErrors((prevErrors) => ({ ...prevErrors, content: "" }));
+          }}
+        />
+        {errors.content && (
+          <p className="text-red-500 text-sm">{errors.content}</p>
+        )}
       </motion.div>
 
       <motion.div
@@ -124,28 +164,37 @@ const StoryPublisher = () => {
           className="textarea textarea-bordered"
           value={summary}
           maxLength={maxSummaryLength}
-          onChange={(e) => setSummary(e.target.value)}
+          onChange={(e) => {
+            setSummary(e.target.value);
+            setErrors((prevErrors) => ({ ...prevErrors, summary: "" }));
+          }}
         />
+        {errors.summary && (
+          <p className="text-red-500 text-sm">{errors.summary}</p>
+        )}
         <p className="text-right text-sm">
           {summary.length}/{maxSummaryLength} characters
         </p>
       </motion.div>
 
       <motion.div
-        className="form-control pt-8 flex flex-col md:flex-row"
+        className="form-control pt-8 flex flex-col "
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2.5, duration: 1.2, ease: "easeOut" }}
       >
-        <div className="w-full md:w-3/5">
+        <div className="">
           <label className="label">Insert some tags (at least 3)</label>
-          <div className="input-group space-x-4">
+          <div className="input-group space-x-4 justify-center">
             <input
               type="text"
               placeholder="New Tag"
               className="input input-bordered"
               value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
+              onChange={(e) => {
+                setNewTag(e.target.value);
+                setErrors((prevErrors) => ({ ...prevErrors, tags: "" }));
+              }}
             />
             <button
               type="button"
@@ -155,7 +204,8 @@ const StoryPublisher = () => {
               <IoMdAdd />
             </button>
           </div>
-          <div className="flex flex-wrap mt-2 gap-2">
+          {errors.tags && <p className="text-red-500 text-sm">{errors.tags}</p>}
+          <div className="flex flex-wrap mt-3 gap-3 ">
             {tags.map((tag, index) => (
               <div
                 key={index}
@@ -169,16 +219,6 @@ const StoryPublisher = () => {
             ))}
           </div>
         </div>
-        <div className="w-full md:w-2/5 flex flex-col items-center justify-center">
-          <img src={illustration2} alt="Illustration typing" className="w-full" />
-          <p className="text-xs text-center mt-4 md:mt-0">
-            Illustration by{" "}
-            <a href="https://icons8.com/illustrations/author/SBxHVFmfplnQ">
-              Vera Erm
-            </a>{" "}
-            from <a href="https://icons8.com/illustrations">Ouch!</a>
-          </p>
-        </div>
       </motion.div>
 
       <motion.div
@@ -188,8 +228,8 @@ const StoryPublisher = () => {
         className="pt-8"
       >
         <div className="form-control flex items-center space-x-2">
-          <FaLinkedin className="mr-2" />
           <label className="cursor-pointer label flex items-center">
+            <FaLinkedin className="mr-2" />
             <span className="label-text">Share on LinkedIn</span>
             <input
               type="checkbox"
@@ -200,8 +240,8 @@ const StoryPublisher = () => {
           </label>
         </div>
         <div className="form-control flex items-center space-x-2">
-          <FaMedium className="mr-2" />
           <label className="cursor-pointer label flex items-center">
+            <FaMedium className="mr-2" />
             <span className="label-text">Share on Medium</span>
             <input
               type="checkbox"
@@ -211,10 +251,10 @@ const StoryPublisher = () => {
             />
           </label>
         </div>
-        <div className="text-center pt-8">
+        <div className="text-center p-16">
           <button
             type="submit"
-            className="btn btn-success"
+            className="btn btn-success rounded-3xl"
             onClick={handleSubmit}
           >
             <FaCheck className="mr-2" />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { motion } from "framer-motion";
@@ -7,9 +7,7 @@ const Font = Quill.import("formats/font");
 Font.whitelist = ["sans-serif", "serif", "monospace"];
 Quill.register(Font, true);
 
-const StoryEditor = () => {
-  const [value, setValue] = useState("");
-
+const StoryEditor = ({ value, onChange }) => {
   const modules = {
     toolbar: {
       container: [
@@ -45,7 +43,9 @@ const StoryEditor = () => {
         className="custom-quill bg-neutral-content text-slate-800 shadow-lg rounded-2xl min-h-36"
         theme="snow"
         value={value}
-        onChange={setValue}
+        onChange={(content, delta, source, editor) =>
+          onChange(editor.getHTML())
+        }
         modules={modules}
         placeholder="Type your story here..."
       />

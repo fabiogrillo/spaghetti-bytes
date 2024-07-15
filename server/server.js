@@ -5,12 +5,11 @@ const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const dotenv = require("dotenv");
+const User = require("./models/User");
+const storyRoutes = require("./routes/storyRoute");
 
 // Configurazione variabili ambiente
 dotenv.config();
-
-// Importare il modello User
-const User = require("./models/User");
 
 // Inizializzare Express
 const app = express();
@@ -113,6 +112,8 @@ app.post("/api/logout", (req, res) => {
     res.json({ message: "Logged out successfully" });
   });
 });
+
+app.use("./api/stories", storyRoutes);
 
 // Avvio del server
 const PORT = process.env.PORT || 5000;
