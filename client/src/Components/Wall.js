@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import StoryCard from "../Components/StoryCard";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import rocketImage from "../Assets/Images/taxi-rocket-delivering-parcels-to-aliens-in-space.gif";
+import rocketImage from "../Assets/Images/juicy-woman-is-reading-a-book-at-home.gif";
 
 const Wall = () => {
   const [stories, setStories] = useState([]);
@@ -51,7 +51,7 @@ const Wall = () => {
   }, [stories.length]);
 
   return (
-    <div className="container mx-auto p-4 space-y-8">
+    <div className="container mx-auto p-4 space-y-8 mb-10">
       <div className="flex justify-between items-center mb-4">
         <div className="w-3/5">
           <h1 className="text-3xl font-bold">
@@ -62,48 +62,46 @@ const Wall = () => {
         <div className="w-2/5">
           <img
             src={rocketImage}
-            alt="Rocket delivering parcels to aliens in space"
+            alt="Illustration Reading"
             className="w-full h-auto"
           />
+          <p className="text-xs text-center mt-4 md:mt-0">
+            Illustration by{" "}
+            <a href="https://icons8.com/illustrations/author/mNCLibjicqSz">
+              Julia K
+            </a>{" "}
+            from <a href="https://icons8.com/illustrations">Ouch!</a>
+          </p>
         </div>
       </div>
-      <div className="carousel relative">
-        {stories.slice(0, 3).map((story, index) => (
-          <motion.div
-            key={story._id}
-            className={`carousel-item absolute w-full ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            }`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: index === currentIndex ? 1 : 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <img
-              src={story.image}
-              alt={story.title}
-              className="w-full h-64 object-cover rounded-lg"
-            />
-            <div className="absolute bottom-0 left-0 p-4 bg-gradient-to-t from-black to-transparent text-white rounded-b-lg w-full">
-              <h2 className="text-2xl font-bold">{story.title}</h2>
-              <p className="text-sm">{story.summary}</p>
-            </div>
-          </motion.div>
-        ))}
+      <div className="relative overflow-hidden">
+        <div
+          className="flex transition-transform ease-in-out duration-1000 mx-8"
+          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        >
+          {filteredStories.slice(0, 3).map((story, index) => (
+            <motion.div
+              key={story._id}
+              className="w-full flex-shrink-0 p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: index === currentIndex ? 1 : 0 }}
+              transition={{ duration: 1.5 }}
+            >
+              <StoryCard story={story} />
+            </motion.div>
+          ))}
+        </div>
         <button
           className="absolute left-0 top-1/2 transform -translate-y-1/2 text-white bg-black bg-opacity-50 p-2 rounded-full"
           onClick={() =>
-            setCurrentIndex(
-              (prevIndex) => (prevIndex - 1 + stories.length) % stories.length
-            )
+            setCurrentIndex((prevIndex) => (prevIndex - 1 + 3) % 3)
           }
         >
           <IoIosArrowBack size={24} />
         </button>
         <button
           className="absolute right-0 top-1/2 transform -translate-y-1/2 text-white bg-black bg-opacity-50 p-2 rounded-full"
-          onClick={() =>
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % stories.length)
-          }
+          onClick={() => setCurrentIndex((prevIndex) => (prevIndex + 1) % 3)}
         >
           <IoIosArrowForward size={24} />
         </button>
@@ -119,7 +117,7 @@ const Wall = () => {
         </select>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredStories.map((story, index) => (
+        {filteredStories.map((story) => (
           <StoryCard key={story._id} story={story} />
         ))}
       </div>

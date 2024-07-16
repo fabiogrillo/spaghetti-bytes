@@ -2,7 +2,7 @@ import React from "react";
 
 const StoryCard = ({ story }) => {
   return (
-    <div data-theme="night" className={`p-4 rounded-lg shadow-lg`}>
+    <div data-theme="night" className={`p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105`} >
       <h2 className="text-xl font-bold mb-2">{story.title}</h2>
       <p className="text-sm mb-2">{story.summary}</p>
       <div className="flex flex-wrap">
