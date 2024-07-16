@@ -13,7 +13,6 @@ const StoryPublisher = () => {
   const [content, setContent] = useState("");
   const [shareOnLinkedIn, setShareOnLinkedIn] = useState(false);
   const [shareOnMedium, setShareOnMedium] = useState(false);
-
   const [errors, setErrors] = useState({});
 
   const maxTitleLength = 100;
@@ -53,7 +52,7 @@ const StoryPublisher = () => {
         body: JSON.stringify(storyData),
       });
       if (response.ok) {
-        console.log("Story published succesfully");
+        console.log("Story published successfully");
       } else {
         console.log("Error publishing story");
       }
@@ -72,6 +71,11 @@ const StoryPublisher = () => {
 
   const handleRemoveTag = (indexToRemove) => {
     setTags(tags.filter((_, index) => index !== indexToRemove));
+  };
+
+  const handleEditorChange = (content, delta, source, editor) => {
+    setContent(editor.getHTML());
+    setErrors((prevErrors) => ({ ...prevErrors, content: "" }));
   };
 
   return (
@@ -111,7 +115,7 @@ const StoryPublisher = () => {
         transition={{ delay: 1, duration: 1.2, ease: "easeOut" }}
       >
         <label className="label">
-          First start with an ashtonishing title for your story 😲 (Max 100
+          First start with an astonishing title for your story 😲 (Max 100
           characters)
         </label>
         <input
@@ -138,13 +142,7 @@ const StoryPublisher = () => {
         className="pt-8"
       >
         <p className="pb-2">What is your story about?</p>
-        <StoryEditor
-          value={content}
-          onChange={(value) => {
-            setContent(value);
-            setErrors((prevErrors) => ({ ...prevErrors, content: "" }));
-          }}
-        />
+        <StoryEditor value={content} onChange={handleEditorChange} />
         {errors.content && (
           <p className="text-red-500 text-sm">{errors.content}</p>
         )}

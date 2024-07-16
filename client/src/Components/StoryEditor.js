@@ -43,9 +43,7 @@ const StoryEditor = ({ value, onChange }) => {
         className="custom-quill bg-neutral-content text-slate-800 shadow-lg rounded-2xl min-h-36"
         theme="snow"
         value={value}
-        onChange={(content, delta, source, editor) =>
-          onChange(editor.getHTML())
-        }
+        onChange={onChange}
         modules={modules}
         placeholder="Type your story here..."
       />

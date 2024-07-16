@@ -113,7 +113,8 @@ app.post("/api/logout", (req, res) => {
   });
 });
 
-app.use("./api/stories", storyRoutes);
+// Configurazione della rotta per le storie
+app.use("/api/stories", storyRoutes);
 
 // Avvio del server
 const PORT = process.env.PORT || 5000;

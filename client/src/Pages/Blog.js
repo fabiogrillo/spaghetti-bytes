@@ -1,10 +1,10 @@
 import React from "react";
+import Wall from "../Components/Wall"; // Assicurati che il percorso sia corretto
 
 const Blog = () => {
   return (
     <div className="p-4">
-      <h2>Blog</h2>
-      <p>Articoli del blog.</p>
+      <Wall />
     </div>
   );
 };

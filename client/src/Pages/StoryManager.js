@@ -54,7 +54,7 @@ const StoryManager = ({ username }) => {
               } items-center `}
             >
               <button
-                className={`btn btn-lg rounded-full p-4 ${button.color}`}
+                className={`btn btn-lg rounded-3xl p-4 ${button.color}`}
                 onClick={button.action}
               >
                 {button.label} {button.icon}
