@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoIosLogIn, IoIosLogOut } from "react-icons/io";
+import { MdManageAccounts } from "react-icons/md";
 import { doLogout } from "../Api";
 
 const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
+  const navigate = useNavigate();
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
   useEffect(() => {
@@ -96,10 +98,14 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
             </li>
             <li>
               {authenticated ? (
-                <span className="flex items-center" onClick={handleLogout}>
+                <div>
                   <span className="mr-2">{username}</span>
-                  <IoIosLogOut className="text-2xl cursor-pointer" />
-                </span>
+                  <IoIosLogOut className="text-2xl" onClick={handleLogout} />
+                  <MdManageAccounts
+                    className="text-2xl"
+                    onClick={() => navigate("/manager")}
+                  />
+                </div>
               ) : (
                 <Link to="/login">
                   <IoIosLogIn className="text-2xl" />

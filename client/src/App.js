@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import Home from "./Pages/Home";
 import Blog from "./Pages/Blog";
@@ -9,10 +9,15 @@ import About from "./Pages/About";
 import Login from "./Pages/Login";
 import StoryManager from "./Pages/StoryManager";
 import StoryPublisher from "./Pages/StoryPublisher";
+import TableManager from "./Pages/TableManager";
 
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
+
+  const ProtectedRoute = ({ children }) => {
+    return isAuthenticated ? children : <Navigate to="/login" />;
+  };
 
   return (
     <Router>
@@ -27,18 +32,36 @@ const App = () => {
         <Route path="/goals" element={<Goals />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/about" element={<About />} />
-        <Route path="/editor" element={<StoryPublisher />} />
+        <Route
+          path="/editor"
+          element={
+            <ProtectedRoute>
+              <StoryPublisher />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/storyTable"
+          element={
+            <ProtectedRoute>
+              <TableManager />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/manager"
           element={
-            isAuthenticated ? (
+            <ProtectedRoute>
               <StoryManager username={username} />
-            ) : (
-              <Login
-                setAuthenticated={setAuthenticated}
-                setUsername={setUsername}
-              />
-            )
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/story-publisher/:id?"
+          element={
+            <ProtectedRoute>
+              <StoryPublisher />
+            </ProtectedRoute>
           }
         />
         <Route

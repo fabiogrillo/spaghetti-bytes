@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import StoryEditor from "../Components/StoryEditor";
 import { motion } from "framer-motion";
 import { IoMdAdd } from "react-icons/io";
 import { FaCheck, FaTimes, FaLinkedin, FaMedium } from "react-icons/fa";
-import illustration1 from "../Assets/Images/rondy-stickers-lettering-sticker-start-here.gif";
+import { useParams } from "react-router-dom";
 
 const StoryPublisher = () => {
+  const { id } = useParams();
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [tags, setTags] = useState([]);
@@ -17,6 +18,27 @@ const StoryPublisher = () => {
 
   const maxTitleLength = 100;
   const maxSummaryLength = 1000;
+
+  useEffect(() => {
+    if (id) {
+      fetchStory(id);
+    }
+  }, [id]);
+
+  const fetchStory = async (storyId) => {
+    try {
+      const response = await fetch(`/api/stories/${storyId}`);
+      const data = await response.json();
+      setTitle(data.title);
+      setSummary(data.summary);
+      setTags(data.tags);
+      setContent(data.content);
+      setShareOnLinkedIn(data.sharedOnLinkedIn);
+      setShareOnMedium(data.sharedOnMedium);
+    } catch (error) {
+      console.error("Error fetching story:", error);
+    }
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -44,17 +66,17 @@ const StoryPublisher = () => {
     };
 
     try {
-      const response = await fetch("/api/stories/publish", {
-        method: "POST",
+      const response = await fetch(id ? `/api/stories/${id}` : "/api/stories/publish", {
+        method: id ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(storyData),
       });
       if (response.ok) {
-        console.log("Story published successfully");
+        console.log("Story published/updated successfully");
       } else {
-        console.log("Error publishing story");
+        console.log("Error publishing/updating story");
       }
     } catch (error) {
       console.log("Error", error);
@@ -88,16 +110,16 @@ const StoryPublisher = () => {
       >
         <div className="md:w-3/5 text-start space-y-6">
           <h1 className="text-2xl font-bold mb-4">
-            Let's write a new incredible story 🤩
+            {id ? "Edit your story" : "Let's write a new incredible story 🤩"}
           </h1>
           <p>
-            Choose the title and then start writing, remember to set the summary
-            up and decide whether to publish it on LinkedIn and/or Medium. Don't
-            forget about tags.
+            {id
+              ? "Edit your existing story. Make sure to update the summary and tags if necessary."
+              : "Choose the title and then start writing, remember to set the summary up and decide whether to publish it on LinkedIn and/or Medium. Don't forget about tags."}
           </p>
         </div>
         <div className="flex flex-col items-center justify-center md:w-2/5">
-          <img src={illustration1} alt="Illustration Start" className="w-60" />
+          <img src="/path/to/your/image.jpg" alt="Illustration Start" className="w-60" />
           <p className="text-xs text-center mt-4 md:mt-0">
             Illustration by{" "}
             <a href="https://icons8.com/illustrations/author/ODexzOcCgAMh">
@@ -115,8 +137,9 @@ const StoryPublisher = () => {
         transition={{ delay: 1, duration: 1.2, ease: "easeOut" }}
       >
         <label className="label">
-          First start with an astonishing title for your story 😲 (Max 100
-          characters)
+          {id
+            ? "Edit the title of your story"
+            : "First start with an astonishing title for your story 😲 (Max 100 characters)"}
         </label>
         <input
           type="text"
@@ -141,7 +164,7 @@ const StoryPublisher = () => {
         transition={{ delay: 1.5, duration: 1.2, ease: "easeOut" }}
         className="pt-8"
       >
-        <p className="pb-2">What is your story about?</p>
+        <p className="pb-2">{id ? "Edit your story content" : "What is your story about?"}</p>
         <StoryEditor value={content} onChange={handleEditorChange} />
         {errors.content && (
           <p className="text-red-500 text-sm">{errors.content}</p>
@@ -155,7 +178,9 @@ const StoryPublisher = () => {
         transition={{ delay: 2.0, duration: 1.2, ease: "easeOut" }}
       >
         <label className="label">
-          Briefly describe what you have already written (Max 1000 characters)
+          {id
+            ? "Edit the summary of your story"
+            : "Briefly describe what you have already written (Max 1000 characters)"}
         </label>
         <textarea
           placeholder="Summary"
@@ -182,7 +207,11 @@ const StoryPublisher = () => {
         transition={{ delay: 2.5, duration: 1.2, ease: "easeOut" }}
       >
         <div className="">
-          <label className="label">Insert some tags (at least 3)</label>
+          <label className="label">
+            {id
+              ? "Edit your tags"
+              : "Insert some tags (at least 3)"}
+          </label>
           <div className="input-group space-x-4 justify-center">
             <input
               type="text"
@@ -256,7 +285,7 @@ const StoryPublisher = () => {
             onClick={handleSubmit}
           >
             <FaCheck className="mr-2" />
-            Publish
+            {id ? "Update" : "Publish"}
           </button>
         </div>
       </motion.div>

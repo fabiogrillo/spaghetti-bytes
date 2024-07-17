@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { TbEdit } from "react-icons/tb";
 import { VscNewFile } from "react-icons/vsc";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { motion } from "framer-motion";
@@ -17,19 +16,12 @@ const StoryManager = ({ username }) => {
       color: "btn-primary",
     },
     {
-      label: "Edit",
-      icon: <TbEdit />,
-      action: () => console.log("Edit action"),
-      description: "Edit your existing stories",
-      color: "btn-secondary",
-    },
-    {
-      label: "Delete",
+      label: "Manage",
       icon: <MdOutlineDeleteOutline />,
-      action: () => console.log("Delete action"),
-      description: "Delete the stories you don't want to hear anymore",
-      color: "btn-error",
-    },
+      action: () => navigate("/storyTable"),
+      description: "Manage your existing stories",
+      color: "btn-secondary",
+    }
   ];
 
   return (

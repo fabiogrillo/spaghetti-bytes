@@ -15,6 +15,9 @@ module.exports = {
       "fantasy",
       "night",
       "sunset",
+      "cyberpunk",
+      "pastel",
+      "aqua"
     ],
   },
 };
