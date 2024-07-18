@@ -3,7 +3,8 @@ import StoryEditor from "../Components/StoryEditor";
 import { motion } from "framer-motion";
 import { IoMdAdd } from "react-icons/io";
 import { FaCheck, FaTimes, FaLinkedin, FaMedium } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import illustration1 from "../Assets/Images/rondy-stickers-lettering-sticker-start-here.gif";
 
 const StoryPublisher = () => {
   const { id } = useParams();
@@ -15,6 +16,8 @@ const StoryPublisher = () => {
   const [shareOnLinkedIn, setShareOnLinkedIn] = useState(false);
   const [shareOnMedium, setShareOnMedium] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const navigate = useNavigate();
 
   const maxTitleLength = 100;
   const maxSummaryLength = 1000;
@@ -66,20 +69,26 @@ const StoryPublisher = () => {
     };
 
     try {
-      const response = await fetch(id ? `/api/stories/${id}` : "/api/stories/publish", {
-        method: id ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(storyData),
-      });
+      const response = await fetch(
+        id ? `/api/stories/${id}` : "/api/stories/publish",
+        {
+          method: id ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(storyData),
+        }
+      );
       if (response.ok) {
         console.log("Story published/updated successfully");
+        navigate("/blog", { state: { success: true } });
       } else {
         console.log("Error publishing/updating story");
+        navigate("/blog", { state: { success: false } });
       }
     } catch (error) {
       console.log("Error", error);
+      navigate("/blog", { state: { success: false } });
     }
   };
 
@@ -119,7 +128,7 @@ const StoryPublisher = () => {
           </p>
         </div>
         <div className="flex flex-col items-center justify-center md:w-2/5">
-          <img src="/path/to/your/image.jpg" alt="Illustration Start" className="w-60" />
+          <img src={illustration1} alt="Illustration Start" className="w-60" />
           <p className="text-xs text-center mt-4 md:mt-0">
             Illustration by{" "}
             <a href="https://icons8.com/illustrations/author/ODexzOcCgAMh">
@@ -164,7 +173,9 @@ const StoryPublisher = () => {
         transition={{ delay: 1.5, duration: 1.2, ease: "easeOut" }}
         className="pt-8"
       >
-        <p className="pb-2">{id ? "Edit your story content" : "What is your story about?"}</p>
+        <p className="pb-2">
+          {id ? "Edit your story content" : "What is your story about?"}
+        </p>
         <StoryEditor value={content} onChange={handleEditorChange} />
         {errors.content && (
           <p className="text-red-500 text-sm">{errors.content}</p>
@@ -208,9 +219,7 @@ const StoryPublisher = () => {
       >
         <div className="">
           <label className="label">
-            {id
-              ? "Edit your tags"
-              : "Insert some tags (at least 3)"}
+            {id ? "Edit your tags" : "Insert some tags (at least 3)"}
           </label>
           <div className="input-group space-x-4 justify-center">
             <input
@@ -256,7 +265,7 @@ const StoryPublisher = () => {
       >
         <div className="form-control flex items-center space-x-2">
           <label className="cursor-pointer label flex items-center">
-            <FaLinkedin className="mr-2" />
+            <FaLinkedin className="mr-2 text-3xl" />
             <span className="label-text">Share on LinkedIn</span>
             <input
               type="checkbox"
@@ -268,7 +277,7 @@ const StoryPublisher = () => {
         </div>
         <div className="form-control flex items-center space-x-2">
           <label className="cursor-pointer label flex items-center">
-            <FaMedium className="mr-2" />
+            <FaMedium className="mr-2 text-3xl" />
             <span className="label-text">Share on Medium</span>
             <input
               type="checkbox"

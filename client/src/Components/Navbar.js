@@ -98,14 +98,14 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
             </li>
             <li>
               {authenticated ? (
-                <div>
+                <span>
                   <span className="mr-2">{username}</span>
                   <IoIosLogOut className="text-2xl" onClick={handleLogout} />
                   <MdManageAccounts
                     className="text-2xl"
                     onClick={() => navigate("/manager")}
                   />
-                </div>
+                </span>
               ) : (
                 <Link to="/login">
                   <IoIosLogIn className="text-2xl" />

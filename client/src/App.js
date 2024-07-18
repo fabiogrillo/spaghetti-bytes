@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import Home from "./Pages/Home";
 import Blog from "./Pages/Blog";
@@ -10,6 +15,7 @@ import Login from "./Pages/Login";
 import StoryManager from "./Pages/StoryManager";
 import StoryPublisher from "./Pages/StoryPublisher";
 import TableManager from "./Pages/TableManager";
+import StoryVisualizer from "./Pages/StoryVisualizer";
 
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
@@ -64,6 +70,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/visualizer/:storyId" element={<StoryVisualizer />} />
         <Route
           path="/login"
           element={

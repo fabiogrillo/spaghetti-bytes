@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import illustration1 from "../Assets/Images/sammy-woman-working-on-laptop-checking-her-workflow.gif" 
+import illustration1 from "../Assets/Images/sammy-woman-working-on-laptop-checking-her-workflow.gif";
 
 const TableManager = () => {
   const [stories, setStories] = useState([]);
@@ -41,10 +41,20 @@ const TableManager = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 mb-16 items-center">
+    <div className="container mx-auto p-4 mb-16 items-center mt-8">
       <h1 className="text-3xl font-bold mb-4 text-center">Story Manager</h1>
-      <img src={illustration1} alt="Header Illustration" className="my-8 w-1/3 content-center items-center" />
-      <table className="table-auto table-zebra-zebra w-full">
+      <div className="flex justify-between items-center">
+        <img
+          src={illustration1}
+          alt="Header Illustration"
+          className="my-8 w-3/5"
+        />
+        <p className="w-2/5 p-4">
+          This page allows you to edit or delete the stories you have written.
+          Manage your stories effectively using the options provided.
+        </p>
+      </div>
+      <table className="table-auto table-zebra w-full">
         <thead>
           <tr>
             <th className="px-4 py-2">#</th>
