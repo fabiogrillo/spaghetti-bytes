@@ -14,9 +14,9 @@ dotenv.config();
 // Inizializzare Express
 const app = express();
 
-// Middleware per parsing del corpo delle richieste
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware per parsing del corpo delle richieste con limiti aumentati
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Configurazione della sessione
 app.use(

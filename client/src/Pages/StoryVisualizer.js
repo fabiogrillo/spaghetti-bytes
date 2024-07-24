@@ -28,8 +28,8 @@ const StoryVisualizer = () => {
   const readingTime = Math.ceil(story.content.split(/\s+/).length / 200);
 
   return (
-    <div className="container mx-auto p-4 mb-16 mt-8">
-      <h1 className="text-3xl font-bold mb-4 text-left">{story.title}</h1>
+    <div className="container mx-auto p-8 mb-32">
+      <h1 className="text-3xl font-bold mb-12 text-left">{story.title}</h1>
       <div className="flex justify-between items-center mb-4">
         <div className="w-1/3">
           <p className="text-lg">Reading time: {readingTime} min</p>
@@ -49,7 +49,7 @@ const StoryVisualizer = () => {
         value={story.content}
         readOnly={true}
         theme="bubble"
-        className="p-4 custom-quill bg-neutral-content text-slate-800 shadow-lg rounded-2xl min-h-36"
+        className="p-8 custom-quill bg-teal-950 outline shadow-lg rounded-2xl"
       />
     </div>
   );

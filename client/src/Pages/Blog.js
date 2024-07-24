@@ -1,17 +1,29 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Wall from "../Components/Wall";
 import { useLocation } from "react-router-dom";
 
 const Blog = () => {
   const location = useLocation();
   const { state } = location;
+  const [showAlert, setShowAlert] = useState(state?.success !== undefined);
+
+  useEffect(() => {
+    if (showAlert) {
+      const timer = setTimeout(() => {
+        setShowAlert(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showAlert]);
 
   return (
     <div className="p-4">
-      {state?.success !== undefined && (
+      {showAlert && (
         <div
           role="alert"
-          className={`alert ${state.success ? "alert-success" : "alert-error"}`}
+          className={`p-4 alert ${
+            state.success ? "alert-success" : "alert-error"
+          }`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

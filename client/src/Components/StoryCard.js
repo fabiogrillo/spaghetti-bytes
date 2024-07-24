@@ -3,39 +3,36 @@ import { useNavigate } from "react-router-dom";
 
 const StoryCard = ({ story }) => {
   const navigate = useNavigate();
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const isNew = new Date(story.createdAt) > thirtyDaysAgo;
+  // Calcolare se la storia è nuova (scritta nelle ultime due settimane)
+  const isNew =
+    new Date() - new Date(story.createdAt) < 14 * 24 * 60 * 60 * 1000;
 
   return (
-    <div
-      data-theme="aqua"
-      className="relative p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 cursor-pointer"
-      onClick={() => navigate(`/visualizer/${story._id}`)}
-    >
+    <div className="indicator w-full text-white">
       {isNew && (
-        <div className="absolute top-0 right-0 m-2">
-          <span className="badge badge-warning rounded-full text-white rotate-6">
-            New
-          </span>
-        </div>
+        <span className="indicator-item badge bg-violet-700 text-white outline border-0">New</span>
       )}
-      <h2 className="text-xl font-bold mb-2">{story.title}</h2>
-      <p className="text-sm mb-2">{story.summary}</p>
-      <div className="flex flex-wrap">
-        {story.tags.map((tag) => (
-          <span
-            key={tag}
-            className="badge badge-primary mr-2 mb-2 rounded-full"
-          >
-            {tag}
-          </span>
-        ))}
+      <div
+        className="p-6 rounded-lg shadow-lg cursor-pointer bg-teal-950 w-full"
+        onClick={() => navigate(`/visualizer/${story._id}`)}
+      >
+        <h2 className="text-xl font-bold mb-2">{story.title}</h2>
+        <p className="text-sm mb-2">{story.summary}</p>
+        <div className="flex flex-wrap">
+          {story.tags.map((tag) => (
+            <span
+              key={tag}
+              className="badge badge-primary mr-2 mb-2 rounded-full text-white"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+        <p className="text-white-600 text-xs">
+          Published on {new Date(story.createdAt).toLocaleDateString()}
+        </p>
       </div>
-      <p className="text-white-600 text-xs">
-        Published on {new Date(story.createdAt).toLocaleDateString()}
-      </p>
     </div>
   );
 };

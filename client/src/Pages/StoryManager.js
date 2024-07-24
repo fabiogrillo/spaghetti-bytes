@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { VscNewFile } from "react-icons/vsc";
-import { MdOutlineDeleteOutline } from "react-icons/md";
+import { IoIosSettings } from "react-icons/io";
 import { motion } from "framer-motion";
 
 const StoryManager = ({ username }) => {
@@ -17,11 +17,11 @@ const StoryManager = ({ username }) => {
     },
     {
       label: "Manage",
-      icon: <MdOutlineDeleteOutline />,
+      icon: <IoIosSettings />,
       action: () => navigate("/storyTable"),
       description: "Manage your existing stories",
       color: "btn-secondary",
-    }
+    },
   ];
 
   return (

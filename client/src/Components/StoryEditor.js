@@ -41,13 +41,12 @@ const StoryEditor = ({ value, onChange, readOnly = false }) => {
       transition={{ ease: "anticipate", duration: 1.5, x: { duration: 0.5 } }}
     >
       <ReactQuill
-        className="custom-quill bg-neutral-content text-slate-800 shadow-lg rounded-2xl min-h-36"
+        className="custom-quill shadow-2xl rounded-2xl outline min-h-64 bg-neutral"
         theme={readOnly ? "bubble" : "snow"}
         value={value}
         onChange={onChange}
         modules={modules}
         readOnly={readOnly}
-        placeholder="Type your story here..."
       />
     </motion.div>
   );

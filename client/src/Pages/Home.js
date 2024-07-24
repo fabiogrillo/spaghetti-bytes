@@ -97,7 +97,7 @@ const Home = () => {
           </div>
           <div className="flex flex-col items-center justify-center md:w-2/5 space-y-4">
             <Link to={"/blog"}>
-              <button className="btn btn-outline btn-lg rounded-full">
+              <button className="btn btn-primary btn-outline btn-lg rounded-full">
                 <GrArticle />
                 Read My Articles
               </button>

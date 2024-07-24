@@ -25,7 +25,7 @@ const Login = ({ setAuthenticated, setUsername }) => {
   };
 
   return (
-    <motion.div className="p-4 space-y-10 flex flex-col">
+    <motion.div className="p-4 space-y-16 flex flex-col my-16">
       <motion.div className="card w-full bg-carolina-blue p-6 flex flex-col mx-auto max-w-6xl items-center justify-center">
         <div className="flex flex-col md:flex-row justify-center items-center">
           <div className="flex flex-col items-center justify-center md:w-3/5 space-y-4">

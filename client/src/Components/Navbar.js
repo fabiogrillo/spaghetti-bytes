@@ -43,13 +43,13 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
               </Link>
             </li>
             <li>
-              <Link to="/goals" className="text-lapis-lazuli">
-                Goals
+              <Link to="/blog" className="text-lapis-lazuli">
+                Blog
               </Link>
             </li>
             <li>
-              <Link to="/blog" className="text-lapis-lazuli">
-                Blog
+              <Link to="/goals" className="text-lapis-lazuli">
+                Goals
               </Link>
             </li>
             <li>

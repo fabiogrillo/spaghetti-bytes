@@ -42,19 +42,23 @@ const TableManager = () => {
 
   return (
     <div className="container mx-auto p-4 mb-16 items-center mt-8">
-      <h1 className="text-3xl font-bold mb-4 text-center">Story Manager</h1>
-      <div className="flex justify-between items-center">
+      <h1 className="text-4xl font-bold mb-4 text-center">Story Manager</h1>
+      <div className="flex justify-between items-center flex-row">
         <img
           src={illustration1}
           alt="Header Illustration"
-          className="my-8 w-3/5"
+          className="my-8 w-2/6"
         />
-        <p className="w-2/5 p-4">
-          This page allows you to edit or delete the stories you have written.
-          Manage your stories effectively using the options provided.
+        <p className="w-3/5 p-4 text-lg">
+          Here you can do anything you want with the stories you've written. Do
+          you want to change something? 
+          Do you want to delete them because you
+          don't like them anymore? Or do you simply want to see how many you
+          have written and when? Whatever you want to do here you have full
+          control over all your stories. Enjoy!
         </p>
       </div>
-      <table className="table-auto table-zebra w-full">
+      <table className="table-auto table-zebra w-full mt-16">
         <thead>
           <tr>
             <th className="px-4 py-2">#</th>
@@ -64,7 +68,7 @@ const TableManager = () => {
             <th className="px-4 py-2">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-center">
           {stories.map((story, index) => (
             <tr key={story._id} className="border-t">
               <td className="px-4 py-2">{index + 1}</td>
