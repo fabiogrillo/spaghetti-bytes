@@ -57,7 +57,7 @@ const TableGoals = () => {
           goals. Enjoy!
         </p>
       </div>
-      <table className="table-auto table-zebra w-full mt-16">
+      <table className="table-auto table-zebra w-full mt-16 bg-secondary rounded-2xl bg-opacity-30">
         <thead>
           <tr>
             <th className="px-4 py-2">#</th>

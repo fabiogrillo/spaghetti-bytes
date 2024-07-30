@@ -138,7 +138,7 @@ const StoryPublisher = () => {
       </motion.div>
 
       <motion.div
-        className="card bg-teal-700 shadow-md p-8 space-y-12"
+        className="card bg-info  bg-opacity-35 shadow-md p-8 space-y-12"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, ease: "easeOut" }}

@@ -49,7 +49,7 @@ const StoryVisualizer = () => {
         value={story.content}
         readOnly={true}
         theme="bubble"
-        className="p-8 custom-quill bg-teal-950 outline shadow-lg rounded-2xl"
+        className="p-8 custom-quill bg-primary bg-opacity-20 outline shadow-lg rounded-2xl"
       />
     </div>
   );

@@ -66,7 +66,7 @@ const Wall = () => {
           <h1 className="text-4xl font-bold">The reading corner</h1>
           <p className="py-6 italic">
             Welcome to the reading corner. Here you can view all the stories
-            that have been written, along with their tags and publication dates
+            that have been written, along with their tags and publication dates.
           </p>
         </div>
         <div className="w-3/8">
@@ -85,7 +85,7 @@ const Wall = () => {
         </div>
       </div>
 
-      <div className="flex flex-col items-center my-12 mb-16">
+      <div className="flex flex-col items-center my-32 mb-32">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -106,8 +106,7 @@ const Wall = () => {
               <PiUsersThree />
             </div>
             <div className="stat-title">Users Reached</div>
-            <div className="stat-value text-secondary">2K</div>
-            <div className="stat-desc">21% more than last month</div>
+            <div className="stat-value text-secondary">100</div>
           </div>
 
           <div className="stat">
@@ -116,16 +115,15 @@ const Wall = () => {
             </div>
             <div className="stat-title">Topics covered</div>
             <div className="stat-value text-warning">{distinctTags}</div>
-            <div className="stat-desc">21% more than last month</div>
           </div>
         </motion.div>
       </div>
 
-      <div className="my-8 text-center">
+      <div className="mt-32 mb-8">
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
-          className="select bg-primary outline text-white"
+          className="select select-bordered"
         >
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>

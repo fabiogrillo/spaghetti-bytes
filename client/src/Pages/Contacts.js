@@ -56,7 +56,7 @@ const Contacts = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.5 }}
-            className="alert alert-success fixed top-16 right-4 z-50"
+            className="alert alert-success p-4 z-50"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -85,7 +85,7 @@ const Contacts = () => {
             possible, I promise.
           </p>
         </div>
-        <div className="w-3/8">
+        <div className="w-2/5">
           <img
             src={rocketImage}
             alt="Illustration Reading"
@@ -105,7 +105,7 @@ const Contacts = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="shadow-lg rounded-lg p-8 md:w-1/2 w-full bg-secondary bg-opacity-40 shadow-secondary mb-16"
+        className="shadow-lg rounded-lg p-8 md:w-1/2 w-full bg-secondary bg-opacity-40 shadow-primary mb-16"
       >
         <h2 className="text-2xl font-bold mb-6 text-center">Contact Me</h2>
         <form onSubmit={handleSubmit} className="space-y-4">

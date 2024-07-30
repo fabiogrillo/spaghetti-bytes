@@ -69,7 +69,7 @@ const GoalPublisher = () => {
   };
 
   return (
-    <div className="container mx-auto my-12">
+    <div className="container mx-auto my-12 p-8 rounded-xl bg-primary bg-opacity-35">
       <h1 className="text-4xl font-bold">
         {id ? "Edit Goal" : "Create a New Goal"}
       </h1>

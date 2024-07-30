@@ -225,7 +225,15 @@ const Home = () => {
             You can connect with me on social media or drop me an email, feel
             free to reach out
           </p>
+          <div className="py-6 text-center">
+            <Link to={"/contacts"}>
+              <button className="btn btn-secondary btn-outline btn-lg rounded-full">
+                <LuContact2 className="text-2xl" /> Reach me out
+              </button>
+            </Link>
+          </div>
         </div>
+
         <div className="md:w-2/5 flex flex-col items-center justify-center">
           <div className="flex-col">
             <img
@@ -240,13 +248,6 @@ const Home = () => {
               </a>{" "}
               from <a href="https://icons8.com/illustrations">Ouch!</a>
             </p>
-          </div>
-          <div className="py-6">
-            <Link to={"/contacts"}>
-              <button className="btn btn-secondary btn-outline btn-lg rounded-full">
-                <LuContact2 className="text-2xl" /> Reach me out
-              </button>
-            </Link>
           </div>
         </div>
       </motion.div>
