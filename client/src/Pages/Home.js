@@ -5,6 +5,7 @@ import { BsFillPatchQuestionFill } from "react-icons/bs";
 import { GoGoal } from "react-icons/go";
 import { FaProjectDiagram } from "react-icons/fa";
 import { GrArticle } from "react-icons/gr";
+import { LuContact2 } from "react-icons/lu";
 import { MdContactMail } from "react-icons/md";
 import { MdOutlineConnectWithoutContact } from "react-icons/md";
 import illustrationBlog from "../Assets/Images/dazzle-man-programmer-writing-code-on-a-laptop.gif";
@@ -98,8 +99,8 @@ const Home = () => {
           <div className="flex flex-col items-center justify-center md:w-2/5 space-y-4">
             <Link to={"/blog"}>
               <button className="btn btn-primary btn-outline btn-lg rounded-full">
-                <GrArticle />
-                Read My Articles
+                <GrArticle className="text-2xl" />
+                Read My Stories
               </button>
             </Link>
           </div>
@@ -150,14 +151,27 @@ const Home = () => {
         style={{ scale: otherSectionsScale, opacity: otherSectionsOpacity }}
       >
         <div className="md:w-2/5 flex flex-col items-center justify-center">
-          <img src={illustrationDev} alt="Illustration Dev" className="my-4" />
-          <p className="text-sm text-center">
-            Illustration by{" "}
-            <a href="https://icons8.com/illustrations/author/TQQ1qAnr9rn5">
-              Oleg Shcherba
-            </a>{" "}
-            from <a href="https://icons8.com/illustrations">Ouch!</a>
-          </p>
+          <div className="flex-col">
+            <img
+              src={illustrationDev}
+              alt="Illustration Dev"
+              className="my-4"
+            />
+            <p className="text-sm text-center">
+              Illustration by{" "}
+              <a href="https://icons8.com/illustrations/author/TQQ1qAnr9rn5">
+                Oleg Shcherba
+              </a>{" "}
+              from <a href="https://icons8.com/illustrations">Ouch!</a>
+            </p>
+          </div>
+          <div className="p-8">
+            <Link to={"/goals"}>
+              <button className="btn btn-warning btn-outline btn-lg rounded-full">
+                <GoGoal className="text-2xl" /> Check my goals
+              </button>
+            </Link>
+          </div>
         </div>
         <div className="card-body md:w-3/5">
           <h2 className="card-title text-4xl font-bold mb-4">
@@ -213,18 +227,27 @@ const Home = () => {
           </p>
         </div>
         <div className="md:w-2/5 flex flex-col items-center justify-center">
-          <img
-            src={illustrationContact}
-            alt="Illustration Contact"
-            className="my-4"
-          />
-          <p className="text-sm text-center">
-            Illustration by{" "}
-            <a href="https://icons8.com/illustrations/author/lZpGtGw5182N">
-              Elisabet Guba
-            </a>{" "}
-            from <a href="https://icons8.com/illustrations">Ouch!</a>
-          </p>
+          <div className="flex-col">
+            <img
+              src={illustrationContact}
+              alt="Illustration Contact"
+              className="my-4"
+            />
+            <p className="text-sm text-center">
+              Illustration by{" "}
+              <a href="https://icons8.com/illustrations/author/lZpGtGw5182N">
+                Elisabet Guba
+              </a>{" "}
+              from <a href="https://icons8.com/illustrations">Ouch!</a>
+            </p>
+          </div>
+          <div className="py-6">
+            <Link to={"/contacts"}>
+              <button className="btn btn-secondary btn-outline btn-lg rounded-full">
+                <LuContact2 className="text-2xl" /> Reach me out
+              </button>
+            </Link>
+          </div>
         </div>
       </motion.div>
     </motion.div>

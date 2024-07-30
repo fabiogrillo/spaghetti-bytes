@@ -9,18 +9,32 @@ const StoryManager = ({ username }) => {
 
   const buttonData = [
     {
-      label: "New",
+      label: "New Story",
       icon: <VscNewFile />,
       action: () => navigate("/editor"),
       description: "Create a new story",
       color: "btn-primary",
     },
     {
-      label: "Manage",
+      label: "Manage Stories",
       icon: <IoIosSettings />,
       action: () => navigate("/storyTable"),
       description: "Manage your existing stories",
       color: "btn-secondary",
+    },
+    {
+      label: "New Goal",
+      icon: <VscNewFile />,
+      action: () => navigate("/create-goal"),
+      description: "Create a new goal",
+      color: "btn-warning",
+    },
+    {
+      label: "Manage Goals",
+      icon: <IoIosSettings />,
+      action: () => navigate("/goalsTable"),
+      description: "Manage your existing goals",
+      color: "btn-success",
     },
   ];
 

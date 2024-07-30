@@ -53,8 +53,8 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
               </Link>
             </li>
             <li>
-              <Link to="/about" className="text-lapis-lazuli">
-                About
+              <Link to="/contacts" className="text-lapis-lazuli">
+                Contacts
               </Link>
             </li>
             <li>

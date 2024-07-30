@@ -10,12 +10,14 @@ import Home from "./Pages/Home";
 import Blog from "./Pages/Blog";
 import Goals from "./Pages/Goals";
 import Footer from "./Components/Footer";
-import About from "./Pages/About";
+import Contacts from "./Pages/Contacts";
 import Login from "./Pages/Login";
 import StoryManager from "./Pages/StoryManager";
 import StoryPublisher from "./Pages/StoryPublisher";
 import TableManager from "./Pages/TableManager";
 import StoryVisualizer from "./Pages/StoryVisualizer";
+import GoalPublisher from "./Pages/GoalPublisher";
+import TableGoals from "./Pages/TableGoals";
 
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
@@ -37,7 +39,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/goals" element={<Goals />} />
         <Route path="/blog" element={<Blog />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/contacts" element={<Contacts />} />
         <Route
           path="/editor"
           element={
@@ -78,6 +80,30 @@ const App = () => {
               setAuthenticated={setAuthenticated}
               setUsername={setUsername}
             />
+          }
+        />
+        <Route
+          path="/create-goal"
+          element={
+            <ProtectedRoute>
+              <GoalPublisher />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/goalsTable"
+          element={
+            <ProtectedRoute>
+              <TableGoals />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-goal/:id"
+          element={
+            <ProtectedRoute>
+              <GoalPublisher />
+            </ProtectedRoute>
           }
         />
       </Routes>

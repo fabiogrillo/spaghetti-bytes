@@ -7,6 +7,7 @@ const session = require("express-session");
 const dotenv = require("dotenv");
 const User = require("./models/User");
 const storyRoutes = require("./routes/storyRoute");
+const goalRoutes = require("./routes/goalRoute");
 
 // Configurazione variabili ambiente
 dotenv.config();
@@ -17,6 +18,12 @@ const app = express();
 // Middleware per parsing del corpo delle richieste con limiti aumentati
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Configurazione della rotta per le storie
+app.use("/api/stories", storyRoutes);
+
+// Configurazione della rotta per i goals
+app.use("/api/goals", goalRoutes);
 
 // Configurazione della sessione
 app.use(
@@ -68,10 +75,7 @@ passport.deserializeUser(async (id, done) => {
 
 // Connessione a MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("Connected to MongoDB");
   })
@@ -113,11 +117,8 @@ app.post("/api/logout", (req, res) => {
   });
 });
 
-// Configurazione della rotta per le storie
-app.use("/api/stories", storyRoutes);
-
 // Avvio del server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
