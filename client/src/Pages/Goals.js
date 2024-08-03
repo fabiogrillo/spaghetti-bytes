@@ -7,6 +7,10 @@ const Goals = () => {
   const [goals, setGoals] = useState([]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     // Fetch goals from the server
     const fetchGoals = async () => {
       try {
