@@ -5,6 +5,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const dotenv = require("dotenv");
+const path = require("path");
 const User = require("./models/User");
 const storyRoutes = require("./routes/storyRoute");
 const goalRoutes = require("./routes/goalRoute");
@@ -18,12 +19,6 @@ const app = express();
 // Middleware per parsing del corpo delle richieste con limiti aumentati
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
-// Configurazione della rotta per le storie
-app.use("/api/stories", storyRoutes);
-
-// Configurazione della rotta per i goals
-app.use("/api/goals", goalRoutes);
 
 // Configurazione della sessione
 app.use(
@@ -83,6 +78,10 @@ mongoose
     console.error("Error connecting to MongoDB", err);
   });
 
+// Configurazione delle rotte API
+app.use("/api/stories", storyRoutes);
+app.use("/api/goals", goalRoutes);
+
 // Route di registrazione
 app.post("/api/register", async (req, res) => {
   const { username, email, password } = req.body;
@@ -117,8 +116,15 @@ app.post("/api/logout", (req, res) => {
   });
 });
 
+// Servire i file statici della cartella build
+app.use(express.static(path.join(__dirname, "../client/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+});
+
 // Avvio del server
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
