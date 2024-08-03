@@ -46,6 +46,11 @@ const GoalPublisher = () => {
     setSteps([...steps, { description: "", completed: false }]);
   };
 
+  const handleRemoveStep = (index) => {
+    const newSteps = steps.filter((_, stepIndex) => stepIndex !== index);
+    setSteps(newSteps);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -69,7 +74,7 @@ const GoalPublisher = () => {
   };
 
   return (
-    <div className="container mx-auto my-12 p-8 rounded-xl bg-primary bg-opacity-35">
+    <div className="container mx-auto my-12 p-8 rounded-xl bg-primary bg-opacity-35 ">
       <h1 className="text-4xl font-bold">
         {id ? "Edit Goal" : "Create a New Goal"}
       </h1>
@@ -98,7 +103,7 @@ const GoalPublisher = () => {
         <div className="my-4">
           <label className="block text-lg font-medium">Steps</label>
           {steps.map((step, index) => (
-            <div key={index} className="my-2">
+            <div key={index} className="my-2 flex items-center">
               <input
                 type="text"
                 name="description"
@@ -108,7 +113,7 @@ const GoalPublisher = () => {
                 onChange={(e) => handleStepChange(index, e)}
                 required
               />
-              <label className="inline-flex items-center mt-2">
+              <label className="inline-flex items-center mt-2 ml-2">
                 <input
                   type="checkbox"
                   name="completed"
@@ -118,14 +123,19 @@ const GoalPublisher = () => {
                 />
                 <span className="ml-2">Completed</span>
               </label>
+              <button
+                className="btn btn-error btn-md ml-4 rounded-full text-xl"
+                onClick={() => handleRemoveStep(index)}
+              >
+                X
+              </button>
             </div>
           ))}
           <button
-            type="button"
-            className="btn btn-secondary mt-2"
+            className="btn btn-success btn-md rounded-full text-3xl"
             onClick={handleAddStep}
           >
-            Add Step
+            +
           </button>
         </div>
         <div className="my-8 text-center">

@@ -39,7 +39,7 @@ const StoryManager = ({ username }) => {
   ];
 
   return (
-    <div className="card w-full bg-carolina-blue p-6">
+    <div className="card w-full bg-carolina-blue p-6 min-h-full">
       <div className="card-body">
         <div className="card-title flex flex-col rounded-md">
           <p className="text-start italic">

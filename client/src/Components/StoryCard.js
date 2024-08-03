@@ -14,7 +14,7 @@ const StoryCard = ({ story }) => {
         <span className="indicator-item badge bg-violet-700 text-white outline border-0">New</span>
       )}
       <div
-        className="p-6 rounded-lg shadow-md cursor-pointer bg-success bg-opacity-50 w-full shadow-primary"
+        className="p-6 rounded-lg shadow-md cursor-pointer bg-primary bg-opacity-40 w-full outline"
         onClick={() => navigate(`/visualizer/${story._id}`)}
       >
         <h2 className="text-xl font-bold mb-2">{story.title}</h2>

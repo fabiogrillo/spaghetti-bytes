@@ -62,22 +62,23 @@ const Home = () => {
   );
 
   return (
-    <motion.div className="p-4 space-y-10">
+    <motion.div className="p-4 space-y-12 m-12">
       <motion.div
-        className="hero h-auto rounded-xl flex flex-col justify-between max-w-6xl mx-auto"
+        className="hero rounded-xl flex flex-col justify-between mx-auto"
         style={{ scale: heroScale, opacity: heroOpacity }}
       >
         <div className="hero-content text-center py-10">
-          <div className="max-w-md mx-auto">
-            <h1 className="text-4xl font-bold">The Italian Software Journey</h1>
+          <div className="mx-auto">
+            <h1 className="text-4xl font-bold">
+              Welcome to my software journey
+            </h1>
             <p className="py-6 italic">
-              "If at first you don’t succeed; call it version 1.0."
+              "If at first you don’t succeed call it version 1.0.""
             </p>
-            <p className="py-2">
-              Welcome to The Italian Software Journey! Here, you'll find
-              insights and discussions on software engineering, personal
-              finance, data engineering, and other technical topics. Dive into
-              my world of code, innovation, and growth. Happy reading!
+            <p className="py-2 mx-36">
+              Here, you'll find insights and discussions on software
+              engineering, data engineering, and other technical topics. Dive
+              into my world of code, innovation, and growth. Happy reading!
             </p>
           </div>
         </div>
@@ -117,9 +118,9 @@ const Home = () => {
             About Me
           </h2>
           <p className="mb-4">
-            Software engineer with a passion for data engineering, personal
-            finance, and self-growth. Musician, football player, and proud owner
-            of Phoebe, a golden retriever
+            I'm a software engineer with a passion for data engineering and
+            self-growth. Musician, football player, and proud owner of Phoebe, a
+            funny 4-years-old golden retriever 🐶
           </p>
           <h2 className="card-title text-4xl font-bold mb-4">
             <BsFillPatchQuestionFill />
@@ -127,7 +128,8 @@ const Home = () => {
           </h2>
           <p>
             Started as a portfolio, evolved into a personal space for sharing
-            projects, aspirations, and experiences
+            projects, aspirations, and experiences. It arises from my exigence
+            to tell about what I do and how I do it
           </p>
         </div>
         <div className="md:w-2/5 flex flex-col items-center justify-center">
@@ -179,8 +181,8 @@ const Home = () => {
             Goals
           </h2>
           <p>
-            In this section, I share my long-term goals and the ones I've
-            already achieved
+            This section may be strange at a frist glance, consider it as my
+            personal achievement board: it contains what I'd like to learn in my career path.
             <ul className="steps mt-4 justify-center">
               <li className="step step-info">Become an astronaut</li>
               <li className="step step-info">Fly to moon</li>
@@ -189,14 +191,14 @@ const Home = () => {
           </p>
           <h2 className="card-title text-4xl font-bold mt-8">
             <FaProjectDiagram />
-            Projects
+            Projects (in progress)
           </h2>
           <p>
             This section highlights some GitHub projects I've worked on or am
             currently working on
             <div className="mockup-code bg- mt-4 w-full justify-center">
               <pre data-prefix="$">
-                <code>npm i golden-bytes</code>
+                <code>npm i spaghetti-bytes</code>
               </pre>
             </div>
           </p>
@@ -215,7 +217,7 @@ const Home = () => {
           <p className="mb-4">
             I’m excited to connect with new people and explore fresh ideas.
             Whether you’re interested in collaborating on a project or simply
-            want to engage in conversation, this space is open for you
+            want to engage in a conversation, this space is open for you
           </p>
           <h2 className="card-title text-4xl font-bold mb-4">
             <MdOutlineConnectWithoutContact />

@@ -29,7 +29,7 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
 
   return (
     <header>
-      <div className="navbar p-4 bg-base-100 shadow-xl">
+      <div className="navbar p-4 shadow-md">
         <div className="flex-1">
           <Link className="text-2xl font-bold" to="/">
             Spaghetti Bytes

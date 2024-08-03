@@ -47,7 +47,7 @@ const TableGoals = () => {
         <img
           src={illustration1}
           alt="Header Illustration"
-          className="my-8 w-2/6"
+          className="my-8 w-1/4"
         />
         <p className="w-3/5 p-4 text-lg">
           Here you can do anything you want with your goals. Do you want to

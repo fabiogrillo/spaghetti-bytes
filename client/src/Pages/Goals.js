@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import illustration from "../Assets/Images/sammy-basketball-ball-and-training-equipment.gif";
+import { format } from "date-fns";
+import illustration from "../Assets/Images/twinkle-online-education.gif";
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
@@ -20,25 +21,25 @@ const Goals = () => {
   }, []);
 
   return (
-    <div className="container mx-auto my-8 px-16">
-      <div className="flex flex-col md:flex-row md:items-center">
-        <div className="md:w-3/5 md:pb-8">
+    <div className="container mx-auto p-16 min-h-full">
+      <div className="flex flex-col md:flex-row md:items-center m-16 mb-32">
+        <div className="md:w-3/5">
           <h1 className="text-4xl font-bold">My Personal Goals</h1>
           <p className="py-6 italic">
-            Welcome to the goals section. Here you can view all my personal
-            goals and the steps I am taking to achieve them.
+            Here you can view all my personal goals and the steps I am taking to
+            achieve them. This helps me keep track of my progresses.
           </p>
         </div>
-        <div className="md:w-2/5 p-4">
+        <div className="md:w-2/5">
           <img
             src={illustration}
             alt="Illustration Blog"
-            className="w-full max-w-lg"
+            className="w-full max-w-md"
           />
           <p className="text-xs text-center mt-4 md:mt-0">
             Illustration by{" "}
-            <a href="https://icons8.com/illustrations/author/kP9rc8JiBCcz">
-              Irene M. Ray
+            <a href="https://icons8.com/illustrations/author/56v7RIkExgol">
+              Anna Żołnierowicz
             </a>{" "}
             from <a href="https://icons8.com/illustrations">Ouch!</a>
           </p>
@@ -55,6 +56,9 @@ const Goals = () => {
           >
             <h2 className="text-2xl font-bold">{goal.title}</h2>
             <p>{goal.description}</p>
+            <p className="text-sm italic py-2">
+              {format(new Date(goal.createdAt), "MMMM dd, yyyy")}
+            </p>
             <ul className="steps mt-4">
               {goal.steps.map((step, index) => (
                 <li

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import emailjs from "emailjs-com";
 import { RiMailSendLine } from "react-icons/ri";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,6 +12,10 @@ const Contacts = () => {
     message: "",
     to_name: process.env.TO_NAME || "Admin",
   });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -91,7 +95,7 @@ const Contacts = () => {
             alt="Illustration Reading"
             className="w-full h-auto"
           />
-          <p className="text-xs text-center mt-4 md:mt-0">
+          <p className="text-xs text-center">
             Illustration by{" "}
             <a href="https://icons8.com/illustrations/author/mNCLibjicqSz">
               Julia K

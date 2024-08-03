@@ -65,8 +65,9 @@ const Wall = () => {
         <div className="max-w-md mx-auto">
           <h1 className="text-4xl font-bold">The reading corner</h1>
           <p className="py-6 italic">
-            Welcome to the reading corner. Here you can view all the stories
-            that have been written, along with their tags and publication dates.
+            Welcome, reader! Here you can view all the stories that have been
+            written, along with their tags and publication dates. You can find
+            also some overall stats on my stories, I hope you enjoy!
           </p>
         </div>
         <div className="w-3/8">
