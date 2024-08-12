@@ -156,7 +156,7 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
 
         {/* Sidebar for small screens */}
         {isSidebarOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden" onClick={closeSidebar}>
+          <div className="fixed inset-0 z-50 lg:hidden " onClick={closeSidebar}>
             {/* Sidebar */}
             <div
               className="fixed left-0 top-0 h-full w-64 bg-neutral shadow-md z-50 p-4 flex flex-col text-white"

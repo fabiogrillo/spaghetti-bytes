@@ -21,10 +21,10 @@ const Home = () => {
             <h1 className="text-3xl md:text-4xl font-bold">
               Welcome to my software journey
             </h1>
-            <p className="py-4 md:py-6 italic text-sm md:text-base">
+            <p className="py-4 md:py-6 italic md:text-base">
               "If at first you don’t succeed call it version 1.0."
             </p>
-            <p className="py-2 mx-4 md:mx-36 text-sm md:text-base">
+            <p className="py-2 mx-4 md:mx-36 md:text-base">
               Here, you'll find insights and discussions on software
               engineering, data engineering, and other technical topics. Dive
               into my world of code, innovation, and growth. Happy reading!
@@ -63,7 +63,7 @@ const Home = () => {
             <IoIosContact />
             About Me
           </h2>
-          <p className="mb-4 text-sm md:text-base">
+          <p className="mb-4 md:text-base">
             I'm a software engineer with a passion for data engineering and
             self-growth. Musician, football player, and proud owner of Phoebe, a
             funny 4-years-old golden retriever 🐶
@@ -72,7 +72,7 @@ const Home = () => {
             <BsFillPatchQuestionFill />
             Why This Blog?
           </h2>
-          <p className="text-sm md:text-base">
+          <p className="md:text-base">
             Started as a portfolio, evolved into a personal space for sharing
             projects, aspirations, and experiences. It arises from my exigence
             to tell about what I do and how I do it.
@@ -84,7 +84,7 @@ const Home = () => {
             alt="Illustration Blog"
             className="w-full max-w-sm md:max-w-lg uniform-img"
           />
-          <p className="text-sm text-center">
+          <p className="text-xs text-center">
             Illustration by{" "}
             <a href="https://icons8.com/illustrations/author/259416">
               Marina Green
@@ -100,7 +100,7 @@ const Home = () => {
             <GoGoal />
             Goals
           </h2>
-          <div className="mb-4 text-sm md:text-base">
+          <div className="mb-4 md:text-base">
             <p>
               At first glance, this section might appear somewhat peculiar or
               unusual. However, I encourage you to view it as a sort of personal
@@ -119,7 +119,7 @@ const Home = () => {
             <FaProjectDiagram />
             Projects (in progress)
           </h2>
-          <div className="text-sm md:text-base my-4">
+          <div className="md:text-base my-4">
             <p>
               This section is dedicated to showcasing a selection of GitHub
               projects that I have either previously worked on or am actively
@@ -156,7 +156,7 @@ const Home = () => {
             <MdContactMail />
             Contact me
           </h2>
-          <p className="mb-4 text-sm md:text-base">
+          <p className="mb-4 md:text-base">
             I am genuinely enthusiastic about the prospect of connecting with
             new individuals and delving into innovative and fresh ideas. This
             space is designed to be a welcoming environment for anyone who is
@@ -168,7 +168,7 @@ const Home = () => {
             <MdOutlineConnectWithoutContact />
             Let's connect
           </h2>
-          <p className="text-sm md:text-base">
+          <p className="md:text-base">
             If you would like to get in touch with me, you can connect through
             various social media platforms or, alternatively, feel free to send
             me an email. I welcome and encourage you to reach out, as I am
@@ -190,7 +190,7 @@ const Home = () => {
             alt="Illustration Contact"
             className="w-full max-w-sm md:max-w-lg uniform-img"
           />
-          <p className="text-sm text-center">
+          <p className="text-xs text-center">
             Illustration by{" "}
             <a href="https://icons8.com/illustrations/author/zD2oqC8lLBBA">
               Olga Ryabtsova
