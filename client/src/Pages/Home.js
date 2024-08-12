@@ -9,13 +9,12 @@ import { MdContactMail } from "react-icons/md";
 import { MdOutlineConnectWithoutContact } from "react-icons/md";
 import illustrationBlog from "../Assets/Images/dazzle-man-programmer-writing-code-on-a-laptop.gif";
 import illustrationHero from "../Assets/Images/bendy-man-developer-writing-programming-code.gif";
-import illustrationDev from "../Assets/Images/taxi-rocket-delivering-parcels-to-aliens-in-space.gif";
 import illustrationContact from "../Assets/Images/bendy-customer-service-man-answering-question.gif";
 import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
-    <div className="p-4 space-y-12 m-4 md:m-12">
+    <div className="md:m-12">
       <div className="hero rounded-xl flex flex-col justify-between mx-auto">
         <div className="hero-content text-center py-10">
           <div className="mx-auto">
@@ -37,7 +36,7 @@ const Home = () => {
             <img
               src={illustrationHero}
               alt="Illustration Hero"
-              className="w-full max-w-sm md:max-w-lg"
+              className="w-full max-w-sm md:max-w-lg uniform-img"
             />
             <p className="text-xs text-center mt-4 md:mt-0">
               Illustration by{" "}
@@ -49,9 +48,9 @@ const Home = () => {
           </div>
           <div className="flex flex-col items-center justify-center md:w-2/5 space-y-4">
             <Link to={"/blog"}>
-              <button className="btn btn-primary btn-outline btn-lg rounded-full mt-4 ">
+              <button className="btn btn-primary btn-outline btn-lg rounded-full mt-4">
                 <GrArticle className="text-2xl" />
-                Read My Stories
+                Read Stories
               </button>
             </Link>
           </div>
@@ -83,7 +82,7 @@ const Home = () => {
           <img
             src={illustrationBlog}
             alt="Illustration Blog"
-            className="w-full max-w-sm md:max-w-lg"
+            className="w-full max-w-sm md:max-w-lg uniform-img"
           />
           <p className="text-sm text-center">
             Illustration by{" "}
@@ -103,11 +102,14 @@ const Home = () => {
           </h2>
           <div className="mb-4 text-sm md:text-base">
             <p>
-              This section may be strange at a first glance. Consider it as my
-              personal achievement board: it contains what I'd like to learn in
-              my career path.
+              At first glance, this section might appear somewhat peculiar or
+              unusual. However, I encourage you to view it as a sort of personal
+              achievement board of sorts. Essentially, it serves as a detailed
+              reflection of the various skills and areas of knowledge that I
+              aspire to acquire and master throughout the course of my
+              professional career.
             </p>
-            <ul className="steps mt-4 justify-center">
+            <ul className="steps mt-8 justify-center">
               <li className="step step-info">Become an astronaut</li>
               <li className="step step-info">Fly to moon</li>
               <li className="step">Take a good photo of Earth</li>
@@ -117,35 +119,31 @@ const Home = () => {
             <FaProjectDiagram />
             Projects (in progress)
           </h2>
-          <div className="text-sm md:text-base">
+          <div className="text-sm md:text-base my-4">
             <p>
-              This section highlights some GitHub projects I've worked on or am
-              currently working on.
+              This section is dedicated to showcasing a selection of GitHub
+              projects that I have either previously worked on or am actively
+              engaged with at the present moment. It provides an overview of the
+              various initiatives and endeavors I have undertaken within the
+              GitHub platform.
             </p>
-            <div className="mockup-code bg- mt-4 w-full justify-center">
+            <div className="mockup-code mt-8 w-full mx-auto rounded-lg py-2">
               <pre data-prefix="$">
                 <code>npm i spaghetti-bytes</code>
               </pre>
+              <pre data-prefix=">" className="text-warning">
+                <code>installing...</code>
+              </pre>
+              <pre data-prefix=">" className="text-success">
+                <code>Done!</code>
+              </pre>
             </div>
           </div>
-          <div className="md:w-2/5 flex flex-col items-center justify-center">
-            <img
-              src={illustrationDev}
-              alt="Illustration Dev"
-              className="max-w-sm md:max-w-lg"
-            />
-            <p className="text-sm text-center">
-              Illustration by{" "}
-              <a href="https://icons8.com/illustrations/author/TQQ1qAnr9rn5">
-                Oleg Shcherba
-              </a>{" "}
-              from <a href="https://icons8.com/illustrations">Ouch!</a>
-            </p>
-          </div>
-          <div className="p-8">
+
+          <div className="text-center">
             <Link to={"/goals"}>
               <button className="btn btn-warning btn-outline btn-lg rounded-full">
-                <GoGoal className="text-2xl" /> Check my goals
+                <GoGoal className="text-2xl" /> Check Goals
               </button>
             </Link>
           </div>
@@ -159,21 +157,28 @@ const Home = () => {
             Contact me
           </h2>
           <p className="mb-4 text-sm md:text-base">
-            I’m excited to connect with new people and explore fresh ideas.
-            Whether you’re interested in collaborating on a project or simply
-            want to engage in a conversation, this space is open for you.
+            I am genuinely enthusiastic about the prospect of connecting with
+            new individuals and delving into innovative and fresh ideas. This
+            space is designed to be a welcoming environment for anyone who is
+            interested in collaborating on exciting projects or who simply
+            wishes to engage in meaningful and stimulating conversations. This
+            space is open and available for all who wish to engage.
           </p>
           <h2 className="card-title text-3xl md:text-4xl font-bold mb-4">
             <MdOutlineConnectWithoutContact />
-            Let's connect!
+            Let's connect
           </h2>
           <p className="text-sm md:text-base">
-            You can connect with me on social media or drop me an email. Feel
-            free to reach out!
+            If you would like to get in touch with me, you can connect through
+            various social media platforms or, alternatively, feel free to send
+            me an email. I welcome and encourage you to reach out, as I am
+            always open to new connections and interactions. Don’t hesitate to
+            contact me—whether it's for a professional inquiry, a collaborative
+            opportunity, or just a friendly chat.
           </p>
-          <div className="py-6">
+          <div className="my-4 text-center">
             <Link to={"/contact"}>
-              <button className="btn btn-error btn-outline btn-lg rounded-full ">
+              <button className="btn btn-error btn-outline btn-lg rounded-full">
                 <LuContact2 className="text-2xl" /> Contact Me
               </button>
             </Link>
@@ -183,7 +188,7 @@ const Home = () => {
           <img
             src={illustrationContact}
             alt="Illustration Contact"
-            className="w-full max-w-sm md:max-w-lg"
+            className="w-full max-w-sm md:max-w-lg uniform-img"
           />
           <p className="text-sm text-center">
             Illustration by{" "}
