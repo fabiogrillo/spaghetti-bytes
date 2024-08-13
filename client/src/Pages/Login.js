@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { doLogin } from "../Api";
 import illustrationLogin from "../Assets/Images/dazzle-artificial-intelligence-powers-sound-data-analysis-and-image-neural-network.gif";
 
@@ -25,8 +24,8 @@ const Login = ({ setAuthenticated, setUsername }) => {
   };
 
   return (
-    <motion.div className="p-4 space-y-16 flex flex-col my-16 min-h-full">
-      <motion.div className="card w-full bg-carolina-blue p-6 flex flex-col mx-auto max-w-6xl items-center justify-center">
+    <div className="p-4 space-y-8 flex flex-col mt-16 min-h-full">
+      <div className="card w-full bg-carolina-blue p-6 flex flex-col mx-auto max-w-4xl items-center justify-center">
         <div className="flex flex-col md:flex-row justify-center items-center">
           <div className="flex flex-col items-center justify-center md:w-3/5 space-y-4">
             <h2 className="card-title">Sign in</h2>
@@ -62,7 +61,7 @@ const Login = ({ setAuthenticated, setUsername }) => {
               </form>
             </p>
           </div>
-          <div className="flex flex-col items-center justify-center md:w-2/5 space-y-4">
+          <div className="flex flex-col items-center justify-center md:w-2/5 space-y-4 mt-6 md:mt-0">
             <img
               src={illustrationLogin}
               alt="Illustration Login"
@@ -77,8 +76,8 @@ const Login = ({ setAuthenticated, setUsername }) => {
             </p>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 

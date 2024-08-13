@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { format } from "date-fns";
 import illustration from "../Assets/Images/twinkle-online-education.gif";
 
 const Goals = () => {
@@ -25,22 +23,25 @@ const Goals = () => {
   }, []);
 
   return (
-    <div className="container mx-auto p-16 min-h-full">
-      <div className="flex flex-col md:flex-row md:items-center m-16 mb-32">
-        <div className="md:w-3/5">
-          <h1 className="text-4xl font-bold">My Personal Goals</h1>
-          <p className="py-6 italic">
-            Here you can view all my personal goals and the steps I am taking to
-            achieve them. This helps me keep track of my progresses.
+    <div className="container mx-auto p-8">
+      <div className="flex flex-col items-center text-center">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold">My Personal Goals</h1>
+          <p className="py-2 md:text-base">
+            I am excited to share with you all of my personal goals, as well as
+            the detailed steps that I am currently undertaking to reach them.
+            Documenting this process not only allows me to maintain a clear view
+            of my progress, but also serves as a constant reminder of my
+            dedication and commitment to personal growth and achievement.
           </p>
         </div>
-        <div className="md:w-2/5">
+        <div className="mb-8">
           <img
             src={illustration}
-            alt="Illustration Blog"
-            className="w-full max-w-md"
+            alt="Illustration Goals"
+            className="w-full max-w-sm md:max-w-lg"
           />
-          <p className="text-xs text-center mt-4 md:mt-0">
+          <p className="text-xs text-center">
             Illustration by{" "}
             <a href="https://icons8.com/illustrations/author/56v7RIkExgol">
               Anna Żołnierowicz
@@ -49,19 +50,17 @@ const Goals = () => {
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {goals.map((goal, index) => (
-          <motion.div
-            key={goal._id}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.2, duration: 0.5 }}
-            className="timeline-item"
-          >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {goals.map((goal) => (
+          <div key={goal._id} className="timeline-item">
             <h2 className="text-2xl font-bold">{goal.title}</h2>
             <p>{goal.description}</p>
             <p className="text-sm italic py-2">
-              {format(new Date(goal.createdAt), "MMMM dd, yyyy")}
+              {new Date(goal.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </p>
             <ul className="steps mt-4">
               {goal.steps.map((step, index) => (
@@ -73,7 +72,7 @@ const Goals = () => {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>

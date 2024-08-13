@@ -13,6 +13,10 @@ const Wall = () => {
   const [distinctTags, setDistinctTags] = useState(0);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     // Fetch stories from the server
     const fetchStories = async () => {
       try {
@@ -60,13 +64,16 @@ const Wall = () => {
 
   return (
     <div>
-      <div className="flex flex-col items-center mx-auto justify-center">
-        <div className="max-w-md text-center py-10">
+      <div className="flex flex-col items-center mx-auto justify-between md:m-8">
+        <div className="text-center py-10">
           <h1 className="text-3xl md:text-4xl font-bold">The reading corner</h1>
           <p className="py-2 md:py-2 md:text-base">
-            Welcome, reader! Here you can view all the stories that have been
-            written, along with their tags and publication dates. You can find
-            also some overall stats on my stories, I hope you enjoy!
+            Welcome, dear reader! I am delighted to invite you into this space
+            where you can explore all the stories that have been thoughtfully
+            crafted and shared. There are some stats that provide insights into
+            various aspects of my storytelling journey. I sincerely hope that
+            you find enjoyment in exploring this collection and that the stories
+            resonate with you 🤗
           </p>
         </div>
         <div className="mb-8">
@@ -115,7 +122,7 @@ const Wall = () => {
         </div>
       </div>
 
-      <div className="mt-8 mb-4">
+      <div className="mt-8 mb-4 text-center">
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}

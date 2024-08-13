@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import emailjs from "emailjs-com";
 import { RiMailSendLine } from "react-icons/ri";
-import { motion, AnimatePresence } from "framer-motion";
 import rocketImage from "../Assets/Images/juicy-people-in-online-zoom-meeting.gif";
 
 const Contacts = () => {
@@ -14,6 +13,7 @@ const Contacts = () => {
   });
 
   useEffect(() => {
+    // Scroll to top when the component is mounted
     window.scrollTo(0, 0);
   }, []);
 
@@ -52,16 +52,11 @@ const Contacts = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-8 mx-auto">
-      <AnimatePresence>
+    <div className="container mx-auto p-8">
+      <div className="flex flex-col items-center">
+        {/* Alert Section */}
         {showAlert && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.5 }}
-            className="alert alert-success p-4 z-50"
-          >
+          <div className="alert alert-success p-4 z-50 mb-8">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 shrink-0 stroke-current"
@@ -76,85 +71,86 @@ const Contacts = () => {
               />
             </svg>
             <span>Your request has been correctly sent!</span>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
 
-      <div className="flex justify-between items-center my-12 mb-16">
-        <div className="max-w-md mx-auto">
-          <h1 className="text-4xl font-bold">Want to reach out?</h1>
-          <p className="py-6 italic">
-            If you have any advices or you want to ask me anything please feel
-            free to contact me whenever you want. I'll try to answer as soon as
-            possible, I promise.
-          </p>
+        <div className="flex flex-col items-center text-center">
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold">
+              Want to reach out?
+            </h1>
+            <p className="py-2 md:text-base">
+              If you ever find yourself in need of advice, or if you simply wish
+              to ask me something—be it a small query or a more complex
+              question—please don't hesitate to reach out. Feel free to contact
+              me at any time that suits you, and I assure you, I will do my
+              utmost to respond as swiftly as I can. Your inquiries are
+              important to me, and I will prioritize getting back to you
+              promptly
+            </p>
+          </div>
+          <div className="mb-8">
+            <img
+              src={rocketImage}
+              alt="Illustration Reading"
+              className="w-full max-w-sm md:max-w-lg"
+            />
+            <p className="text-xs text-center ">
+              Illustration by{" "}
+              <a href="https://icons8.com/illustrations/author/mNCLibjicqSz">
+                Julia K
+              </a>{" "}
+              from <a href="https://icons8.com/illustrations">Ouch!</a>
+            </p>
+          </div>
         </div>
-        <div className="w-2/5">
-          <img
-            src={rocketImage}
-            alt="Illustration Reading"
-            className="w-full h-auto"
-          />
-          <p className="text-xs text-center">
-            Illustration by{" "}
-            <a href="https://icons8.com/illustrations/author/mNCLibjicqSz">
-              Julia K
-            </a>{" "}
-            from <a href="https://icons8.com/illustrations">Ouch!</a>
-          </p>
+
+        <div className="shadow-lg rounded-lg bg-primary bg-opacity-40 p-12">
+          <h2 className="text-2xl font-bold text-center">Contact Me</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-mono">Name:</label>
+              <input
+                type="text"
+                name="from_name"
+                value={formData.from_name}
+                onChange={handleChange}
+                required
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-mono">Email:</label>
+              <input
+                type="email"
+                name="from_email"
+                value={formData.from_email}
+                onChange={handleChange}
+                required
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-mono">Message:</label>
+              <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                required
+                className="textarea textarea-bordered w-full"
+              ></textarea>
+            </div>
+            <div className="text-center">
+              <button
+                type="submit"
+                className="btn btn-primary btn-md rounded-full"
+              >
+                <RiMailSendLine className="mr-2" /> Send
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="shadow-lg rounded-lg p-8 md:w-1/2 w-full bg-secondary bg-opacity-40 shadow-primary mb-16"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center">Contact Me</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-mono">Name:</label>
-            <input
-              type="text"
-              name="from_name"
-              value={formData.from_name}
-              onChange={handleChange}
-              required
-              className="input input-bordered w-full"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-mono">Email:</label>
-            <input
-              type="email"
-              name="from_email"
-              value={formData.from_email}
-              onChange={handleChange}
-              required
-              className="input input-bordered w-full"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-mono">Message:</label>
-            <textarea
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              required
-              className="textarea textarea-bordered w-full"
-            ></textarea>
-          </div>
-          <div className="text-center">
-            <button
-              type="submit"
-              className="btn btn-primary btn-md rounded-full"
-            >
-              <RiMailSendLine /> Send
-            </button>
-          </div>
-        </form>
-      </motion.div>
     </div>
   );
 };

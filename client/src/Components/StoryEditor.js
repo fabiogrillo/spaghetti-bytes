@@ -2,7 +2,6 @@ import React from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "react-quill/dist/quill.bubble.css";
-import { motion } from "framer-motion";
 
 const Font = Quill.import("formats/font");
 Font.whitelist = ["sans-serif", "serif", "monospace"];
@@ -25,8 +24,8 @@ const StoryEditor = ({ value, onChange, readOnly = false }) => {
           { indent: "-1" },
           { indent: "+1" },
         ],
-        [{ color: [] }, { background: [] }], // Aggiunge i colori per il testo e lo sfondo
-        [{ align: [] }], // Aggiunge i pulsanti di allineamento del testo
+        [{ color: [] }, { background: [] }],
+        [{ align: [] }],
         ["link", "image"],
         ["clean"],
       ],
@@ -34,12 +33,7 @@ const StoryEditor = ({ value, onChange, readOnly = false }) => {
   };
 
   return (
-    <motion.div
-      className="card bg-carolina-blue"
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ ease: "anticipate", duration: 1.5, x: { duration: 0.5 } }}
-    >
+    <div className="card bg-carolina-blue">
       <ReactQuill
         className="custom-quill shadow-2xl rounded-2xl outline min-h-32 bg-neutral"
         theme={readOnly ? "bubble" : "snow"}
@@ -48,7 +42,7 @@ const StoryEditor = ({ value, onChange, readOnly = false }) => {
         modules={modules}
         readOnly={readOnly}
       />
-    </motion.div>
+    </div>
   );
 };
 

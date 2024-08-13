@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { VscNewFile } from "react-icons/vsc";
 import { IoIosSettings } from "react-icons/io";
-import { motion } from "framer-motion";
 
 const StoryManager = ({ username }) => {
   const navigate = useNavigate();
@@ -39,34 +38,24 @@ const StoryManager = ({ username }) => {
   ];
 
   return (
-    <div className="card w-full bg-carolina-blue p-6 min-h-full">
-      <div className="card-body">
-        <div className="card-title flex flex-col rounded-md">
-          <p className="text-start italic">
+    <div className="container mx-auto p-8">
+      <div className="flex flex-col items-center text-center">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold">
             {username} 🍝, welcome to your stories manager
-          </p>
+          </h1>
         </div>
-        <div className="card-actions justify-center flex flex-col items-center p-6 space-y-8">
+        <div className="card-actions ">
           {buttonData.map((button, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: index % 2 === 0 ? 100 : -100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.4 }}
-              className={`flex ${
-                index % 2 === 0
-                  ? "flex-row space-x-8"
-                  : "flex-row-reverse space-x-reverse space-x-8"
-              } items-center `}
-            >
+            <div key={index} className={`flex flex-row items-center `}>
               <button
-                className={`btn btn-lg rounded-3xl p-4 ${button.color}`}
+                className={`btn rounded-3xl p-4 ${button.color}`}
                 onClick={button.action}
               >
                 {button.label} {button.icon}
               </button>
               <p className="text-lg">{button.description}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

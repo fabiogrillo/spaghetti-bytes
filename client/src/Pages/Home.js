@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
-    <div className="md:m-12">
+    <div className="md:m-8">
       <div className="hero rounded-xl flex flex-col justify-between mx-auto">
         <div className="hero-content text-center py-10">
           <div className="mx-auto">
@@ -109,11 +109,13 @@ const Home = () => {
               aspire to acquire and master throughout the course of my
               professional career.
             </p>
-            <ul className="steps mt-8 justify-center">
-              <li className="step step-info">Become an astronaut</li>
-              <li className="step step-info">Fly to moon</li>
-              <li className="step">Take a good photo of Earth</li>
-            </ul>
+            <div className="flex justify-center mx-auto">
+              <ul className="steps mt-8">
+                <li className="step step-info">Become an astronaut</li>
+                <li className="step step-info">Fly to moon</li>
+                <li className="step">Take a good photo of Earth</li>
+              </ul>
+            </div>
           </div>
           <h2 className="card-title text-3xl md:text-4xl font-bold mt-8">
             <FaProjectDiagram />
@@ -177,7 +179,7 @@ const Home = () => {
             opportunity, or just a friendly chat.
           </p>
           <div className="my-4 text-center">
-            <Link to={"/contact"}>
+            <Link to={"/contacts"}>
               <button className="btn btn-error btn-outline btn-lg rounded-full">
                 <LuContact2 className="text-2xl" /> Contact Me
               </button>
