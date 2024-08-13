@@ -33,9 +33,9 @@ const StoryEditor = ({ value, onChange, readOnly = false }) => {
   };
 
   return (
-    <div className="card bg-carolina-blue">
+    <div className="card ">
       <ReactQuill
-        className="custom-quill shadow-2xl rounded-2xl outline min-h-32 bg-neutral"
+        className="custom-quill rounded-2xl bg-neutral bg-opacity-80"
         theme={readOnly ? "bubble" : "snow"}
         value={value}
         onChange={onChange}

@@ -29,37 +29,32 @@ const Login = ({ setAuthenticated, setUsername }) => {
         <div className="flex flex-col md:flex-row justify-center items-center">
           <div className="flex flex-col items-center justify-center md:w-3/5 space-y-4">
             <h2 className="card-title">Sign in</h2>
-            <p className="card-body">
-              <form
-                onSubmit={handleLogin}
-                className="w-full flex flex-col gap-4"
-              >
-                <label className="input input-bordered flex items-center gap-2 w-full">
-                  Email
-                  <input
-                    type="text"
-                    className="grow"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="daisy@site.com"
-                  />
-                </label>
-                <label className="input input-bordered flex items-center gap-2 w-full">
-                  Password
-                  <input
-                    type="password"
-                    className="grow"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="******"
-                  />
-                </label>
-                {error && <p className="text-red-500">{error}</p>}
-                <button className="btn btn-primary w-full" type="submit">
-                  Login
-                </button>
-              </form>
-            </p>
+            <form onSubmit={handleLogin} className="w-full flex flex-col gap-4">
+              <label className="input input-bordered flex items-center gap-2 w-full">
+                Email
+                <input
+                  type="text"
+                  className="grow"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="daisy@site.com"
+                />
+              </label>
+              <label className="input input-bordered flex items-center gap-2 w-full">
+                Password
+                <input
+                  type="password"
+                  className="grow"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="******"
+                />
+              </label>
+              {error && <p className="text-red-500">{error}</p>}
+              <button className="btn btn-primary w-full" type="submit">
+                Login
+              </button>
+            </form>
           </div>
           <div className="flex flex-col items-center justify-center md:w-2/5 space-y-4 mt-6 md:mt-0">
             <img

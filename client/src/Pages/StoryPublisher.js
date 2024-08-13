@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import StoryEditor from "../Components/StoryEditor";
-import { motion } from "framer-motion";
 import { IoMdAdd } from "react-icons/io";
-import { FaCheck, FaTimes, FaMedium } from "react-icons/fa";
+import { FaTimes, FaMedium } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
-import illustration1 from "../Assets/Images/rondy-stickers-lettering-sticker-start-here.gif";
+import { BsArrowLeft, BsCheck2All } from "react-icons/bs";
 
 const StoryPublisher = () => {
   const { id } = useParams();
@@ -108,51 +107,31 @@ const StoryPublisher = () => {
   };
 
   return (
-    <div className="container mx-auto p-8 space-y-8">
-      <motion.div
-        className="flex flex-col md:flex-row items-center space-y-8 md:space-y-4 md:space-x-4 mb-16"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-      >
-        <div className="md:w-3/5 text-start space-y-12">
-          <h1 className="text-2xl font-bold mb-4">
-            {id ? "Edit your story" : "Let's write a new incredible story 🤩"}
+    <div className="container mx-auto p-4 md:p-8">
+      <div className="flex flex-col items-center text-center space-y-8">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold">
+            {id ? "Edit Your Story" : "Let's Write a New Incredible Story"}
           </h1>
-          <p className="italic">
+          <p className="py-2 md:text-base">
             {id
-              ? "Edit your existing story. Make sure to update the summary and tags if necessary."
-              : "Choose the title and then start writing, remember to set the summary up and decide whether to publish it on LinkedIn and/or Medium. Don't forget about tags."}
+              ? "You are currently editing your story. Please ensure all details are accurate, including the title, summary, and tags. After making your changes, you can update the story by clicking the button below"
+              : "Start by choosing a title for your story. Once the title is set, you can begin writing. Remember to provide a concise summary and include relevant tags. If you'd like, you can also share your story on Medium. Once you're ready, click the publish button"}
           </p>
         </div>
-        <div className="flex flex-col items-center justify-center md:w-2/5">
-          <img src={illustration1} alt="Illustration Start" className="w-60" />
-          <p className="text-xs text-center mt-4 md:mt-0">
-            Illustration by{" "}
-            <a href="https://icons8.com/illustrations/author/ODexzOcCgAMh">
-              Finn Reville
-            </a>{" "}
-            from <a href="https://icons8.com/illustrations">Ouch!</a>
-          </p>
-        </div>
-      </motion.div>
+      </div>
 
-      <motion.div
-        className="card bg-info  bg-opacity-35 shadow-md p-8 space-y-12"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-      >
-        <div className="form-control">
-          <label className="label">
+      <div className="card p-6 my-8 space-y-4">
+        <div className="form-control items-center">
+          <label className="label font-mono text-center">
             {id
               ? "Edit the title of your story"
-              : "First start with an astonishing title for your story 😲 (Max 100 characters)"}
+              : "Start with a title"}
           </label>
           <input
             type="text"
             placeholder="Your title here..."
-            className="input input-bordered"
+            className="input input-bordered italic"
             value={title}
             maxLength={maxTitleLength}
             onChange={(e) => {
@@ -163,20 +142,20 @@ const StoryPublisher = () => {
           {errors.title && (
             <p className="text-red-500 text-sm">{errors.title}</p>
           )}
-          <p className="text-right text-sm">
+          <p className="text-right text-xs mt-1">
             {title.length}/{maxTitleLength} characters
           </p>
         </div>
 
-        <div className="form-control">
-          <label className="label">
+        <div className="form-control items-center">
+          <label className="label font-mono text-center">
             {id
               ? "Edit the summary of your story"
-              : "Briefly describe what you have already written (Max 1000 characters)"}
+              : "Brief description"}
           </label>
           <textarea
-            placeholder="Summary"
-            className="textarea textarea-bordered"
+            placeholder="Summary here..."
+            className="textarea textarea-bordered italic"
             value={summary}
             maxLength={maxSummaryLength}
             onChange={(e) => {
@@ -187,20 +166,20 @@ const StoryPublisher = () => {
           {errors.summary && (
             <p className="text-red-500 text-sm">{errors.summary}</p>
           )}
-          <p className="text-right text-sm">
+          <p className="text-right text-xs mt-1">
             {summary.length}/{maxSummaryLength} characters
           </p>
         </div>
 
-        <div className="form-control">
-          <label className="label">
-            {id ? "Edit your tags" : "Insert some tags (at least 3)"}
+        <div className="form-control items-center">
+          <label className="label font-mono text-center">
+            {id ? "Edit your tags" : "Add some tags (at least 3)"}
           </label>
-          <div className="input-group space-x-4 justify-center">
+          <div className="input-group flex flex-row justify-around">
             <input
               type="text"
-              placeholder="New Tag"
-              className="input input-bordered"
+              placeholder="New Tag..."
+              className="input input-bordered italic"
               value={newTag}
               onChange={(e) => {
                 setNewTag(e.target.value);
@@ -209,14 +188,14 @@ const StoryPublisher = () => {
             />
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-primary rounded-full"
               onClick={handleAddTag}
             >
               <IoMdAdd />
             </button>
           </div>
           {errors.tags && <p className="text-red-500 text-sm">{errors.tags}</p>}
-          <div className="flex flex-wrap mt-3 gap-3 ">
+          <div className="flex flex-wrap mt-3 gap-3">
             {tags.map((tag, index) => (
               <div
                 key={index}
@@ -231,38 +210,55 @@ const StoryPublisher = () => {
           </div>
         </div>
 
-        <div className="form-control">
-          <label className="label">
-            {id ? "Edit your story content" : "What is your story about?"}
+        <div className="form-control items-center">
+          <label className="label font-mono text-center">
+            {id ? "Edit your story" : "Now write your story"}
           </label>
-          <StoryEditor value={content} onChange={handleEditorChange} />
+          <StoryEditor
+            value={content}
+            onChange={handleEditorChange}
+            error={errors.content}
+          />
           {errors.content && (
             <p className="text-red-500 text-sm">{errors.content}</p>
           )}
         </div>
-        <div className="form-control flex items-center space-x-2">
-          <label className="cursor-pointer label flex items-center">
-            <FaMedium className="mr-2 text-3xl" />
-            <span className="label-text">Share on Medium</span>
+
+        <div className="form-control flex items-center">
+          <label className="label font-mono text-center">
+            {id
+              ? "Edit your Medium sharing settings"
+              : "Share your story on Medium?"}
+          </label>
+          <div className="flex space-x-2">
             <input
               type="checkbox"
-              className="toggle toggle-primary ml-2"
+              className="toggle toggle-primary"
               checked={shareOnMedium}
-              onChange={() => setShareOnMedium(!shareOnMedium)}
+              onChange={(e) => setShareOnMedium(e.target.checked)}
             />
-          </label>
+            <FaMedium className="text-2xl " />
+          </div>
         </div>
-        <div className="text-center pt-8">
-          <button
-            type="submit"
-            className="btn btn-primary rounded-3xl"
-            onClick={handleSubmit}
-          >
-            <FaCheck className="mr-2" />
-            {id ? "Update" : "Publish"}
-          </button>
-        </div>
-      </motion.div>
+      </div>
+
+      <div className="flex justify-between items-center mt-8">
+        <button
+          type="button"
+          className="btn btn-primary btn-sm rounded-2xl"
+          onClick={() => navigate("/manager")}
+        >
+          <BsArrowLeft /> Back
+        </button>
+        <button
+          type="submit"
+          className="btn btn-success btn-sm rounded-2xl"
+          onClick={handleSubmit}
+        >
+          <BsCheck2All />
+          {id ? "Update Story" : "Publish Story"}
+        </button>
+      </div>
     </div>
   );
 };

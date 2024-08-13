@@ -41,20 +41,20 @@ const StoryManager = ({ username }) => {
     <div className="container mx-auto p-8">
       <div className="flex flex-col items-center text-center">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold">
+          <h1 className="text-3xl md:text-4xl font-bold mb-8">
             {username} 🍝, welcome to your stories manager
           </h1>
         </div>
-        <div className="card-actions ">
+        <div className="space-y-8 mx-4">
           {buttonData.map((button, index) => (
-            <div key={index} className={`flex flex-row items-center `}>
+            <div key={index} className={`flex flex-col items-center `}>
               <button
-                className={`btn rounded-3xl p-4 ${button.color}`}
+                className={`btn rounded-3xl p-4 hover:-translate-y-1 hover:scale-110 ${button.color}`}
                 onClick={button.action}
               >
                 {button.label} {button.icon}
               </button>
-              <p className="text-lg">{button.description}</p>
+              <p className="text-lg m-2">{button.description}</p>
             </div>
           ))}
         </div>

@@ -95,7 +95,7 @@ const Contacts = () => {
               alt="Illustration Reading"
               className="w-full max-w-sm md:max-w-lg"
             />
-            <p className="text-xs text-center ">
+            <p className="text-xs text-center">
               Illustration by{" "}
               <a href="https://icons8.com/illustrations/author/mNCLibjicqSz">
                 Julia K
@@ -143,7 +143,7 @@ const Contacts = () => {
             <div className="text-center">
               <button
                 type="submit"
-                className="btn btn-primary btn-md rounded-full"
+                className="btn btn-primary btn-md rounded-full hover:-translate-y-1 hover:scale-110"
               >
                 <RiMailSendLine className="mr-2" /> Send
               </button>

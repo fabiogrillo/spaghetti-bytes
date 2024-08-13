@@ -48,7 +48,7 @@ const Home = () => {
           </div>
           <div className="flex flex-col items-center justify-center md:w-2/5 space-y-4">
             <Link to={"/blog"}>
-              <button className="btn btn-primary btn-outline btn-lg rounded-full mt-4">
+              <button className="btn btn-primary btn-outline btn-lg rounded-full mt-4 hover:-translate-y-1 hover:scale-110">
                 <GrArticle className="text-2xl" />
                 Read Stories
               </button>
@@ -144,7 +144,7 @@ const Home = () => {
 
           <div className="text-center">
             <Link to={"/goals"}>
-              <button className="btn btn-warning btn-outline btn-lg rounded-full">
+              <button className="btn btn-warning btn-outline btn-lg rounded-full hover:-translate-y-1 hover:scale-110">
                 <GoGoal className="text-2xl" /> Check Goals
               </button>
             </Link>
@@ -180,7 +180,7 @@ const Home = () => {
           </p>
           <div className="my-4 text-center">
             <Link to={"/contacts"}>
-              <button className="btn btn-error btn-outline btn-lg rounded-full">
+              <button className="btn btn-error btn-outline btn-lg rounded-full hover:-translate-y-1 hover:scale-110">
                 <LuContact2 className="text-2xl" /> Contact Me
               </button>
             </Link>
