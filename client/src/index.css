@@ -17,27 +17,27 @@ body,
 .custom-quill .ql-container {
   border: none !important;
   border-radius: 12px !important;
-  /* Arrotonda i bordi */
   background-color: transparent !important;
-  /* Rendi trasparente lo sfondo */
 }
 
 .custom-quill .ql-toolbar {
   border-radius: 12px 12px 0 0 !important;
-  /* Arrotonda i bordi della toolbar */
   background-color: white !important;
-  /* Rendi trasparente lo sfondo della toolbar */
 }
 
 .custom-quill .ql-editor {
   border-radius: 0 0 12px 12px !important;
-  /* Arrotonda i bordi dell'editor */
-  /* Rendi trasparente lo sfondo dell'editor */
-  color: white !important;
-  /* Colore del testo */
+  background-color: transparent !important;
 }
 
-.custom-quill .ql-toolbar button {
-  color: white !important;
-  /* Colore dei pulsanti della toolbar */
+/* Colore del testo condizionato dal tema */
+.custom-quill .ql-editor {
+  @apply text-black;
+  /* Default: testo nero */
+}
+
+[data-theme='synthwave'] .custom-quill .ql-editor,
+[data-theme='synthwave'] .custom-quill .ql-toolbar {
+  @apply text-white;
+  /* Tema synthwave: testo bianco */
 }

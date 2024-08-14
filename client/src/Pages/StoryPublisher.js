@@ -175,7 +175,7 @@ const StoryPublisher = () => {
           <label className="label font-mono text-center">
             {id ? "Edit your tags" : "Add some tags (at least 3)"}
           </label>
-          <div className="input-group flex flex-row justify-around">
+          <div className="input-group flex flex-row justify-between space-x-2">
             <input
               type="text"
               placeholder="New Tag..."
@@ -188,7 +188,7 @@ const StoryPublisher = () => {
             />
             <button
               type="button"
-              className="btn btn-primary rounded-full"
+              className="btn btn-primary  rounded-full"
               onClick={handleAddTag}
             >
               <IoMdAdd />

@@ -55,7 +55,7 @@ const TableManager = () => {
         </div>
 
         <div className="w-full overflow-x-auto">
-          <table className="table-zebra bg-primary rounded-2xl bg-opacity-50 w-full">
+          <table className="table-zebra bg-primary rounded-2xl bg-opacity-50">
             <thead>
               <tr>
                 <th className="px-2 md:px-4 py-2">#</th>
@@ -78,15 +78,15 @@ const TableManager = () => {
                   <td className="px-2 md:px-4 py-2">
                     {new Date(story.createdAt).toLocaleString()}
                   </td>
-                  <td className="px-2 md:px-4 py-2">
+                  <td className="px-2 md:px-4 py-2 flex flex-col justify-center space-y-1">
                     <button
-                      className="btn btn-error btn-sm mr-2"
+                      className="btn btn-error"
                       onClick={() => deleteStory(story._id)}
                     >
                       Delete <FaTrashAlt />
                     </button>
                     <button
-                      className="btn btn-warning btn-sm"
+                      className="btn btn-warning "
                       onClick={() => editStory(story._id)}
                     >
                       Edit <FaEdit />
@@ -104,7 +104,7 @@ const TableManager = () => {
             className="btn btn-secondary btn-sm rounded-xl"
             onClick={() => navigate("/manager")}
           >
-            <BsArrowLeft/> Back
+            <BsArrowLeft /> Back
           </button>
         </div>
       </div>

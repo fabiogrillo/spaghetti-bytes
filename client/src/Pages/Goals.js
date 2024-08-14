@@ -52,8 +52,8 @@ const Goals = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {goals.map((goal) => (
-          <div key={goal._id} className="timeline-item">
-            <h2 className="text-2xl font-bold">{goal.title}</h2>
+          <div key={goal._id} className="timeline-item p-4 rounded-xl shadow-md">
+            <h2 className="text-xl font-bold">{goal.title}</h2>
             <p>{goal.description}</p>
             <p className="text-sm italic py-2">
               {new Date(goal.createdAt).toLocaleDateString("en-US", {
@@ -66,7 +66,7 @@ const Goals = () => {
               {goal.steps.map((step, index) => (
                 <li
                   key={index}
-                  className={`step ${step.completed ? "step-primary" : ""}`}
+                  className={`step ${step.completed ? "step-primary" : ""} text-sm`}
                 >
                   {step.description}
                 </li>

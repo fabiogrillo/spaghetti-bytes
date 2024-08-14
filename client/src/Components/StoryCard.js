@@ -9,12 +9,14 @@ const StoryCard = ({ story }) => {
     new Date() - new Date(story.createdAt) < 14 * 24 * 60 * 60 * 1000;
 
   return (
-    <div className="indicator w-full text-white">
+    <div className="indicator w-full p-6">
       {isNew && (
-        <span className="indicator-item badge bg-violet-700 text-white outline border-0">New</span>
+        <span className="indicator-item badge bg-orange-500 animate-pulse absolute top-4 right-4 m-2 text-white">
+          New
+        </span>
       )}
       <div
-        className="p-6 rounded-lg shadow-md cursor-pointer bg-primary bg-opacity-40 w-full outline"
+        className="p-4 rounded-lg shadow-lg cursor-pointer w-full"
         onClick={() => navigate(`/visualizer/${story._id}`)}
       >
         <h2 className="text-xl font-bold mb-2">{story.title}</h2>

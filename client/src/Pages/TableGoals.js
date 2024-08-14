@@ -100,7 +100,7 @@ const TableGoals = () => {
         <div className="flex items-center mt-8">
           <button
             type="button"
-            className="btn btn-secondary btn-sm rounded-xl"
+            className="btn btn-primary btn-sm rounded-xl"
             onClick={() => navigate("/manager")}
           >
             <BsArrowLeft /> Back

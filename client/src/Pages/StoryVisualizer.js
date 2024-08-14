@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.bubble.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.bubble.css";
+import { BsArrowLeft } from "react-icons/bs";
 
 const StoryVisualizer = () => {
+  const navigate = useNavigate();
   const { storyId } = useParams();
   const [story, setStory] = useState(null);
 
@@ -14,7 +16,7 @@ const StoryVisualizer = () => {
         const data = await response.json();
         setStory(data);
       } catch (error) {
-        console.error('Error fetching story:', error);
+        console.error("Error fetching story:", error);
       }
     };
     fetchStory();
@@ -24,33 +26,47 @@ const StoryVisualizer = () => {
     return <div>Loading...</div>;
   }
 
-  // Calcolo del tempo di lettura (assumendo 200 parole per minuto)
   const readingTime = Math.ceil(story.content.split(/\s+/).length / 200);
 
   return (
-    <div className="container mx-auto p-8 mb-32 min-h-full">
-      <h1 className="text-3xl font-bold mb-12 text-left">{story.title}</h1>
-      <div className="flex justify-between items-center mb-4">
-        <div className="w-1/3">
-          <p className="text-lg">Reading time: {readingTime} min</p>
+    <div className="container mx-auto p-4 md:p-8">
+      <h1 className="text-2xl md:text-3xl font-bold my-4 text-center">
+        {story.title}
+      </h1>
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+        <div className="w-full md:w-1/3 text-center md:text-left">
+          <p className="text-sm md:text-lg">Reading time: {readingTime} min</p>
         </div>
-        <div className="w-1/3 text-center">
+        <div className="w-full md:w-1/3 text-center mt-2 md:mt-0">
           {story.tags.map((tag) => (
-            <span key={tag} className="badge badge-primary mr-2 mb-2 rounded-full">
+            <span
+              key={tag}
+              className="badge badge-primary mr-2 mb-2 rounded-full"
+            >
               {tag}
             </span>
           ))}
         </div>
-        <div className="w-1/3 text-right">
-          <p className="text-lg">Published on {new Date(story.createdAt).toLocaleDateString()}</p>
+        <div className="w-full md:w-1/3 text-center md:text-right mt-2 md:mt-0">
+          <p className="text-sm md:text-lg">
+            Published on {new Date(story.createdAt).toLocaleDateString()}
+          </p>
         </div>
       </div>
       <ReactQuill
         value={story.content}
         readOnly={true}
         theme="bubble"
-        className="p-8 custom-quill bg-primary bg-opacity-5 rounded-2xl"
+        className="p-2 custom-quill rounded-2xl bg-transparent text-black shadow-md"
       />
+      <div className="flex justify-center md:justify-start mt-4">
+        <button
+          className="btn btn-secondary btn-sm rounded-2xl"
+          onClick={() => navigate("/blog")}
+        >
+          <BsArrowLeft /> Back
+        </button>
+      </div>
     </div>
   );
 };
