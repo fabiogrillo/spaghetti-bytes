@@ -30,14 +30,11 @@ body,
   background-color: transparent !important;
 }
 
-/* Colore del testo condizionato dal tema */
 .custom-quill .ql-editor {
   @apply text-black;
-  /* Default: testo nero */
 }
 
 [data-theme='synthwave'] .custom-quill .ql-editor,
 [data-theme='synthwave'] .custom-quill .ql-toolbar {
   @apply text-white;
-  /* Tema synthwave: testo bianco */
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import StoryCard from "../Components/StoryCard";
 import rocketImage from "../Assets/Images/juicy-woman-is-reading-a-book-at-home.gif";
-import { FaRegBookmark } from "react-icons/fa";
+import { FaRegBookmark, FaSearch } from "react-icons/fa";
 import { PiUsersThree } from "react-icons/pi";
 import { LuTags } from "react-icons/lu";
 
@@ -9,6 +9,7 @@ const Wall = () => {
   const [stories, setStories] = useState([]);
   const [filteredStories, setFilteredStories] = useState([]);
   const [sortOption, setSortOption] = useState("newest");
+  const [searchTag, setSearchTag] = useState("");
   const [lastMonthStories, setLastMonthStories] = useState(0);
   const [distinctTags, setDistinctTags] = useState(0);
 
@@ -17,7 +18,6 @@ const Wall = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch stories from the server
     const fetchStories = async () => {
       try {
         const response = await fetch("/api/stories");
@@ -45,9 +45,19 @@ const Wall = () => {
   }, []);
 
   useEffect(() => {
-    // Sort stories based on sortOption
-    const sortStories = () => {
+    const sortAndFilterStories = () => {
       let sortedStories = [...stories];
+
+      // Filtro per il tag cercato
+      if (searchTag) {
+        sortedStories = sortedStories.filter((story) =>
+          story.tags.some((tag) =>
+            tag.toLowerCase().includes(searchTag.toLowerCase())
+          )
+        );
+      }
+
+      // Ordinamento per la data
       if (sortOption === "newest") {
         sortedStories.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -57,10 +67,12 @@ const Wall = () => {
           (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
         );
       }
+
       setFilteredStories(sortedStories);
     };
-    sortStories();
-  }, [sortOption, stories]);
+
+    sortAndFilterStories();
+  }, [sortOption, searchTag, stories]);
 
   return (
     <div>
@@ -92,7 +104,6 @@ const Wall = () => {
         </div>
       </div>
 
-      {/* Container per centrare le stats */}
       <div className="flex justify-center mx-auto">
         <div className="stats stats-vertical lg:stats-horizontal w-full max-w-4xl shadow-md">
           <div className="stat">
@@ -122,22 +133,48 @@ const Wall = () => {
         </div>
       </div>
 
-      <div className="mt-8 mb-4 text-center">
+      <div className="flex justify-center items-center text-center mt-12">
+        <h1 className="text-xl font-semibold">
+          Click 🖱️ on a story to read it, enjoy!
+        </h1>
+      </div>
+      <div className="mt-8 mb-4 flex  gap-2">
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
-          className="select select-bordered w-full max-w-xs"
+          className="select select-bordered max-w-md "
         >
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
         </select>
+
+        <div className="relative">
+          <input
+            type="text"
+            value={searchTag}
+            onChange={(e) => setSearchTag(e.target.value)}
+            placeholder="Search by tag"
+            className="input input-bordered w-full pr-10"
+          />
+          <div className="absolute top-3.5 right-3 text-gray-400">
+            <FaSearch />
+          </div>
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {filteredStories.map((story) => (
-          <div key={story._id}>
-            <StoryCard story={story} />
+        {filteredStories.length > 0 ? (
+          filteredStories.map((story) => (
+            <div key={story._id}>
+              <StoryCard story={story} />
+            </div>
+          ))
+        ) : (
+          <div className="col-span-1 md:col-span-2 text-center">
+            <p className="text-md  text-gray-500">
+              None of the stories has the "{searchTag}" tag 😢
+            </p>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

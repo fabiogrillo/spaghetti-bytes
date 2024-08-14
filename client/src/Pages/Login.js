@@ -24,43 +24,41 @@ const Login = ({ setAuthenticated, setUsername }) => {
   };
 
   return (
-    <div className="p-4 space-y-8 flex flex-col mt-16 min-h-full">
-      <div className="card w-full bg-carolina-blue p-6 flex flex-col mx-auto max-w-4xl items-center justify-center">
-        <div className="flex flex-col md:flex-row justify-center items-center">
-          <div className="flex flex-col items-center justify-center md:w-3/5 space-y-4">
-            <h2 className="card-title">Sign in</h2>
-            <form onSubmit={handleLogin} className="w-full flex flex-col gap-4">
-              <label className="input input-bordered flex items-center gap-2 w-full">
-                Email
-                <input
-                  type="text"
-                  className="grow"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="daisy@site.com"
-                />
-              </label>
-              <label className="input input-bordered flex items-center gap-2 w-full">
-                Password
-                <input
-                  type="password"
-                  className="grow"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="******"
-                />
-              </label>
-              {error && <p className="text-red-500">{error}</p>}
-              <button className="btn btn-primary w-full" type="submit">
-                Login
-              </button>
-            </form>
-          </div>
-          <div className="flex flex-col items-center justify-center md:w-2/5 space-y-4 mt-6 md:mt-0">
+    <div className="container mx-auto p-8">
+      <div className="flex flex-col items-center text-center">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold">Sign in</h1>
+          <form onSubmit={handleLogin} className="py-2 md:text-base space-y-4 my-6">
+            <label className="input input-bordered flex items-center gap-2 w-full">
+              Email
+              <input
+                type="text"
+                className="grow"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="spaghetti@bytes.blog"
+              />
+            </label>
+            <label className="input input-bordered flex items-center gap-2 w-full">
+              Password
+              <input
+                type="password"
+                className="grow"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="******"
+              />
+            </label>
+            {error && <p className="text-red-500">{error}</p>}
+            <button className="btn btn-primary w-full" type="submit">
+              Login
+            </button>
+          </form>
+          <div className="mb-8">
             <img
               src={illustrationLogin}
               alt="Illustration Login"
-              className="w-full max-w-lg"
+              className="w-full max-w-sm md:max-w-lg"
             />
             <p className="text-xs text-center ">
               Illustration by{" "}

@@ -66,7 +66,7 @@ const Goals = () => {
               {goal.steps.map((step, index) => (
                 <li
                   key={index}
-                  className={`step ${step.completed ? "step-primary" : ""} text-sm`}
+                  className={`step ${step.completed ? "step-primary" : ""} text-xs p-2`}
                 >
                   {step.description}
                 </li>

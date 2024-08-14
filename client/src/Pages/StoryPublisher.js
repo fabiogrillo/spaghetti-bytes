@@ -245,7 +245,7 @@ const StoryPublisher = () => {
       <div className="flex justify-between items-center mt-8">
         <button
           type="button"
-          className="btn btn-primary btn-sm rounded-2xl"
+          className="btn btn-primary btn-outline btn-sm rounded-2xl"
           onClick={() => navigate("/manager")}
         >
           <BsArrowLeft /> Back

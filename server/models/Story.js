@@ -5,7 +5,6 @@ const storySchema = new mongoose.Schema({
   summary: { type: String, required: true },
   tags: { type: [String], required: true },
   content: { type: Object, required: true },
-  sharedOnLinkedIn: { type: Boolean, default: false },
   sharedOnMedium: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
