@@ -138,11 +138,11 @@ const Wall = () => {
           Click 🖱️ on a story to read it, enjoy!
         </h1>
       </div>
-      <div className="mt-8 mb-4 flex  gap-2">
+      <div className="mt-8 mb-4 flex gap-2 items-center justify-center">
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
-          className="select select-bordered max-w-md "
+          className="select select-bordered"
         >
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
