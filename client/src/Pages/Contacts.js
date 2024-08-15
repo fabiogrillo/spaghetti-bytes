@@ -143,7 +143,7 @@ const Contacts = () => {
             <div className="text-center">
               <button
                 type="submit"
-                className="btn btn-primary btn-md rounded-full hover:-translate-y-1 hover:scale-110"
+                className="btn btn-secondary btn-md rounded-full hover:translate-y-1 hover:scale-110"
               >
                 <RiMailSendLine className="mr-2" /> Send
               </button>

@@ -11,7 +11,7 @@ const StoryCard = ({ story }) => {
   return (
     <div className="indicator w-full p-6">
       {isNew && (
-        <span className="indicator-item badge bg-secondary animate-pulse absolute top-4 right-4 m-2 text-white">
+        <span className="indicator-item badge bg-emerald-800 animate-pulse absolute top-4 right-3.5 m-2 text-white">
           New
         </span>
       )}

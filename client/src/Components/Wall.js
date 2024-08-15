@@ -12,6 +12,7 @@ const Wall = () => {
   const [searchTag, setSearchTag] = useState("");
   const [lastMonthStories, setLastMonthStories] = useState(0);
   const [distinctTags, setDistinctTags] = useState(0);
+  const [loading, setLoading] = useState(true); // Stato per il caricamento
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -39,6 +40,8 @@ const Wall = () => {
         setDistinctTags(uniqueTags.size);
       } catch (error) {
         console.error("Error fetching stories:", error);
+      } finally {
+        setLoading(false); // Dati caricati, disabilitiamo il loading
       }
     };
     fetchStories();
@@ -161,21 +164,28 @@ const Wall = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {filteredStories.length > 0 ? (
-          filteredStories.map((story) => (
-            <div key={story._id}>
-              <StoryCard story={story} />
+      {loading ? (
+        <div className="flex flex-col items-center mt-20">
+          <span className="loading loading-infinity loading-lg"></span>
+          <p className="mt-4 text-lg">Loading stories...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {filteredStories.length > 0 ? (
+            filteredStories.map((story) => (
+              <div key={story._id}>
+                <StoryCard story={story} />
+              </div>
+            ))
+          ) : (
+            <div className="col-span-1 md:col-span-2 text-center">
+              <p className="text-md text-gray-500">
+                None of the stories has the "{searchTag}" tag 😢
+              </p>
             </div>
-          ))
-        ) : (
-          <div className="col-span-1 md:col-span-2 text-center">
-            <p className="text-md  text-gray-500">
-              None of the stories has the "{searchTag}" tag 😢
-            </p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

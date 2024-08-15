@@ -3,6 +3,7 @@ import illustration from "../Assets/Images/twinkle-online-education.gif";
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
+  const [loading, setLoading] = useState(true); // Stato per il caricamento
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -17,6 +18,8 @@ const Goals = () => {
         setGoals(data);
       } catch (error) {
         console.error("Error fetching goals:", error);
+      } finally {
+        setLoading(false); // Dati caricati, disabilitiamo il loading
       }
     };
     fetchGoals();
@@ -50,31 +53,44 @@ const Goals = () => {
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {goals.map((goal) => (
-          <div key={goal._id} className="timeline-item p-4 rounded-xl shadow-md">
-            <h2 className="text-xl font-bold">{goal.title}</h2>
-            <p>{goal.description}</p>
-            <p className="text-sm italic py-2">
-              {new Date(goal.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-            <ul className="steps mt-4">
-              {goal.steps.map((step, index) => (
-                <li
-                  key={index}
-                  className={`step ${step.completed ? "step-primary" : ""} text-xs p-2`}
-                >
-                  {step.description}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center mt-20">
+          <span className="loading loading-infinity loading-lg"></span>
+          <p className="mt-4 text-lg">Loading goals...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {goals.map((goal) => (
+            <div
+              key={goal._id}
+              className="timeline-item p-4 rounded-xl shadow-md"
+            >
+              <h2 className="text-xl font-bold">{goal.title}</h2>
+              <p>{goal.description}</p>
+              <p className="text-sm italic py-2">
+                {new Date(goal.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+              <ul className="steps mt-4">
+                {goal.steps.map((step, index) => (
+                  <li
+                    key={index}
+                    className={`step ${
+                      step.completed ? "step-primary" : ""
+                    } text-xs p-2`}
+                  >
+                    {step.description}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

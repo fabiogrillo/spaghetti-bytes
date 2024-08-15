@@ -8,6 +8,7 @@ const StoryVisualizer = () => {
   const navigate = useNavigate();
   const { storyId } = useParams();
   const [story, setStory] = useState(null);
+  const [loading, setLoading] = useState(true); // Stato per il caricamento
 
   useEffect(() => {
     const fetchStory = async () => {
@@ -17,13 +18,24 @@ const StoryVisualizer = () => {
         setStory(data);
       } catch (error) {
         console.error("Error fetching story:", error);
+      } finally {
+        setLoading(false); // Dati caricati, disabilitiamo il loading
       }
     };
     fetchStory();
   }, [storyId]);
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center mt-20">
+        <span className="loading loading-infinity loading-lg"></span>
+        <p className="mt-4 text-lg">Loading story...</p>
+      </div>
+    );
+  }
+
   if (!story) {
-    return <div>Loading...</div>;
+    return <div>Error loading story...</div>;
   }
 
   const readingTime = Math.ceil(story.content.split(/\s+/).length / 200);
