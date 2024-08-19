@@ -54,7 +54,7 @@ const TableGoals = () => {
         </div>
 
         <div className="w-full overflow-x-auto">
-          <table className="table-zebra bg-secondary rounded-2xl bg-opacity-50 w-full">
+          <table className="table-zebra bg-primary bg-opacity-60 rounded-2xl  w-full">
             <thead>
               <tr>
                 <th className="px-2 md:px-4 py-2">#</th>
@@ -77,7 +77,7 @@ const TableGoals = () => {
                   <td className="px-2 md:px-4 py-2">
                     {new Date(goal.createdAt).toLocaleString()}
                   </td>
-                  <td className="px-2 md:px-4 py-2">
+                  <td className="px-2 md:px-4 py-2 flex flex-col justify-center space-y-1">
                     <button
                       className="btn btn-error btn-sm mr-2"
                       onClick={() => deleteGoal(goal._id)}

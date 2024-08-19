@@ -16,7 +16,7 @@ const StoryCard = ({ story }) => {
         </span>
       )}
       <div
-        className="p-4 rounded-lg shadow-md cursor-pointer w-full "
+        className="p-4 rounded-lg shadow-md cursor-pointer w-full"
         onClick={() => navigate(`/visualizer/${story._id}`)}
       >
         <h2 className="text-xl font-bold mb-2">{story.title}</h2>

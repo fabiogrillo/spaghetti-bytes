@@ -26,8 +26,20 @@ const Home = () => {
             </p>
             <p className="py-2 mx-4 md:mx-36 md:text-base">
               Here, you'll find insights and discussions on software
-              engineering, data engineering, and other technical topics. Dive
-              into my world of code, innovation, and growth. Happy reading!
+              engineering, data engineering, and topics closely related to these
+              fields.
+              <br />
+              <b>Spaghetti Bytes</b> is a playful nod to the concept of "spaghetti
+              code," a chaotic and tangled approach to programming that I aim to
+              avoid. Instead, I strive to unravel the complexities of code,
+              addressing bugs, exceptions, and other challenges with clarity and
+              precision. The term "Bytes" reflects the core of computer science,
+              while also echoing "bites," representing small, digestible pieces
+              of software engineering knowledge.
+              <br />
+              These stories aren't meant to be exhaustive scientific articles,
+              but rather thoughtful bites or "pills" of insight that reflect my
+              evolving perspective and experiences over time.
             </p>
           </div>
         </div>

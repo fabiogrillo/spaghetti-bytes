@@ -64,7 +64,7 @@ const Goals = () => {
           {goals.map((goal) => (
             <div
               key={goal._id}
-              className="timeline-item p-4 rounded-xl shadow-md"
+              className="timeline-item p-4 rounded-xl shadow-md mx-4 sm:mx-6 lg:mx-8"
             >
               <h2 className="text-xl font-bold">{goal.title}</h2>
               <p>{goal.description}</p>
@@ -75,18 +75,18 @@ const Goals = () => {
                   day: "numeric",
                 })}
               </p>
-              <ul className="steps mt-4">
+              <div className="steps mt-4 flex">
                 {goal.steps.map((step, index) => (
-                  <li
+                  <p
                     key={index}
                     className={`step ${
-                      step.completed ? "step-primary" : ""
-                    } text-xs p-2`}
+                      step.completed ? "step-success" : ""
+                    } text-xs px-2`}
                   >
                     {step.description}
-                  </li>
+                  </p>
                 ))}
-              </ul>
+              </div>
             </div>
           ))}
         </div>
