@@ -44,7 +44,7 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
     <header>
       <div className="navbar p-4 shadow-md">
         <div className="flex-1">
-          <Link className="text-2xl font-bold" to="/">
+          <Link className="text-2xl font-bold flex" to="/">
             Spaghetti Bytes
           </Link>
         </div>
@@ -157,13 +157,11 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
         {/* Sidebar for small screens */}
         {isSidebarOpen && (
           <div className="fixed inset-0 z-50 lg:hidden " onClick={closeSidebar}>
-            {/* Sidebar */}
             <div
               className="fixed left-0 top-0 h-full w-64 bg-neutral shadow-md z-50 p-4 flex flex-col text-white"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Title */}
-              <h1 className="text-4xl font-bold mb-8">Spaghetti Bytes</h1>
+              <h1 className="text-3xl font-bold mb-8 flex">Spaghetti Bytes</h1>
 
               {/* Navigation links */}
               <ul className="menu menu-vertical space-y-4 text-lg">
