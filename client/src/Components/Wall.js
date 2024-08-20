@@ -78,9 +78,9 @@ const Wall = () => {
   }, [sortOption, searchTag, stories]);
 
   return (
-    <div>
-      <div className="flex flex-col items-center mx-auto justify-between md:m-8">
-        <div className="text-center py-10">
+    <div className="container mx-auto p-8">
+      <div className="flex flex-col items-center text-center">
+        <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold">The reading corner</h1>
           <p className="py-2 md:py-2 md:text-base">
             Welcome, dear reader! I am delighted to invite you into this space
@@ -178,7 +178,7 @@ const Wall = () => {
               </div>
             ))
           ) : (
-            <div className="col-span-1 md:col-span-2 text-center">
+            <div className="col-span-1 md:col-span-2 text-center mt-8">
               <p className="text-md text-gray-500">
                 None of the stories has the "{searchTag}" tag 😢
               </p>

@@ -16,12 +16,12 @@ const StoryCard = ({ story }) => {
         </span>
       )}
       <div
-        className="p-4 rounded-lg shadow-md cursor-pointer w-full"
+        className="p-4 rounded-lg shadow-md cursor-pointer w-full transition ease-in hover:scale-105 hover:shadow-primary flex flex-col justify-between"
         onClick={() => navigate(`/visualizer/${story._id}`)}
       >
         <h2 className="text-xl font-bold mb-2">{story.title}</h2>
         <p className="text-sm mb-2">{story.summary}</p>
-        <div className="flex flex-wrap">
+        <div className="flex flex-wrap mt-2">
           {story.tags.map((tag) => (
             <span
               key={tag}

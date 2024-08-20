@@ -64,7 +64,7 @@ const Goals = () => {
           {goals.map((goal) => (
             <div
               key={goal._id}
-              className="timeline-item p-4 rounded-xl shadow-md mx-4 sm:mx-6 lg:mx-8"
+              className="timeline-item p-4 rounded-xl shadow-md mx-4 sm:mx-6 lg:mx-8 min-h-[300px] flex flex-col justify-between transition ease-in hover:scale-105 hover:shadow-primary"
             >
               <h2 className="text-xl font-bold">{goal.title}</h2>
               <p>{goal.description}</p>
@@ -75,13 +75,13 @@ const Goals = () => {
                   day: "numeric",
                 })}
               </p>
-              <div className="steps mt-4 flex">
+              <div className="steps mt-4 flex justify-between">
                 {goal.steps.map((step, index) => (
                   <p
                     key={index}
                     className={`step ${
                       step.completed ? "step-success" : ""
-                    } text-xs px-2`}
+                    } text-[10px] text-center px-2`}
                   >
                     {step.description}
                   </p>

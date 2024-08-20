@@ -69,15 +69,17 @@ const StoryVisualizer = () => {
         value={story.content}
         readOnly={true}
         theme="bubble"
-        className="p-2 custom-quill rounded-2xl bg-transparent text-black shadow-md"
+        className="p-2 custom-quill rounded-2xl bg-transparent text-black shadow-md mt-8"
       />
-      <div className="flex justify-center md:justify-start mt-4">
-        <button
-          className="btn btn-secondary btn-sm rounded-2xl"
-          onClick={() => navigate("/blog")}
-        >
-          <BsArrowLeft /> Back
-        </button>
+      <div className="flex justify-center mt-8">
+        <div className="md:justify-start mt-4">
+          <button
+            className="btn btn-secondary btn-sm rounded-2xl"
+            onClick={() => navigate("/blog")}
+          >
+            <BsArrowLeft /> Back
+          </button>
+        </div>
       </div>
     </div>
   );
