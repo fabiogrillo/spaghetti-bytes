@@ -42,22 +42,12 @@ const StoryVisualizer = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h1 className="text-2xl md:text-3xl font-bold my-4 text-center">
+      <h1 className="text-2xl md:text-3xl font-semibold my-4 text-center text-primary mb-6">
         {story.title}
       </h1>
       <div className="flex flex-col md:flex-row justify-between items-center mb-4">
         <div className="w-full md:w-1/3 text-center md:text-left">
           <p className="text-sm md:text-lg">Reading time: {readingTime} min</p>
-        </div>
-        <div className="w-full md:w-1/3 text-center mt-2 md:mt-0">
-          {story.tags.map((tag) => (
-            <span
-              key={tag}
-              className="badge badge-primary mr-2 mb-2 rounded-full"
-            >
-              {tag}
-            </span>
-          ))}
         </div>
         <div className="w-full md:w-1/3 text-center md:text-right mt-2 md:mt-0">
           <p className="text-sm md:text-lg">
@@ -65,16 +55,28 @@ const StoryVisualizer = () => {
           </p>
         </div>
       </div>
+      <div className="divider"></div>
       <ReactQuill
         value={story.content}
         readOnly={true}
         theme="bubble"
-        className="p-2 custom-quill rounded-2xl bg-transparent text-black shadow-md mt-8"
+        className="p-2 custom-quill rounded-2xl bg-transparent text-black mt-4"
       />
+      <div className="flex flex-wrap justify-center mt-4">
+        {story.tags.map((tag) => (
+          <span
+            key={tag}
+            className="badge badge-primary mr-4 mb-2 rounded-full text-md p-2"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+      <div className="divider"></div>
       <div className="flex justify-center mt-8">
         <div className="md:justify-start mt-4">
           <button
-            className="btn btn-secondary btn-sm rounded-2xl"
+            className="btn btn-secondary btn-md rounded-2xl"
             onClick={() => navigate("/blog")}
           >
             <BsArrowLeft /> Back

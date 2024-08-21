@@ -80,8 +80,10 @@ const Goals = () => {
                   <p
                     key={index}
                     className={`step ${
-                      step.completed ? "step-success" : ""
-                    } text-[10px] text-center px-2`}
+                      step.completed
+                        ? "step-success text-success"
+                        : "step-error text-error"
+                    } text-[12px] text-center px-2`}
                   >
                     {step.description}
                   </p>

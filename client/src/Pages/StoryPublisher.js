@@ -107,9 +107,9 @@ const StoryPublisher = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
-      <div className="flex flex-col items-center text-center space-y-8">
-        <div>
+    <div className="container mx-auto p-8">
+      <div className="flex flex-col items-center text-center">
+        <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold">
             {id ? "Edit Your Story" : "Let's Write a New Incredible Story"}
           </h1>
@@ -121,17 +121,15 @@ const StoryPublisher = () => {
         </div>
       </div>
 
-      <div className="card p-6 my-8 space-y-4">
-        <div className="form-control items-center">
+      <div className="card my-8 space-y-6 max-w-3xl mx-auto">
+        <div className="form-control items-center w-full">
           <label className="label font-mono text-center">
-            {id
-              ? "Edit the title of your story"
-              : "Start with a title"}
+            {id ? "Edit the title of your story" : "Start with a title"}
           </label>
           <input
             type="text"
             placeholder="Your title here..."
-            className="input input-bordered italic"
+            className="input input-bordered italic w-full"
             value={title}
             maxLength={maxTitleLength}
             onChange={(e) => {
@@ -147,15 +145,13 @@ const StoryPublisher = () => {
           </p>
         </div>
 
-        <div className="form-control items-center">
+        <div className="form-control items-center w-full">
           <label className="label font-mono text-center">
-            {id
-              ? "Edit the summary of your story"
-              : "Brief description"}
+            {id ? "Edit the summary of your story" : "Brief description"}
           </label>
           <textarea
             placeholder="Summary here..."
-            className="textarea textarea-bordered italic"
+            className="textarea textarea-bordered italic w-full"
             value={summary}
             maxLength={maxSummaryLength}
             onChange={(e) => {
@@ -171,15 +167,15 @@ const StoryPublisher = () => {
           </p>
         </div>
 
-        <div className="form-control items-center">
+        <div className="form-control items-center w-full">
           <label className="label font-mono text-center">
             {id ? "Edit your tags" : "Add some tags (at least 3)"}
           </label>
-          <div className="input-group flex flex-row justify-between space-x-2">
+          <div className="input-group flex flex-row justify-between space-x-2 w-full">
             <input
               type="text"
               placeholder="New Tag..."
-              className="input input-bordered italic"
+              className="input input-bordered italic w-full"
               value={newTag}
               onChange={(e) => {
                 setNewTag(e.target.value);
@@ -188,7 +184,7 @@ const StoryPublisher = () => {
             />
             <button
               type="button"
-              className="btn btn-primary  rounded-full"
+              className="btn btn-primary rounded-full"
               onClick={handleAddTag}
             >
               <IoMdAdd />
@@ -210,7 +206,7 @@ const StoryPublisher = () => {
           </div>
         </div>
 
-        <div className="form-control items-center">
+        <div className="form-control items-center w-full">
           <label className="label font-mono text-center">
             {id ? "Edit your story" : "Now write your story"}
           </label>
@@ -224,7 +220,7 @@ const StoryPublisher = () => {
           )}
         </div>
 
-        <div className="form-control flex items-center">
+        <div className="form-control flex items-center w-full">
           <label className="label font-mono text-center">
             {id
               ? "Edit your Medium sharing settings"

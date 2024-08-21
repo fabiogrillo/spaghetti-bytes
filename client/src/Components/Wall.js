@@ -80,9 +80,9 @@ const Wall = () => {
   return (
     <div className="container mx-auto p-8">
       <div className="flex flex-col items-center text-center">
-        <div className="mb-8">
+        <div className="mb-2">
           <h1 className="text-3xl md:text-4xl font-bold">The reading corner</h1>
-          <p className="py-2 md:py-2 md:text-base">
+          <p className="pt-2 md:pt-2 md:text-base">
             Welcome, dear reader! I am delighted to invite you into this space
             where you can explore all the stories that have been thoughtfully
             crafted and shared. There are some stats that provide insights into
@@ -91,7 +91,7 @@ const Wall = () => {
             resonate with you 🤗
           </p>
         </div>
-        <div className="mb-8">
+        <div className="mb-12">
           <img
             src={rocketImage}
             alt="Illustration Reading"
@@ -116,14 +116,6 @@ const Wall = () => {
             <div className="stat-title">Total Stories</div>
             <div className="stat-value text-primary">{stories.length}</div>
             <div className="stat-desc">{`${lastMonthStories} new stories last month`}</div>
-          </div>
-
-          <div className="stat">
-            <div className="stat-figure text-secondary text-3xl">
-              <PiUsersThree />
-            </div>
-            <div className="stat-title">Users Reached</div>
-            <div className="stat-value text-secondary">100</div>
           </div>
 
           <div className="stat">

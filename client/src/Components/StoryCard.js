@@ -9,23 +9,23 @@ const StoryCard = ({ story }) => {
     new Date() - new Date(story.createdAt) < 14 * 24 * 60 * 60 * 1000;
 
   return (
-    <div className="indicator w-full p-6">
+    <div className="indicator w-full p-6 transition ease-in hover:scale-105">
       {isNew && (
-        <span className="indicator-item badge bg-emerald-800 animate-pulse absolute top-4 right-3.5 m-2 text-white">
+        <span className="indicator-item badge bg-emerald-800 animate-pulse absolute top-4 right-3.5 m-2 text-white transform transition ease-in hover:scale-105">
           New
         </span>
       )}
       <div
-        className="p-4 rounded-lg shadow-md cursor-pointer w-full transition ease-in hover:scale-105 hover:shadow-primary flex flex-col justify-between"
+        className="p-4 rounded-lg shadow-md cursor-pointer w-full flex flex-col justify-between"
         onClick={() => navigate(`/visualizer/${story._id}`)}
       >
-        <h2 className="text-xl font-bold mb-2">{story.title}</h2>
-        <p className="text-sm mb-2">{story.summary}</p>
-        <div className="flex flex-wrap mt-2">
+        <h2 className="text-lg font-bold mb-2">{story.title}</h2>
+        <p className="text-md mb-2">{story.summary}</p>
+        <div className="flex flex-wrap my-2 ">
           {story.tags.map((tag) => (
             <span
               key={tag}
-              className="badge badge-primary mr-2 mb-2 rounded-full text-white"
+              className="badge badge-primary m-1 rounded-full text-white text-sm"
             >
               {tag}
             </span>
