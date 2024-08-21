@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import StoryCard from "../Components/StoryCard";
 import rocketImage from "../Assets/Images/juicy-woman-is-reading-a-book-at-home.gif";
 import { FaRegBookmark, FaSearch } from "react-icons/fa";
-import { PiUsersThree } from "react-icons/pi";
 import { LuTags } from "react-icons/lu";
 
 const Wall = () => {
