@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { GoBook } from "react-icons/go";
 
 const StoryCard = ({ story }) => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const StoryCard = ({ story }) => {
         </span>
       )}
       <div
-        className="p-4 rounded-lg shadow-md cursor-pointer w-full flex flex-col justify-between"
+        className="p-4 rounded-lg shadow-md cursor-pointer w-full flex flex-col justify-between shadow-md shadow-warning"
         onClick={() => navigate(`/visualizer/${story._id}`)}
       >
         <h2 className="text-lg font-bold mb-2">{story.title}</h2>
@@ -34,6 +35,11 @@ const StoryCard = ({ story }) => {
         <p className="text-white-600 text-xs">
           Published on {new Date(story.createdAt).toLocaleDateString()}
         </p>
+        <div className="mt-2 text-center">
+          <button className="btn btn-success btn-outline btn-md rounded-full">
+            <GoBook className="text-xl"/> Read
+          </button>
+        </div>
       </div>
     </div>
   );
