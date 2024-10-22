@@ -18,7 +18,13 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/client/"
+      "dest": "/client/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/index.html",
+      "methods": ["GET"],
+      "status": 200
     }
   ]
 }
