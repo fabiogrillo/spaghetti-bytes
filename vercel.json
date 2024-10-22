@@ -11,20 +11,14 @@
       "config": { "distDir": "build" }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server/server.js"
+      "source": "/api/(.*)",
+      "destination": "/server/server.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "/client/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/client/index.html",
-      "methods": ["GET"],
-      "status": 200
+      "source": "/(.*)",
+      "destination": "/client/"
     }
   ]
 }
