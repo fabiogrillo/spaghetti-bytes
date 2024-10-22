@@ -15,10 +15,12 @@
     {
       "src": "/api/(.*)",
       "dest": "/server/server.js"
-    },
+    }
+  ],
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/client/index.html"
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
