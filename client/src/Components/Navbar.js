@@ -10,7 +10,7 @@ import { GrContact } from "react-icons/gr";
 
 const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "cupcake");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Stato per gestire la sidebar
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(theme === "light" ? "synthwave" : "light");
+    setTheme(theme === "cupcake" ? "night" : "cupcake");
   };
 
   const handleLogout = async () => {
@@ -100,7 +100,7 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
               <label className="grid cursor-pointer place-items-center">
                 <input
                   type="checkbox"
-                  checked={theme === "synthwave"}
+                  checked={theme === "night"}
                   onChange={toggleTheme}
                   className="toggle theme-controller bg-base-content col-span-2 col-start-1 row-start-1"
                 />
@@ -207,13 +207,13 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
                   <label className="grid cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={theme === "synthwave"}
+                      checked={theme === "night"}
                       onChange={toggleTheme}
                       className="toggle theme-controller bg-base-content col-span-2 col-start-1 row-start-1"
                     />
                     <svg
                       className={`absolute inset-0 m-auto h-5 w-5 ${
-                        theme === "synthwave" ? "hidden" : "block"
+                        theme === "night" ? "hidden" : "block"
                       }`}
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -228,7 +228,7 @@ const Navbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
                     </svg>
                     <svg
                       className={`absolute inset-0 m-auto h-5 w-5 ${
-                        theme === "synthwave" ? "block" : "hidden"
+                        theme === "night" ? "block" : "hidden"
                       }`}
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"

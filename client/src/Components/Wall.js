@@ -127,11 +127,6 @@ const Wall = () => {
         </div>
       </div>
 
-      <div className="flex justify-center items-center text-center mt-12">
-        <h1 className="text-xl font-semibold">
-          Click 🖱️ on a story to read it, enjoy!
-        </h1>
-      </div>
       <div className="mt-8 mb-4 flex gap-2 items-center justify-center">
         <select
           value={sortOption}
@@ -150,7 +145,7 @@ const Wall = () => {
             placeholder="Search by tag"
             className="input input-bordered w-full pr-10"
           />
-          <div className="absolute top-3.5 right-3 text-gray-400">
+          <div className="absolute top-3.5 right-3 ">
             <FaSearch />
           </div>
         </div>

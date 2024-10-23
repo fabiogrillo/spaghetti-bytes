@@ -34,7 +34,7 @@ body,
   @apply text-black;
 }
 
-[data-theme='synthwave'] .custom-quill .ql-editor,
-[data-theme='synthwave'] .custom-quill .ql-toolbar {
+[data-theme='night'] .custom-quill .ql-editor,
+[data-theme='night'] .custom-quill .ql-toolbar {
   @apply text-white;
 }
