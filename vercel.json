@@ -11,7 +11,7 @@
       "config": { "distDir": "build" }
     }
   ],
-  "rewwrites": [
+  "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/api"
