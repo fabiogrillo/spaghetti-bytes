@@ -26,7 +26,7 @@ const StoryCard = ({ story }) => {
           {story.tags.map((tag) => (
             <span
               key={tag}
-              className="badge badge-primary badge-outline m-1 rounded-full text-white text-xs"
+              className="badge bg-orange-900 m-1 rounded-full text-xs text-white"
             >
               {tag}
             </span>
@@ -36,7 +36,7 @@ const StoryCard = ({ story }) => {
           Published on {new Date(story.createdAt).toLocaleDateString()}
         </p>
         <div className="mt-2 text-center">
-          <button className="btn btn-success btn-outline btn-md rounded-full ">
+          <button className="btn btn-primary btn-outline btn-md rounded-full ">
             <GoBook className="text-xl" /> Read
           </button>
         </div>
