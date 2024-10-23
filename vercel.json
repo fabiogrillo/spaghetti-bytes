@@ -17,8 +17,12 @@
       "dest": "/server/server.js"
     },
     {
+      "src": "^/static/(.*)",
+      "dest": "/client/static/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/client/$1"
+      "dest": "/client/index.html"
     }
   ]
 }
