@@ -47,7 +47,7 @@ const StoryVisualizer = () => {
       </h1>
       <div className="flex flex-col md:flex-row justify-between items-center mb-4">
         <div className="w-full md:w-1/3 text-center md:text-left">
-          <p className="text-sm md:text-lg">Reading time: {readingTime} min</p>
+          <p className="text-sm md:text-lg">📖 Reading time: {readingTime} min</p>
         </div>
         <div className="w-full md:w-1/3 text-center md:text-right mt-2 md:mt-0">
           <p className="text-sm md:text-lg">
