@@ -42,7 +42,7 @@ const StoryVisualizer = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h1 className="text-2xl md:text-3xl font-semibold my-4 text-center text-primary mb-6">
+      <h1 className="text-2xl md:text-3xl font-semibold my-4 text-center mb-6">
         {story.title}
       </h1>
       <div className="flex flex-col md:flex-row justify-between items-center mb-4">

@@ -28,13 +28,18 @@ body,
 .custom-quill .ql-editor {
   border-radius: 0 0 12px 12px !important;
   background-color: transparent !important;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .custom-quill .ql-editor {
   @apply text-black text-xl;
 }
 
-[data-theme='night'] .custom-quill .ql-editor,
-[data-theme='night'] .custom-quill .ql-toolbar {
+.custom-quill :any-link {
+  color:cornflowerblue;
+}
+
+[data-theme="night"] .custom-quill .ql-editor,
+[data-theme="night"] .custom-quill .ql-toolbar {
   @apply text-white;
 }

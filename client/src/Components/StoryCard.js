@@ -10,14 +10,14 @@ const StoryCard = ({ story }) => {
     new Date() - new Date(story.createdAt) < 14 * 24 * 60 * 60 * 1000;
 
   return (
-    <div className="indicator w-full p-6 transition ease-in hover:scale-105">
+    <div className="indicator w-full p-6 transition ease-in">
       {isNew && (
-        <span className="indicator-item badge bg-error absolute top-4 right-3.5 m-2 text-white transform hover:scale-105">
+        <span className="indicator-item badge bg-warning absolute top-4 right-3.5 m-2 text-white transform scale-110">
           New
         </span>
       )}
       <div
-        className="p-6 rounded-lg cursor-pointer w-full flex flex-col justify-between shadow-md border border-primary"
+        className="p-6 rounded-lg cursor-pointer w-full flex flex-col justify-between border border-primary transition ease-in hover:shadow-lg hover:shadow-primary"
         onClick={() => navigate(`/visualizer/${story._id}`)}
       >
         <h2 className="text-md font-bold mb-2">{story.title}</h2>
@@ -26,7 +26,7 @@ const StoryCard = ({ story }) => {
           {story.tags.map((tag) => (
             <span
               key={tag}
-              className="badge bg-violet-600 m-1 rounded-full text-xs text-white"
+              className="badge border-primary m-1 rounded-full text-xs text-primary font-bold"
             >
               {tag}
             </span>
@@ -36,7 +36,7 @@ const StoryCard = ({ story }) => {
           Published on {new Date(story.createdAt).toLocaleDateString()}
         </p>
         <div className="mt-2 text-center">
-          <button className="btn bg-green-600 btn-outline btn-md rounded-full ">
+          <button className="btn btn-primary btn-outline btn-md rounded-full ">
             <GoBook className="text-xl" /> Read
           </button>
         </div>

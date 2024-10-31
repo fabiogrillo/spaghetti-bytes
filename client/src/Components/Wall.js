@@ -109,20 +109,20 @@ const Wall = () => {
       <div className="flex justify-center mx-auto">
         <div className="stats stats-vertical lg:stats-horizontal w-full max-w-4xl shadow-md">
           <div className="stat">
-            <div className="stat-figure text-primary text-3xl">
+            <div className="stat-figure text-secondary text-3xl">
               <FaRegBookmark />
             </div>
             <div className="stat-title">Total Stories</div>
-            <div className="stat-value text-primary">{stories.length}</div>
+            <div className="stat-value text-secondary">{stories.length}</div>
             <div className="stat-desc">{`${lastMonthStories} new stories last month`}</div>
           </div>
 
           <div className="stat">
-            <div className="stat-figure text-warning text-3xl">
+            <div className="stat-figure text-success text-3xl">
               <LuTags />
             </div>
             <div className="stat-title">Topics covered</div>
-            <div className="stat-value text-warning">{distinctTags}</div>
+            <div className="stat-value text-success">{distinctTags}</div>
           </div>
         </div>
       </div>
