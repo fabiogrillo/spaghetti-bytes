@@ -31,7 +31,7 @@ body,
 }
 
 .custom-quill .ql-editor {
-  @apply text-black;
+  @apply text-black text-xl;
 }
 
 [data-theme='night'] .custom-quill .ql-editor,

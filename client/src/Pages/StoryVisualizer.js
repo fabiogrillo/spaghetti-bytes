@@ -60,7 +60,7 @@ const StoryVisualizer = () => {
         value={story.content}
         readOnly={true}
         theme="bubble"
-        className="p-2 custom-quill rounded-2xl bg-transparent text-black mt-4"
+        className="p-2 custom-quill rounded-2xl bg-transparent text-black mt-4 "
       />
       <div className="flex flex-wrap justify-center mt-4">
         {story.tags.map((tag) => (
