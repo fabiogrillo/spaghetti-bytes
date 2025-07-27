@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { BsArrowLeft } from "react-icons/bs";
+import ResponsiveTable from "../Components/ResponsiveTable";
+import { motion } from "framer-motion";
+
 const TableGoals = () => {
   const [goals, setGoals] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,15 +15,20 @@ const TableGoals = () => {
 
   const fetchGoals = async () => {
     try {
+      setLoading(true);
       const response = await fetch("/api/goals");
       const data = await response.json();
       setGoals(data);
     } catch (error) {
       console.error("Error fetching goals:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const deleteGoal = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this goal?")) return;
+    
     try {
       const response = await fetch(`/api/goals/${id}`, {
         method: "DELETE",
@@ -39,12 +47,81 @@ const TableGoals = () => {
     navigate(`/create-goal/${id}`);
   };
 
+  // Define columns for ResponsiveTable
+  const goalColumns = [
+    { 
+      key: "title", 
+      label: "Goal",
+      render: (goal) => (
+        <span className="font-semibold">{goal.title}</span>
+      )
+    },
+    { 
+      key: "description", 
+      label: "Description", 
+      render: (goal) => (
+        <span className="text-sm text-gray-600">
+          {goal.description.length > 80 
+            ? `${goal.description.slice(0, 80)}...` 
+            : goal.description}
+        </span>
+      )
+    },
+    {
+      key: "progress",
+      label: "Progress",
+      render: (goal) => {
+        const completedSteps = goal.steps.filter(step => step.completed).length;
+        const totalSteps = goal.steps.length;
+        const percentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+        
+        return (
+          <div className="flex items-center gap-2">
+            <progress 
+              className="progress progress-success w-24" 
+              value={percentage} 
+              max="100"
+            ></progress>
+            <span className="text-sm font-medium">{percentage}%</span>
+          </div>
+        );
+      }
+    },
+    {
+      key: "steps",
+      label: "Steps",
+      render: (goal) => {
+        const completedSteps = goal.steps.filter(step => step.completed).length;
+        const totalSteps = goal.steps.length;
+        
+        return (
+          <span className="badge badge-primary">
+            {completedSteps}/{totalSteps}
+          </span>
+        );
+      }
+    },
+    { 
+      key: "createdAt", 
+      label: "Created", 
+      render: (goal) => (
+        <span className="text-sm">
+          {new Date(goal.createdAt).toLocaleDateString()}
+        </span>
+      )
+    }
+  ];
+
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <div className="flex flex-col items-center text-center space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center text-center space-y-8"
+      >
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold">Goal Manager</h1>
-          <p className="py-2 md:text-base">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">Goal Manager</h1>
+          <p className="py-2 md:text-base max-w-3xl mx-auto">
             Here you can do anything you want with your goals. Do you want to
             change something? Do you want to delete them because you don't like
             them anymore? Or do you simply want to see how many you have and
@@ -53,60 +130,36 @@ const TableGoals = () => {
           </p>
         </div>
 
-        <div className="w-full overflow-x-auto">
-          <table className="table-zebra bg-primary bg-opacity-60 rounded-2xl  w-full">
-            <thead>
-              <tr>
-                <th className="px-2 md:px-4 py-2">#</th>
-                <th className="px-2 md:px-4 py-2">Title</th>
-                <th className="px-2 md:px-4 py-2">Description</th>
-                <th className="px-2 md:px-4 py-2">Created At</th>
-                <th className="px-2 md:px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-center">
-              {goals.map((goal, index) => (
-                <tr key={goal._id} className="border-t">
-                  <td className="px-2 md:px-4 py-2">{index + 1}</td>
-                  <td className="px-2 md:px-4 py-2">{goal.title}</td>
-                  <td className="px-2 md:px-4 py-22">
-                    {goal.description.length > 50
-                      ? `${goal.description.slice(0, 50)}...`
-                      : goal.description}
-                  </td>
-                  <td className="px-2 md:px-4 py-2">
-                    {new Date(goal.createdAt).toLocaleString()}
-                  </td>
-                  <td className="px-2 md:px-4 py-2 flex flex-col justify-center space-y-1">
-                    <button
-                      className="btn btn-error btn-sm mr-2"
-                      onClick={() => deleteGoal(goal._id)}
-                    >
-                      Delete <FaTrashAlt />
-                    </button>
-                    <button
-                      className="btn btn-warning btn-sm"
-                      onClick={() => editGoal(goal._id)}
-                    >
-                      Edit <FaEdit />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {loading ? (
+          <div className="flex flex-col items-center mt-20">
+            <span className="loading loading-infinity loading-lg text-cartoon-yellow"></span>
+            <p className="mt-4 text-lg">Loading goals...</p>
+          </div>
+        ) : (
+          <div className="w-full">
+            <ResponsiveTable
+              data={goals}
+              columns={goalColumns}
+              onEdit={editGoal}
+              onDelete={deleteGoal}
+              title=""
+              colorScheme="cartoon-yellow"
+            />
+          </div>
+        )}
 
         <div className="flex items-center mt-8">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             type="button"
-            className="btn btn-primary btn-sm rounded-xl"
+            className="btn btn-primary rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
             onClick={() => navigate("/manager")}
           >
-            <BsArrowLeft /> Back
-          </button>
+            <BsArrowLeft /> Back to Manager
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -1,0 +1,41 @@
+{
+  "name": "spaghetti-bytes",
+  "version": "1.0.0",
+  "description": "A cartoon-themed technical blog where code meets creativity",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "heroku-postbuild": "cd client && npm install && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "blog",
+    "react",
+    "nodejs",
+    "mongodb",
+    "tailwindcss",
+    "cartoon",
+    "technical-writing"
+  ],
+  "author": "Fabio Grillo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabiogrillo/spaghetti-bytes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fabiogrillo/spaghetti-bytes/issues"
+  },
+  "homepage": "https://github.com/fabiogrillo/spaghetti-bytes#readme",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

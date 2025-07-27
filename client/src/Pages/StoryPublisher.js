@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import StoryEditor from "../Components/StoryEditor";
+import TipTapEditor from "../Components/TipTapEditor";
 import { IoMdAdd } from "react-icons/io";
 import { FaTimes, FaMedium } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { BsArrowLeft, BsCheck2All } from "react-icons/bs";
+import { motion } from "framer-motion";
 
 const StoryPublisher = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ const StoryPublisher = () => {
   const [content, setContent] = useState("");
   const [shareOnMedium, setShareOnMedium] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -28,6 +30,7 @@ const StoryPublisher = () => {
 
   const fetchStory = async (storyId) => {
     try {
+      setLoading(true);
       const response = await fetch(`/api/stories/${storyId}`);
       const data = await response.json();
       setTitle(data.title);
@@ -37,6 +40,8 @@ const StoryPublisher = () => {
       setShareOnMedium(data.sharedOnMedium);
     } catch (error) {
       console.error("Error fetching story:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +50,7 @@ const StoryPublisher = () => {
     if (!title) newErrors.title = "Title is required";
     if (!summary) newErrors.summary = "Summary is required";
     if (tags.length < 3) newErrors.tags = "Please add at least 3 tags";
-    if (!content) newErrors.content = "Content is required";
+    if (!content || content === "<p></p>") newErrors.content = "Content is required";
     return newErrors;
   };
 
@@ -65,6 +70,7 @@ const StoryPublisher = () => {
     };
 
     try {
+      setLoading(true);
       const response = await fetch(
         id ? `/api/stories/${id}` : "/api/stories/publish",
         {
@@ -86,6 +92,8 @@ const StoryPublisher = () => {
     } catch (error) {
       console.error("Network error:", error);
       navigate("/blog", { state: { success: false } });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -101,27 +109,40 @@ const StoryPublisher = () => {
     setTags(tags.filter((_, index) => index !== indexToRemove));
   };
 
-  const handleEditorChange = (content, delta, source, editor) => {
-    setContent(editor.getHTML());
+  const handleEditorChange = (htmlContent) => {
+    setContent(htmlContent);
     setErrors((prevErrors) => ({ ...prevErrors, content: "" }));
   };
 
+  if (loading && id) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <span className="loading loading-spinner loading-lg text-cartoon-pink"></span>
+        <p className="mt-4">Loading story...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-8">
-      <div className="flex flex-col items-center text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center text-center"
+      >
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold">
             {id ? "Edit Your Story" : "Let's Write a New Incredible Story"}
           </h1>
-          <p className="py-2 md:text-base">
+          <p className="py-2 md:text-base max-w-3xl mx-auto">
             {id
               ? "You are currently editing your story. Please ensure all details are accurate, including the title, summary, and tags. After making your changes, you can update the story by clicking the button below"
               : "Start by choosing a title for your story. Once the title is set, you can begin writing. Remember to provide a concise summary and include relevant tags. If you'd like, you can also share your story on Medium. Once you're ready, click the publish button"}
           </p>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="card my-8 space-y-6 max-w-3xl mx-auto">
+      <div className="card my-8 space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-cartoon shadow-cartoon border-2 border-black">
         <div className="form-control items-center w-full">
           <label className="label font-mono text-center">
             {id ? "Edit the title of your story" : "Start with a title"}
@@ -129,7 +150,7 @@ const StoryPublisher = () => {
           <input
             type="text"
             placeholder="Your title here..."
-            className="input input-bordered italic w-full"
+            className="input input-bordered w-full rounded-cartoon"
             value={title}
             maxLength={maxTitleLength}
             onChange={(e) => {
@@ -138,9 +159,9 @@ const StoryPublisher = () => {
             }}
           />
           {errors.title && (
-            <p className="text-red-500 text-sm">{errors.title}</p>
+            <p className="text-error text-sm mt-1">{errors.title}</p>
           )}
-          <p className="text-right text-xs mt-1">
+          <p className="text-right text-xs mt-1 w-full">
             {title.length}/{maxTitleLength} characters
           </p>
         </div>
@@ -151,7 +172,7 @@ const StoryPublisher = () => {
           </label>
           <textarea
             placeholder="Summary here..."
-            className="textarea textarea-bordered italic w-full"
+            className="textarea textarea-bordered w-full rounded-cartoon"
             value={summary}
             maxLength={maxSummaryLength}
             onChange={(e) => {
@@ -160,9 +181,9 @@ const StoryPublisher = () => {
             }}
           />
           {errors.summary && (
-            <p className="text-red-500 text-sm">{errors.summary}</p>
+            <p className="text-error text-sm mt-1">{errors.summary}</p>
           )}
-          <p className="text-right text-xs mt-1">
+          <p className="text-right text-xs mt-1 w-full">
             {summary.length}/{maxSummaryLength} characters
           </p>
         </div>
@@ -175,48 +196,61 @@ const StoryPublisher = () => {
             <input
               type="text"
               placeholder="New Tag..."
-              className="input input-bordered italic w-full"
+              className="input input-bordered w-full rounded-cartoon"
               value={newTag}
               onChange={(e) => {
                 setNewTag(e.target.value);
                 setErrors((prevErrors) => ({ ...prevErrors, tags: "" }));
               }}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddTag();
+                }
+              }}
             />
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="button"
-              className="btn btn-primary rounded-full"
+              className="btn btn-primary rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
               onClick={handleAddTag}
             >
               <IoMdAdd />
-            </button>
+            </motion.button>
           </div>
-          {errors.tags && <p className="text-red-500 text-sm">{errors.tags}</p>}
+          {errors.tags && <p className="text-error text-sm mt-1">{errors.tags}</p>}
           <div className="flex flex-wrap mt-3 gap-3">
             {tags.map((tag, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="badge badge-md badge-primary flex items-center space-x-2"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="badge badge-lg bg-cartoon-pink text-white flex items-center space-x-2 p-3 shadow-cartoon-sm"
               >
                 <span>{tag}</span>
-                <button onClick={() => handleRemoveTag(index)}>
+                <button 
+                  onClick={() => handleRemoveTag(index)}
+                  className="hover:scale-110 transition-transform"
+                >
                   <FaTimes />
                 </button>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
 
         <div className="form-control items-center w-full">
-          <label className="label font-mono text-center">
+          <label className="label font-mono text-center mb-4">
             {id ? "Edit your story" : "Now write your story"}
           </label>
-          <StoryEditor
+          <TipTapEditor
             value={content}
             onChange={handleEditorChange}
             error={errors.content}
           />
           {errors.content && (
-            <p className="text-red-500 text-sm">{errors.content}</p>
+            <p className="text-error text-sm mt-1">{errors.content}</p>
           )}
         </div>
 
@@ -226,34 +260,45 @@ const StoryPublisher = () => {
               ? "Edit your Medium sharing settings"
               : "Share your story on Medium?"}
           </label>
-          <div className="flex space-x-2">
+          <div className="flex items-center space-x-4">
             <input
               type="checkbox"
-              className="toggle toggle-primary"
+              className="toggle toggle-primary toggle-lg"
               checked={shareOnMedium}
               onChange={(e) => setShareOnMedium(e.target.checked)}
             />
-            <FaMedium className="text-2xl " />
+            <FaMedium className="text-3xl" />
           </div>
         </div>
       </div>
 
-      <div className="flex justify-between items-center mt-8">
-        <button
+      <div className="flex justify-between items-center mt-8 max-w-4xl mx-auto">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           type="button"
-          className="btn btn-primary btn-outline btn-sm rounded-2xl"
+          className="btn btn-primary btn-outline rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
           onClick={() => navigate("/manager")}
         >
           <BsArrowLeft /> Back
-        </button>
-        <button
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           type="submit"
-          className="btn btn-success btn-sm rounded-2xl"
+          className="btn btn-success rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
           onClick={handleSubmit}
+          disabled={loading}
         >
-          <BsCheck2All />
-          {id ? "Update Story" : "Publish Story"}
-        </button>
+          {loading ? (
+            <span className="loading loading-spinner"></span>
+          ) : (
+            <>
+              <BsCheck2All />
+              {id ? "Update Story" : "Publish Story"}
+            </>
+          )}
+        </motion.button>
       </div>
     </div>
   );

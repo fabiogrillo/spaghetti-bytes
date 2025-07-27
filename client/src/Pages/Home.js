@@ -4,7 +4,7 @@ import { BsFillPatchQuestionFill } from "react-icons/bs";
 import { GoGoal } from "react-icons/go";
 import { FaProjectDiagram } from "react-icons/fa";
 import { GrArticle } from "react-icons/gr";
-import { LuContact2 } from "react-icons/lu";
+import { LuContact } from "react-icons/lu";
 import { MdContactMail } from "react-icons/md";
 import { MdOutlineConnectWithoutContact } from "react-icons/md";
 import illustrationBlog from "../Assets/Images/dazzle-man-programmer-writing-code-on-a-laptop.gif";
@@ -193,7 +193,7 @@ const Home = () => {
           <div className="my-4 text-center">
             <Link to={"/contacts"}>
               <button className="btn btn-error btn-outline btn-lg rounded-full hover:-translate-y-1 hover:scale-110">
-                <LuContact2 className="text-2xl" /> Contact Me
+                <LuContact className="text-2xl" /> Contact Me
               </button>
             </Link>
           </div>

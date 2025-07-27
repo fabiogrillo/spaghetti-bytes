@@ -14,32 +14,12 @@ body,
   flex-direction: column;
 }
 
-.custom-quill .ql-container {
-  border: none !important;
-  border-radius: 12px !important;
-  background-color: transparent !important;
+/* Cartoon theme additions */
+.rounded-cartoon {
+  border-radius: 1.5rem !important;
 }
 
-.custom-quill .ql-toolbar {
-  border-radius: 12px 12px 0 0 !important;
-  background-color: white !important;
-}
-
-.custom-quill .ql-editor {
-  border-radius: 0 0 12px 12px !important;
-  background-color: transparent !important;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.custom-quill .ql-editor {
-  @apply text-black text-xl;
-}
-
-.custom-quill :any-link {
-  color:cornflowerblue;
-}
-
-[data-theme="night"] .custom-quill .ql-editor,
-[data-theme="night"] .custom-quill .ql-toolbar {
-  @apply text-white;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }

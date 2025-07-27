@@ -9,6 +9,7 @@ const path = require("path");
 const User = require("./models/User");
 const storyRoutes = require("./routes/storyRoute");
 const goalRoutes = require("./routes/goalRoute");
+const conversationRoutes = require("./routes/conversationRoute");
 
 // Configurazione variabili ambiente
 dotenv.config();
@@ -81,6 +82,7 @@ mongoose
 // Configurazione delle rotte API
 app.use("/api/stories", storyRoutes);
 app.use("/api/goals", goalRoutes);
+app.use("/api/conversations", conversationRoutes);
 
 // Route di registrazione
 app.post("/api/register", async (req, res) => {

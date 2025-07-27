@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import StoryCard from "../Components/StoryCard";
+import { useState, useEffect } from "react";
+import ImprovedStoryCard from "./ImprovedStoryCard";
 import rocketImage from "../Assets/Images/juicy-woman-is-reading-a-book-at-home.gif";
 import { FaRegBookmark, FaSearch } from "react-icons/fa";
 import { LuTags } from "react-icons/lu";
@@ -158,9 +158,9 @@ const Wall = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {filteredStories.length > 0 ? (
-            filteredStories.map((story) => (
+            filteredStories.map((story, index) => (
               <div key={story._id}>
-                <StoryCard story={story} />
+                <ImprovedStoryCard story={story} index={index} />
               </div>
             ))
           ) : (

@@ -5,7 +5,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Navbar from "./Components/Navbar";
+import ImprovedNavbar from "./Components/ImprovedNavbar";
 import Home from "./Pages/Home";
 import Blog from "./Pages/Blog";
 import Goals from "./Pages/Goals";
@@ -18,6 +18,8 @@ import TableManager from "./Pages/TableManager";
 import StoryVisualizer from "./Pages/StoryVisualizer";
 import GoalPublisher from "./Pages/GoalPublisher";
 import TableGoals from "./Pages/TableGoals";
+import ChatBot from "./Components/ChatBot";
+import ConversationDashboard from "./Pages/ConversationDashboard";
 
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
@@ -29,7 +31,7 @@ const App = () => {
 
   return (
     <Router>
-      <Navbar
+      <ImprovedNavbar
         authenticated={isAuthenticated}
         username={username}
         setAuthenticated={setAuthenticated}
@@ -106,8 +108,17 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/conversations"
+          element={
+            <ProtectedRoute>
+              <ConversationDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       <Footer />
+      <ChatBot />
     </Router>
   );
 };

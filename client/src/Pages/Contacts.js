@@ -1,55 +1,14 @@
-import React, { useState, useEffect } from "react";
-import emailjs from "emailjs-com";
-import { RiMailSendLine } from "react-icons/ri";
+import { useState, useEffect } from "react";
 import rocketImage from "../Assets/Images/juicy-people-in-online-zoom-meeting.gif";
+import ChatBot from "../Components/ChatBot";
 
 const Contacts = () => {
-  const [showAlert, setShowAlert] = useState(false);
-  const [formData, setFormData] = useState({
-    from_name: "",
-    from_email: "",
-    message: "",
-    to_name: process.env.TO_NAME || "Admin",
-  });
+  const [showAlert] = useState(false);
 
   useEffect(() => {
     // Scroll to top when the component is mounted
     window.scrollTo(0, 0);
   }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    emailjs
-      .sendForm(
-        process.env.REACT_APP_EMAILJS_SERVICE_ID,
-        process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
-        e.target,
-        process.env.REACT_APP_EMAILJS_USER_ID
-      )
-      .then(
-        (result) => {
-          setShowAlert(true);
-          setFormData({
-            from_name: "",
-            from_email: "",
-            message: "",
-            to_name: process.env.TO_NAME || "Admin",
-          });
-          setTimeout(() => {
-            setShowAlert(false);
-          }, 5000); // Nascondi l'alert dopo 5 secondi
-        },
-        (error) => {
-          console.log(error.text);
-        }
-      );
-  };
 
   return (
     <div className="container mx-auto p-8">
@@ -107,48 +66,11 @@ const Contacts = () => {
 
         <div className="shadow-lg rounded-lg bg-primary bg-opacity-40 p-12">
           <h2 className="text-2xl font-bold text-center">Contact Me</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-mono">Name:</label>
-              <input
-                type="text"
-                name="from_name"
-                value={formData.from_name}
-                onChange={handleChange}
-                required
-                className="input input-bordered w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-mono">Email:</label>
-              <input
-                type="email"
-                name="from_email"
-                value={formData.from_email}
-                onChange={handleChange}
-                required
-                className="input input-bordered w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-mono">Message:</label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                className="textarea textarea-bordered w-full"
-              ></textarea>
-            </div>
-            <div className="text-center">
-              <button
-                type="submit"
-                className="btn btn-secondary btn-md rounded-full hover:translate-y-1 hover:scale-110"
-              >
-                <RiMailSendLine className="mr-2" /> Send
-              </button>
-            </div>
-          </form>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">Let's Chat!</h2>
+            <p className="mb-8">Click the chat button in the corner to start a conversation!</p>
+            <ChatBot />
+          </div>
         </div>
       </div>
     </div>
