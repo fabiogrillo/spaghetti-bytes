@@ -8,7 +8,6 @@ import { BiCodeAlt, BiHeart } from "react-icons/bi";
 import { BsStars } from "react-icons/bs";
 import illustrationBlog from "../Assets/Images/dazzle-man-programmer-writing-code-on-a-laptop.gif";
 import illustrationHero from "../Assets/Images/bendy-man-developer-writing-programming-code.gif";
-import illustrationContact from "../Assets/Images/bendy-customer-service-man-answering-question.gif";
 
 const Home = () => {
   const fadeInUp = {
