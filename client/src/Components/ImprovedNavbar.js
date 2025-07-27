@@ -7,13 +7,14 @@ import {
   IoMdHome,
   IoMdBook,
   IoMdRocket,
-  IoMdMail,
   IoMdMenu,
   IoMdClose,
-  IoMdSettings
+  IoMdSettings,
+  IoMdStats
 } from "react-icons/io";
 import { BiSun, BiMoon } from "react-icons/bi";
 import { doLogout } from "../Api";
+import Logo from "./Logo";
 
 const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername }) => {
   const navigate = useNavigate();
@@ -21,6 +22,16 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "cartoon");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  // Auto theme switching based on time
+  useEffect(() => {
+    const hour = new Date().getHours();
+    const isNightTime = hour >= 19 || hour < 7;
+    
+    if (!localStorage.getItem("theme-manual")) {
+      setTheme(isNightTime ? "night" : "cartoon");
+    }
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -36,7 +47,9 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
   }, []);
 
   const toggleTheme = () => {
-    setTheme(theme === "cartoon" ? "night" : "cartoon");
+    const newTheme = theme === "cartoon" ? "night" : "cartoon";
+    setTheme(newTheme);
+    localStorage.setItem("theme-manual", "true");
   };
 
   const handleLogout = async () => {
@@ -51,10 +64,9 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
   };
 
   const navItems = [
-    { path: "/", label: "Home", icon: IoMdHome, color: "text-cartoon-pink" },
-    { path: "/blog", label: "Blog", icon: IoMdBook, color: "text-cartoon-blue" },
-    { path: "/goals", label: "Goals", icon: IoMdRocket, color: "text-cartoon-yellow" },
-    { path: "/contacts", label: "Contact", icon: IoMdMail, color: "text-cartoon-purple" },
+    { path: "/", label: "Home", icon: IoMdHome },
+    { path: "/blog", label: "Blog", icon: IoMdBook },
+    { path: "/goals", label: "Goals", icon: IoMdRocket },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -70,41 +82,32 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
         {/* Logo Section */}
         <div className="flex-1">
           <Link to="/">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2"
-            >
-              <span className="text-3xl">🍝</span>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-cartoon-pink to-cartoon-blue bg-clip-text text-transparent">
-                  Spaghetti Bytes
-                </h1>
-                <p className="text-xs text-gray-500">Untangling code, one byte at a time</p>
-              </div>
-            </motion.div>
+            <Logo size="normal" />
           </Link>
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-3">
           <nav className="flex gap-2">
-            {navItems.map((item) => {
+            {navItems.map((item, index) => {
               const Icon = item.icon;
+              const colors = ['cartoon-pink', 'cartoon-blue', 'cartoon-yellow'];
+              const color = colors[index % colors.length];
+              
               return (
                 <Link key={item.path} to={item.path}>
                   <motion.button
-                    whileHover={{ y: -2 }}
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className={`
-                      btn rounded-cartoon shadow-cartoon-sm
+                      btn rounded-cartoon shadow-cartoon-sm btn-pop
                       ${isActive(item.path) 
-                        ? 'bg-cartoon-pink text-white shadow-cartoon' 
-                        : 'btn-ghost hover:shadow-cartoon'
+                        ? `bg-${color} text-white shadow-cartoon` 
+                        : 'bg-white hover:shadow-cartoon'
                       }
                     `}
                   >
-                    <Icon className={`text-xl ${item.color}`} />
+                    <Icon className="text-xl" />
                     <span className="ml-1">{item.label}</span>
                   </motion.button>
                 </Link>
@@ -112,13 +115,33 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
             })}
           </nav>
 
+          {/* Admin Stats Link */}
+          {authenticated && (
+            <Link to="/visualizations">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`
+                  btn rounded-cartoon shadow-cartoon-sm btn-pop
+                  ${isActive('/visualizations')
+                    ? 'bg-cartoon-orange text-white shadow-cartoon' 
+                    : 'bg-white hover:shadow-cartoon'
+                  }
+                `}
+              >
+                <IoMdStats className="text-xl" />
+                <span className="ml-1">Stats</span>
+              </motion.button>
+            </Link>
+          )}
+
           {/* Theme Toggle */}
           <motion.button
             whileHover={{ rotate: 180 }}
             onClick={toggleTheme}
-            className="btn btn-circle btn-ghost"
+            className="btn btn-circle bg-white shadow-cartoon-sm hover:shadow-cartoon btn-pop"
           >
-            {theme === "cartoon" ? <BiMoon size={24} /> : <BiSun size={24} />}
+            {theme === "cartoon" ? <BiMoon size={24} /> : <BiSun size={24} className="text-yellow-500" />}
           </motion.button>
 
           {/* Auth Section */}
@@ -127,19 +150,19 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 tabIndex={0}
-                className="btn rounded-cartoon bg-cartoon-purple text-white shadow-cartoon-sm hover:shadow-cartoon"
+                className="btn rounded-cartoon bg-cartoon-purple text-white shadow-cartoon-sm hover:shadow-cartoon btn-pop"
               >
                 <span className="text-xl">👨‍🍳</span>
                 {username}
               </motion.button>
               <ul tabIndex={0} className="dropdown-content menu p-2 shadow-cartoon bg-base-100 rounded-cartoon w-52 mt-3 border-2 border-black">
                 <li>
-                  <button onClick={() => navigate("/manager")} className="rounded-cartoon">
+                  <button onClick={() => navigate("/manager")} className="rounded-cartoon hover:bg-cartoon-purple hover:text-white">
                     <IoMdSettings /> Manager
                   </button>
                 </li>
                 <li>
-                  <button onClick={handleLogout} className="rounded-cartoon text-error">
+                  <button onClick={handleLogout} className="rounded-cartoon hover:bg-error hover:text-white">
                     <IoIosLogOut /> Logout
                   </button>
                 </li>
@@ -150,7 +173,7 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="btn rounded-cartoon bg-cartoon-purple text-white shadow-cartoon-sm hover:shadow-cartoon"
+                className="btn rounded-cartoon bg-cartoon-purple text-white shadow-cartoon-sm hover:shadow-cartoon btn-pop"
               >
                 <IoIosLogIn size={24} />
                 Login
@@ -192,7 +215,7 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
               <div className="p-6">
                 {/* Close Button */}
                 <div className="flex justify-between items-center mb-8">
-                  <h2 className="text-2xl font-bold">Menu</h2>
+                  <Logo size="small" />
                   <button
                     onClick={() => setIsSidebarOpen(false)}
                     className="btn btn-circle btn-ghost"
@@ -203,8 +226,11 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
 
                 {/* Mobile Navigation Links */}
                 <nav className="space-y-3">
-                  {navItems.map((item) => {
+                  {navItems.map((item, index) => {
                     const Icon = item.icon;
+                    const colors = ['cartoon-pink', 'cartoon-blue', 'cartoon-yellow'];
+                    const color = colors[index % colors.length];
+                    
                     return (
                       <Link
                         key={item.path}
@@ -215,19 +241,38 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
                           whileHover={{ x: 10 }}
                           whileTap={{ scale: 0.95 }}
                           className={`
-                            w-full btn justify-start rounded-cartoon
+                            w-full btn justify-start rounded-cartoon shadow-cartoon-sm
                             ${isActive(item.path)
-                              ? 'bg-cartoon-pink text-white shadow-cartoon'
-                              : 'btn-ghost'
+                              ? `bg-${color} text-white shadow-cartoon`
+                              : 'btn-ghost hover:bg-gray-100'
                             }
                           `}
                         >
-                          <Icon className={`text-xl ${item.color}`} />
+                          <Icon className="text-xl" />
                           <span className="ml-3">{item.label}</span>
                         </motion.button>
                       </Link>
                     );
                   })}
+                  
+                  {authenticated && (
+                    <Link to="/visualizations" onClick={() => setIsSidebarOpen(false)}>
+                      <motion.button
+                        whileHover={{ x: 10 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`
+                          w-full btn justify-start rounded-cartoon shadow-cartoon-sm
+                          ${isActive('/visualizations')
+                            ? 'bg-cartoon-orange text-white shadow-cartoon'
+                            : 'btn-ghost hover:bg-gray-100'
+                          }
+                        `}
+                      >
+                        <IoMdStats className="text-xl" />
+                        <span className="ml-3">Stats</span>
+                      </motion.button>
+                    </Link>
+                  )}
                 </nav>
 
                 {/* Theme Toggle Mobile */}
@@ -256,7 +301,7 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
                           navigate("/manager");
                           setIsSidebarOpen(false);
                         }}
-                        className="w-full btn rounded-cartoon"
+                        className="w-full btn rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
                       >
                         <IoMdSettings /> Manager
                       </button>
@@ -265,14 +310,14 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
                           handleLogout();
                           setIsSidebarOpen(false);
                         }}
-                        className="w-full btn btn-error rounded-cartoon"
+                        className="w-full btn btn-error rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
                       >
                         <IoIosLogOut /> Logout
                       </button>
                     </div>
                   ) : (
                     <Link to="/login" onClick={() => setIsSidebarOpen(false)}>
-                      <button className="w-full btn bg-cartoon-purple text-white rounded-cartoon shadow-cartoon">
+                      <button className="w-full btn bg-cartoon-purple text-white rounded-cartoon shadow-cartoon hover:shadow-cartoon">
                         <IoIosLogIn /> Login
                       </button>
                     </Link>

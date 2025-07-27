@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Pacifico&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Global Styles */
 html,
 body,
 #root,
@@ -14,12 +17,116 @@ body,
   flex-direction: column;
 }
 
+/* Base font and smooth scrolling */
+body {
+  font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif;
+  font-weight: 400;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Logo font */
+.logo-font {
+  font-family: 'Pacifico', cursive;
+}
+
 /* Cartoon theme additions */
 .rounded-cartoon {
   border-radius: 1.5rem !important;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* Pop-cartoon button styles */
+.btn-pop {
+  @apply transform transition-all duration-200 hover:translate-x-1 hover:translate-y-1;
+}
+
+/* Dark mode fixes */
+[data-theme="night"] {
+  --tw-prose-body: #e5e7eb;
+  --tw-prose-headings: #f3f4f6;
+  --tw-prose-links: #60a5fa;
+}
+
+/* TipTap Editor Styles */
+.ProseMirror {
+  @apply outline-none;
+}
+
+[data-theme="night"] .ProseMirror {
+  @apply text-gray-100;
+}
+
+[data-theme="night"] .ProseMirror h1,
+[data-theme="night"] .ProseMirror h2,
+[data-theme="night"] .ProseMirror h3,
+[data-theme="night"] .ProseMirror h4 {
+  @apply text-white;
+}
+
+[data-theme="night"] .ProseMirror p {
+  @apply text-gray-200;
+}
+
+[data-theme="night"] .ProseMirror code {
+  @apply bg-gray-800 text-gray-300;
+}
+
+[data-theme="night"] .ProseMirror pre {
+  @apply bg-gray-900 text-gray-100;
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gradient text */
+.gradient-text {
+  @apply bg-gradient-to-r from-cartoon-pink via-cartoon-purple to-cartoon-blue bg-clip-text text-transparent;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 hover:scale-105;
+}
+
+/* Progress bar custom styles */
+.progress-cartoon {
+  @apply rounded-full overflow-hidden bg-gray-200;
+}
+
+.progress-cartoon::-webkit-progress-bar {
+  @apply bg-gray-200;
+}
+
+.progress-cartoon::-webkit-progress-value {
+  @apply bg-gradient-to-r from-cartoon-pink to-cartoon-purple;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-cartoon-pink rounded-full hover:bg-cartoon-purple;
+}
+
+[data-theme="night"] ::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+[data-theme="night"] ::-webkit-scrollbar-thumb {
+  @apply bg-cartoon-blue;
 }
