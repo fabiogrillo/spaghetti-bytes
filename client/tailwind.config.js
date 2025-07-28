@@ -10,6 +10,7 @@ module.exports = {
           'blue': '#4ECDC4',
           'purple': '#9B59B6',
           'orange': '#FF8C42',
+          'blue-dark': '#031e2bff',
         }
       },
       boxShadow: {

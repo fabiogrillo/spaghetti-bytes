@@ -212,19 +212,22 @@ const TipTapEditor = ({ value, onChange, readOnly = false }) => {
   });
 
   return (
-    <div className={`${!readOnly ? 'border-2 border-black shadow-cartoon rounded-cartoon' : ''}`}>
+    <div className={`${!readOnly ? 'shadow-cartoon rounded-cartoon' : ''}`}>
       {!readOnly && <MenuBar editor={editor} />}
       <EditorContent 
         editor={editor} 
         className={`
           prose prose-lg max-w-none
-          ${!readOnly ? 'min-h-[400px] p-6 bg-white rounded-b-cartoon' : ''}
+          ${!readOnly ? 'min-h-[400px] p-6 bg-white dark:bg-gray-800 rounded-b-cartoon border-2 border-t-0 border-black' : ''}
+          dark:prose-invert
           [&_.ProseMirror]:outline-none
           [&_.ProseMirror]:min-h-[380px]
           [&_.ProseMirror_h1]:text-3xl
           [&_.ProseMirror_h2]:text-2xl
           [&_.ProseMirror_h3]:text-xl
           [&_.ProseMirror_p]:my-3
+          [&_.ProseMirror_p]:text-gray-800
+          [&_.ProseMirror_p]:dark:text-gray-200
           [&_.ProseMirror_img]:rounded-cartoon
           [&_.ProseMirror_img]:shadow-cartoon
           [&_.ProseMirror_blockquote]:border-l-4
@@ -232,6 +235,7 @@ const TipTapEditor = ({ value, onChange, readOnly = false }) => {
           [&_.ProseMirror_blockquote]:pl-4
           [&_.ProseMirror_blockquote]:italic
           [&_.ProseMirror_code]:bg-gray-100
+          [&_.ProseMirror_code]:dark:bg-gray-700
           [&_.ProseMirror_code]:px-1
           [&_.ProseMirror_code]:rounded
           [&_.ProseMirror_pre]:bg-gray-900

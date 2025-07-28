@@ -99,15 +99,13 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`
-                      btn rounded-cartoon shadow-cartoon-sm btn-pop
-                      ${isActive(item.path) 
-                        ? `bg-${color} text-white shadow-cartoon` 
-                        : 'bg-white hover:shadow-cartoon'
-                      }
-                    `}
+                    className={
+                      isActive(item.path) 
+                        ? `btn rounded-cartoon shadow-cartoon btn-pop bg-${color} text-white` 
+                        : 'btn rounded-cartoon shadow-cartoon-sm btn-pop bg-white text-gray-700 hover:shadow-cartoon'
+                    }
                   >
-                    <Icon className="text-xl" />
+                    <Icon className={isActive(item.path) ? 'text-xl text-white' : 'text-xl'} />
                     <span className="ml-1">{item.label}</span>
                   </motion.button>
                 </Link>
@@ -121,15 +119,13 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`
-                  btn rounded-cartoon shadow-cartoon-sm btn-pop
-                  ${isActive('/visualizations')
-                    ? 'bg-cartoon-orange text-white shadow-cartoon' 
-                    : 'bg-white hover:shadow-cartoon'
-                  }
-                `}
+                className={
+                  isActive('/visualizations')
+                    ? 'btn rounded-cartoon shadow-cartoon btn-pop bg-cartoon-orange text-white'
+                    : 'btn rounded-cartoon shadow-cartoon-sm btn-pop bg-white text-gray-700 hover:shadow-cartoon'
+                }
               >
-                <IoMdStats className="text-xl" />
+                <IoMdStats className={isActive('/visualizations') ? 'text-xl text-white' : 'text-xl'} />
                 <span className="ml-1">Stats</span>
               </motion.button>
             </Link>
@@ -159,6 +155,11 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
                 <li>
                   <button onClick={() => navigate("/manager")} className="rounded-cartoon hover:bg-cartoon-purple hover:text-white">
                     <IoMdSettings /> Manager
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("/conversations")} className="rounded-cartoon hover:bg-cartoon-blue hover:text-white">
+                    <IoMdBook /> Conversations
                   </button>
                 </li>
                 <li>
@@ -240,13 +241,11 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
                         <motion.button
                           whileHover={{ x: 10 }}
                           whileTap={{ scale: 0.95 }}
-                          className={`
-                            w-full btn justify-start rounded-cartoon shadow-cartoon-sm
-                            ${isActive(item.path)
-                              ? `bg-${color} text-white shadow-cartoon`
-                              : 'btn-ghost hover:bg-gray-100'
-                            }
-                          `}
+                          className={
+                            isActive(item.path)
+                              ? `w-full btn justify-start rounded-cartoon shadow-cartoon bg-${color} text-white`
+                              : 'w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100'
+                          }
                         >
                           <Icon className="text-xl" />
                           <span className="ml-3">{item.label}</span>
@@ -256,22 +255,36 @@ const ImprovedNavbar = ({ authenticated, username, setAuthenticated, setUsername
                   })}
                   
                   {authenticated && (
-                    <Link to="/visualizations" onClick={() => setIsSidebarOpen(false)}>
-                      <motion.button
-                        whileHover={{ x: 10 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={`
-                          w-full btn justify-start rounded-cartoon shadow-cartoon-sm
-                          ${isActive('/visualizations')
-                            ? 'bg-cartoon-orange text-white shadow-cartoon'
-                            : 'btn-ghost hover:bg-gray-100'
+                    <>
+                      <Link to="/visualizations" onClick={() => setIsSidebarOpen(false)}>
+                        <motion.button
+                          whileHover={{ x: 10 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={
+                            isActive('/visualizations')
+                              ? 'w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-orange text-white'
+                              : 'w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100'
                           }
-                        `}
-                      >
-                        <IoMdStats className="text-xl" />
-                        <span className="ml-3">Stats</span>
-                      </motion.button>
-                    </Link>
+                        >
+                          <IoMdStats className="text-xl" />
+                          <span className="ml-3">Stats</span>
+                        </motion.button>
+                      </Link>
+                      <Link to="/conversations" onClick={() => setIsSidebarOpen(false)}>
+                        <motion.button
+                          whileHover={{ x: 10 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={
+                            isActive('/conversations')
+                              ? 'w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-blue text-white'
+                              : 'w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100'
+                          }
+                        >
+                          <IoMdBook className="text-xl" />
+                          <span className="ml-3">Conversations</span>
+                        </motion.button>
+                      </Link>
+                    </>
                   )}
                 </nav>
 

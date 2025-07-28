@@ -87,10 +87,12 @@ html {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Gradient text */
+/* Fixed gradient text with better visibility */
 .gradient-text {
-  @apply bg-gradient-to-r from-cartoon-pink via-cartoon-purple to-cartoon-blue bg-clip-text text-transparent;
+  background-image: linear-gradient(90deg, #ff80ab 10%, #b388ff 40%, #3399cc 90%);
+  @apply bg-clip-text text-transparent font-bold;
 }
+
 
 /* Card hover effects */
 .card-hover {
@@ -130,3 +132,4 @@ html {
 [data-theme="night"] ::-webkit-scrollbar-thumb {
   @apply bg-cartoon-blue;
 }
+

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import ImprovedStoryCard from "./ImprovedStoryCard";
 import rocketImage from "../Assets/Images/juicy-woman-is-reading-a-book-at-home.gif";
 import { FaRegBookmark, FaSearch } from "react-icons/fa";
 import { LuTags } from "react-icons/lu";
+import { BsStars } from "react-icons/bs";
 
 const Wall = () => {
   const [stories, setStories] = useState([]);
@@ -11,7 +13,7 @@ const Wall = () => {
   const [searchTag, setSearchTag] = useState("");
   const [lastMonthStories, setLastMonthStories] = useState(0);
   const [distinctTags, setDistinctTags] = useState(0);
-  const [loading, setLoading] = useState(true); // Stato per il caricamento
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -40,7 +42,7 @@ const Wall = () => {
       } catch (error) {
         console.error("Error fetching stories:", error);
       } finally {
-        setLoading(false); // Dati caricati, disabilitiamo il loading
+        setLoading(false);
       }
     };
     fetchStories();
@@ -50,7 +52,7 @@ const Wall = () => {
     const sortAndFilterStories = () => {
       let sortedStories = [...stories];
 
-      // Filtro per il tag cercato
+      // Filter by search tag
       if (searchTag) {
         sortedStories = sortedStories.filter((story) =>
           story.tags.some((tag) =>
@@ -59,7 +61,7 @@ const Wall = () => {
         );
       }
 
-      // Ordinamento per la data
+      // Sort by date
       if (sortOption === "newest") {
         sortedStories.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -78,63 +80,104 @@ const Wall = () => {
 
   return (
     <div className="container mx-auto p-8">
-      <div className="flex flex-col items-center text-center">
-        <div className="mb-2">
-          <h1 className="text-3xl md:text-4xl font-bold">The reading corner</h1>
-          <p className="pt-2 md:pt-2 md:text-base">
-            Welcome, dear reader! I am delighted to invite you into this space
-            where you can explore all the stories that have been thoughtfully
-            crafted and shared. There are some stats that provide insights into
-            various aspects of my storytelling journey. I sincerely hope that
-            you find enjoyment in exploring this collection and that the stories
-            resonate with you 🤗
-          </p>
-        </div>
-        <div className="mb-12">
+      <motion.div 
+        className="flex flex-col items-center text-center"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.div
+          className="inline-block mb-6"
+          whileHover={{ scale: 1.05 }}
+        >
+          <span className="badge badge-lg bg-cartoon-blue text-white shadow-cartoon-sm px-6 py-3">
+            <BsStars className="mr-2" /> Welcome to the Reading Corner!
+          </span>
+        </motion.div>
+
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          The <span className="gradient-text-fixed">Reading</span> Corner
+        </h1>
+        
+        <p className="text-lg md:text-xl max-w-3xl text-gray-600 dark:text-gray-300 leading-relaxed">
+          Welcome, dear reader! 📚 Dive into my collection of 
+          <strong> carefully crafted stories</strong> where code meets creativity. 
+          Each article is a byte-sized adventure waiting to be discovered. 
+          Let the stats guide you through my storytelling journey! 🚀
+        </p>
+        
+        <div className="my-8">
           <img
             src={rocketImage}
             alt="Illustration Reading"
-            className="w-full max-w-sm md:max-w-lg uniform-img"
+            className="w-full max-w-sm md:max-w-lg animate-float"
           />
-          <p className="text-xs text-center">
+          <p className="text-xs text-center mt-2">
             Illustration by{" "}
-            <a href="https://icons8.com/illustrations/author/mNCLibjicqSz">
+            <a href="https://icons8.com/illustrations/author/mNCLibjicqSz" className="underline hover:text-cartoon-pink">
               Julia K
             </a>{" "}
-            from <a href="https://icons8.com/illustrations">Ouch!</a>
+            from <a href="https://icons8.com/illustrations" className="underline hover:text-cartoon-pink">Ouch!</a>
           </p>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="flex justify-center mx-auto">
-        <div className="stats stats-vertical lg:stats-horizontal w-full max-w-4xl shadow-md">
-          <div className="stat">
-            <div className="stat-figure text-secondary text-3xl">
-              <FaRegBookmark />
+      {/* Stats Section with Pop-Cartoon Style */}
+      <motion.div 
+        className="flex justify-center mx-auto mb-12"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon border-2 border-black hover:shadow-cartoon-hover transform transition-all hover:translate-x-1 hover:translate-y-1"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-4xl font-bold text-cartoon-pink mb-2">{stories.length}</div>
+                <div className="text-lg font-semibold">Total Stories</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {lastMonthStories} new this month!
+                </div>
+              </div>
+              <FaRegBookmark className="text-5xl text-cartoon-pink opacity-20" />
             </div>
-            <div className="stat-title">Total Stories</div>
-            <div className="stat-value text-secondary">{stories.length}</div>
-            <div className="stat-desc">{`${lastMonthStories} new stories last month`}</div>
-          </div>
+          </motion.div>
 
-          <div className="stat">
-            <div className="stat-figure text-success text-3xl">
-              <LuTags />
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon border-2 border-black hover:shadow-cartoon-hover transform transition-all hover:translate-x-1 hover:translate-y-1"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-4xl font-bold text-cartoon-yellow mb-2">{distinctTags}</div>
+                <div className="text-lg font-semibold">Topics Covered</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Diverse content awaits!
+                </div>
+              </div>
+              <LuTags className="text-5xl text-cartoon-yellow opacity-20" />
             </div>
-            <div className="stat-title">Topics covered</div>
-            <div className="stat-value text-success">{distinctTags}</div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="mt-8 mb-4 flex gap-2 items-center justify-center">
+      {/* Filter Controls */}
+      <motion.div 
+        className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
-          className="select select-bordered"
+          className="select select-bordered rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon transition-all"
         >
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
+          <option value="newest">📅 Newest First</option>
+          <option value="oldest">📅 Oldest First</option>
         </select>
 
         <div className="relative">
@@ -142,35 +185,50 @@ const Wall = () => {
             type="text"
             value={searchTag}
             onChange={(e) => setSearchTag(e.target.value)}
-            placeholder="Search by tag"
-            className="input input-bordered w-full pr-10"
+            placeholder="Search by tag..."
+            className="input input-bordered w-full pr-10 rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon transition-all"
           />
-          <div className="absolute top-3.5 right-3 ">
+          <div className="absolute top-3.5 right-3 text-cartoon-purple">
             <FaSearch />
           </div>
         </div>
-      </div>
+      </motion.div>
+
+      {/* Stories Grid */}
       {loading ? (
         <div className="flex flex-col items-center mt-20">
-          <span className="loading loading-infinity loading-lg"></span>
-          <p className="mt-4 text-lg">Loading stories...</p>
+          <span className="loading loading-spinner loading-lg text-cartoon-pink"></span>
+          <p className="mt-4 text-lg">Loading amazing stories...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
           {filteredStories.length > 0 ? (
             filteredStories.map((story, index) => (
-              <div key={story._id}>
-                <ImprovedStoryCard story={story} index={index} />
-              </div>
+              <ImprovedStoryCard key={story._id} story={story} index={index} />
             ))
           ) : (
             <div className="col-span-1 md:col-span-2 text-center mt-8">
-              <p className="text-md text-gray-500">
-                None of the stories has the "{searchTag}" tag 😢
-              </p>
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                className="inline-block"
+              >
+                <p className="text-2xl mb-4">😢</p>
+                <p className="text-xl text-gray-500">
+                  No stories found with tag "{searchTag}"
+                </p>
+                <p className="text-md text-gray-400 mt-2">
+                  Try searching for something else!
+                </p>
+              </motion.div>
             </div>
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   );
