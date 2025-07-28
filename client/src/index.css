@@ -91,8 +91,10 @@ html {
 .gradient-text {
   background-image: linear-gradient(90deg, #ff80ab 10%, #b388ff 40%, #3399cc 90%);
   @apply bg-clip-text text-transparent font-bold;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-
 
 /* Card hover effects */
 .card-hover {
@@ -133,3 +135,39 @@ html {
   @apply bg-cartoon-blue;
 }
 
+/* Steps component fixes for mobile */
+@media (max-width: 768px) {
+  .steps-vertical {
+    @apply flex flex-col items-center;
+  }
+  
+  .steps-vertical .step {
+    @apply flex flex-row items-center justify-center w-full;
+  }
+  
+  .steps-vertical .step::before {
+    @apply relative;
+  }
+  
+  .steps-vertical .step span {
+    @apply ml-3;
+  }
+  
+  /* Alternating text position for mobile steps */
+  .steps-vertical .step:nth-child(odd) {
+    @apply flex-row-reverse;
+  }
+  
+  .steps-vertical .step:nth-child(odd) span {
+    @apply mr-3 ml-0;
+  }
+}
+
+/* Fix for mobile sidebar background */
+.fixed.inset-0 {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+}

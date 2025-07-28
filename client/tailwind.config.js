@@ -24,6 +24,8 @@ module.exports = {
       animation: {
         'bounce-slow': 'bounce 3s infinite',
         'wiggle': 'wiggle 1s ease-in-out infinite',
+        'spin-slow': 'spin 6s linear infinite',
+        'pulse-slow': 'pulse 3s ease-in-out infinite',
       },
       keyframes: {
         wiggle: {
