@@ -343,10 +343,10 @@ const Home = () => {
               </div>
 
               {/* Button moved down with more spacing */}
-              <div className="pt-6">
+              <div className="pt-6 flex justify-center lg:justify-start">
                 <Link to="/goals">
                   <motion.button
-                    className="btn btn-lg bg-cartoon-yellow text-black rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover btn-pop"
+                    className="btn btn-lg bg-cartoon-yellow text-black rounded-cartoon shadow-cartoon hover:bg-cartoon-purple btn-pop"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >

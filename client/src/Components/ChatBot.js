@@ -151,8 +151,8 @@ const ChatBot = () => {
             <div className="bg-cartoon-pink text-white p-4 rounded-t-cartoon flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="avatar">
-                  <div className="w-10 rounded-full bg-white/20 flex items-center justify-center">
-                    <BiBot size={24} />
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <BiBot size={20} />
                   </div>
                 </div>
                 <div>
@@ -184,8 +184,8 @@ const ChatBot = () => {
                     <div
                       className={`
                         px-4 py-2 rounded-cartoon shadow-cartoon-sm
-                        ${message.sender === 'user' 
-                          ? 'bg-cartoon-blue text-white' 
+                        ${message.sender === 'user'
+                          ? 'bg-cartoon-blue text-white'
                           : 'bg-gray-100 text-gray-800'
                         }
                       `}
@@ -198,7 +198,7 @@ const ChatBot = () => {
                   </div>
                 </motion.div>
               ))}
-              
+
               {isTyping && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -218,7 +218,7 @@ const ChatBot = () => {
 
             {/* Quick Replies */}
             {stage === 'greeting' && (
-              <div className="px-4 pb-2 flex flex-wrap gap-2">
+              <div className="px-4 pt-3 pb-2 flex flex-wrap gap-2">
                 {quickReplies.map((reply, index) => (
                   <button
                     key={index}
@@ -250,7 +250,7 @@ const ChatBot = () => {
                 <button
                   type="submit"
                   disabled={!inputMessage.trim()}
-                  className="btn btn-circle bg-cartoon-pink text-white shadow-cartoon-sm hover:shadow-cartoon disabled:opacity-50"
+                  className="btn btn-circle bg-cartoon-pink text-white shadow-cartoon-sm hover:shadow-cartoon disabled:opacity-990"
                 >
                   <BiSend size={20} />
                 </button>

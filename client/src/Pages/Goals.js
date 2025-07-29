@@ -58,7 +58,7 @@ const Goals = () => {
             <div className="flex items-start justify-between mb-2">
               <BiTargetLock className="text-3xl" />
               <motion.div 
-                className="badge badge-lg bg-white/20 backdrop-blur"
+                className="badge badge-lg bg-white/20 backdrop-blur text-black"
                 whileHover={{ scale: 1.1 }}
               >
                 {percentage}%
@@ -72,8 +72,8 @@ const Goals = () => {
           <div className="p-6 flex-1 flex flex-col">
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Progress</span>
-                <span className="text-sm text-gray-600 dark:text-gray-300">
+                <span className="text-sm font-medium text-white">Progress</span>
+                <span className="text-sm dark:text-white">
                   {completedSteps}/{totalSteps} steps
                 </span>
               </div>
@@ -158,7 +158,7 @@ const Goals = () => {
           Personal <span className="gradient-text">Goals</span> & Milestones
         </h1>
         
-        <p className="text-lg md:text-xl max-w-3xl text-gray-600 dark:text-gray-300">
+        <p className="text-lg md:text-xl max-w-3xl text-gray dark:text-gray">
           Transparency is key! Here's where I'm headed, what I'm learning, 
           and how I'm progressing. No smoke and mirrors, just real goals 
           with real progress tracking.

@@ -93,7 +93,7 @@ const ImprovedNavbar = ({
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-300 ${scrolled ? "shadow-lg backdrop-blur-md bg-base-100/90" : "bg-base-100"
+      className={`sticky top-0 z-40 transition-all duration-300 bg-base-100 ${scrolled ? "shadow-lg backdrop-blur-md" : ""
         }`}
     >
       <div className="navbar p-4 max-w-7xl mx-auto">
@@ -119,7 +119,7 @@ const ImprovedNavbar = ({
                     className={
                       isActive(item.path)
                         ? `btn rounded-cartoon shadow-cartoon btn-pop bg-${color} text-white`
-                        : "btn rounded-cartoon shadow-cartoon-sm btn-pop bg-white text-gray-700 hover:shadow-cartoon"
+                        : "btn rounded-cartoon shadow-cartoon-sm btn-pop bg-white text-gray-700 hover:shadow-cartoon hover:dark:text-white"
                     }
                   >
                     <Icon className="text-xl" />
@@ -330,8 +330,8 @@ const ImprovedNavbar = ({
                     whileHover={{ rotate: 180 }}
                     onClick={toggleTheme}
                     className={`btn btn-circle shadow-cartoon-sm hover:shadow-cartoon btn-pop transition-all duration-300 ${theme === "cartoon"
-                        ? "bg-gradient-to-br from-blue-500 to-blue-800"
-                        : "bg-gradient-to-br from-yellow-300 to-yellow-500"
+                      ? "bg-gradient-to-br from-blue-500 to-blue-800"
+                      : "bg-gradient-to-br from-yellow-300 to-yellow-500"
                       }`}
                   >
                     {theme === "cartoon" ? (

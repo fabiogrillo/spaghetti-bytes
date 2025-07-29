@@ -226,8 +226,8 @@ const TipTapEditor = ({ value, onChange, readOnly = false }) => {
           [&_.ProseMirror_h2]:text-2xl
           [&_.ProseMirror_h3]:text-xl
           [&_.ProseMirror_p]:my-3
-          [&_.ProseMirror_p]:text-gray-800
-          [&_.ProseMirror_p]:dark:text-gray-200
+          [&_.ProseMirror_p]:text-gray-450
+          [&_.ProseMirror_p]:dark:text-grey
           [&_.ProseMirror_img]:rounded-cartoon
           [&_.ProseMirror_img]:shadow-cartoon
           [&_.ProseMirror_blockquote]:border-l-4

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { 
-  BiChat, 
-  BiCheckCircle, 
-  BiTime, 
+import {
+  BiChat,
+  BiCheckCircle,
+  BiTime,
   BiArchive,
   BiReply,
   BiTrash,
@@ -52,7 +52,7 @@ const ConversationDashboard = () => {
 
   const handleSelectConversation = async (conversation) => {
     setSelectedConversation(conversation);
-    
+
     // Mark as read if new
     if (conversation.status === "new") {
       await updateStatus(conversation._id, "read");
@@ -82,7 +82,7 @@ const ConversationDashboard = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: replyText })
       });
-      
+
       if (response.ok) {
         setReplyText("");
         fetchConversations();
@@ -133,7 +133,7 @@ const ConversationDashboard = () => {
     <div className="container mx-auto p-4 md:p-8">
       <div className="mb-8 text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-4">Conversation Dashboard</h1>
-        
+
         {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -174,11 +174,10 @@ const ConversationDashboard = () => {
             <button
               key={status}
               onClick={() => setFilter(status)}
-              className={`btn btn-sm rounded-cartoon capitalize ${
-                filter === status 
-                  ? "bg-cartoon-pink text-white shadow-cartoon" 
-                  : "btn-outline"
-              }`}
+              className={`btn btn-sm rounded-cartoon capitalize ${filter === status
+                ? "bg-cartoon-pink text-white shadow-cartoon"
+                : "btn-outline"
+                }`}
             >
               {status}
             </button>
@@ -197,9 +196,9 @@ const ConversationDashboard = () => {
         <div className="lg:col-span-1">
           <div className="bg-white rounded-cartoon shadow-cartoon border-2 border-black h-[600px] overflow-hidden">
             <div className="bg-cartoon-yellow p-4 border-b-2 border-black">
-              <h2 className="font-bold text-lg">Conversations</h2>
+              <h2 className="font-bold text-lg text-white">Conversations</h2>
             </div>
-            
+
             <div className="overflow-y-auto h-[calc(100%-60px)]">
               {loading ? (
                 <div className="flex items-center justify-center h-full">
@@ -216,9 +215,8 @@ const ConversationDashboard = () => {
                       key={conv._id}
                       whileHover={{ backgroundColor: "#f9f9f9" }}
                       onClick={() => handleSelectConversation(conv)}
-                      className={`p-4 cursor-pointer transition-colors ${
-                        selectedConversation?._id === conv._id ? "bg-gray-100" : ""
-                      }`}
+                      className={`p-4 cursor-pointer transition-colors ${selectedConversation?._id === conv._id ? "bg-gray-100" : ""
+                        }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
@@ -251,7 +249,7 @@ const ConversationDashboard = () => {
           {selectedConversation ? (
             <div className="bg-white rounded-cartoon shadow-cartoon border-2 border-black h-[600px] flex flex-col">
               {/* Header */}
-              <div className="bg-cartoon-blue text-white p-4 border-b-2 border-black">
+              <div className="bg-cartoon-blue text-white p-4 border-b-2 border-black rounded-t-cartoon">
                 <div className="flex justify-between items-start">
                   <div>
                     <h2 className="font-bold text-xl">{selectedConversation.userInfo.name}</h2>
@@ -286,9 +284,9 @@ const ConversationDashboard = () => {
                     <div
                       className={`
                         max-w-[80%] p-4 rounded-cartoon shadow-cartoon-sm
-                        ${message.sender === "user" 
-                          ? "bg-gray-100" 
-                          : "bg-cartoon-purple text-white"
+                        ${message.sender === "user"
+                          ? "bg-gray-100 text-black"
+                          : "bg-cartoon-purple text-black"
                         }
                       `}
                     >
@@ -323,7 +321,7 @@ const ConversationDashboard = () => {
                     className="btn bg-cartoon-purple text-white rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
                   >
                     <BiReply size={20} />
-                    Send
+                    <span className="hidden sm:inline">Send</span>
                   </button>
                 </form>
               </div>

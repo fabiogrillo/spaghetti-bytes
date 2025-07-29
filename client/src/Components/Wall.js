@@ -80,7 +80,7 @@ const Wall = () => {
 
   return (
     <div className="container mx-auto p-8">
-      <motion.div 
+      <motion.div
         className="flex flex-col items-center text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -90,7 +90,7 @@ const Wall = () => {
           className="inline-block mb-6"
           whileHover={{ scale: 1.05 }}
         >
-          <span className="badge badge-lg bg-cartoon-blue text-white shadow-cartoon-sm px-6 py-3">
+          <span className="badge badge-lg bg-cartoon-blue text-white shadow-cartoon-sm px-3 md:px-6 py-3 whitespace-nowrap">
             <BsStars className="mr-2" /> Welcome to the Reading Corner!
           </span>
         </motion.div>
@@ -98,14 +98,14 @@ const Wall = () => {
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           The <span className="gradient-text-fixed">Reading</span> Corner
         </h1>
-        
-        <p className="text-lg md:text-xl max-w-3xl text-gray-600 dark:text-gray-300 leading-relaxed">
-          Welcome, dear reader! 📚 Dive into my collection of 
-          <strong> carefully crafted stories</strong> where code meets creativity. 
-          Each article is a byte-sized adventure waiting to be discovered. 
+
+        <p className="text-lg md:text-xl max-w-3xl dark:text-grey leading-relaxed">
+          Welcome, dear reader! 📚 Dive into my collection of
+          <strong> carefully crafted stories</strong> where code meets creativity.
+          Each article is a byte-sized adventure waiting to be discovered.
           Let the stats guide you through my storytelling journey! 🚀
         </p>
-        
+
         <div className="my-8">
           <img
             src={rocketImage}
@@ -123,7 +123,7 @@ const Wall = () => {
       </motion.div>
 
       {/* Stats Section with Pop-Cartoon Style */}
-      <motion.div 
+      <motion.div
         className="flex justify-center mx-auto mb-12"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -165,7 +165,7 @@ const Wall = () => {
       </motion.div>
 
       {/* Filter Controls */}
-      <motion.div 
+      <motion.div
         className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -201,7 +201,7 @@ const Wall = () => {
           <p className="mt-4 text-lg">Loading amazing stories...</p>
         </div>
       ) : (
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

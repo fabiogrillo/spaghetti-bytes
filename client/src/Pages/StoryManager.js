@@ -63,7 +63,7 @@ const StoryManager = ({ username }) => {
           Welcome back, <span className="gradient-text-fixed">{username}</span>! 🍝
         </h1>
         
-        <p className="text-lg md:text-xl max-w-3xl text-gray-600 dark:text-gray-300 mb-12">
+        <p className="text-lg md:text-xl max-w-3xl dark:text-gray mb-12">
           Your creative kitchen awaits! What amazing content shall we cook up today?
         </p>
 
@@ -107,7 +107,7 @@ const StoryManager = ({ username }) => {
           transition={{ delay: 0.5 }}
         >
           <h3 className="text-xl font-bold mb-4">Quick Tip! 💡</h3>
-          <p className="text-gray-700 dark:text-gray-300">
+          <p className="dark:text-gray">
             Remember to add engaging titles and summaries to your stories. 
             They're the first things readers see!
           </p>

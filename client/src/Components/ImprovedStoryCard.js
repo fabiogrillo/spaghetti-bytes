@@ -53,7 +53,7 @@ const ImprovedStoryCard = ({ story, index }) => {
       >
         {/* Title Section */}
         <div className="mb-4">
-          <h2 className="text-xl font-bold mb-2 line-clamp-2">{story.title}</h2>
+          <h2 className="text-xl text-black font-bold mb-2 line-clamp-2">{story.title}</h2>
           <p className="text-gray-600 line-clamp-3">{story.summary}</p>
         </div>
 
