@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BiTargetLock, BiTime, BiCheckCircle, BiCircle } from "react-icons/bi";
 import { FaFire } from "react-icons/fa";
-import illustration from "../Assets/Images/twinkle-online-education.gif";
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
@@ -39,7 +38,7 @@ const Goals = () => {
     const totalSteps = goal.steps.length;
     const percentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
     const progressColor = getProgressColor(percentage);
-    
+
     // Rotate colors for variety
     const cardColors = ['cartoon-pink', 'cartoon-blue', 'cartoon-yellow', 'cartoon-purple', 'cartoon-orange'];
     const cardColor = cardColors[index % cardColors.length];
@@ -57,7 +56,7 @@ const Goals = () => {
           <div className={`bg-${cardColor} text-white p-6 rounded-t-cartoon`}>
             <div className="flex items-start justify-between mb-2">
               <BiTargetLock className="text-3xl" />
-              <motion.div 
+              <motion.div
                 className="badge badge-lg bg-white/20 backdrop-blur text-black"
                 whileHover={{ scale: 1.1 }}
               >
@@ -101,8 +100,8 @@ const Goals = () => {
                     transition={{ delay: index * 0.1 + stepIndex * 0.05 }}
                     className={`
                       flex items-center gap-3 p-3 rounded-lg transition-all
-                      ${step.completed 
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                      ${step.completed
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                       }
                     `}
@@ -140,7 +139,7 @@ const Goals = () => {
   return (
     <div className="container mx-auto p-8">
       {/* Header Section */}
-      <motion.div 
+      <motion.div
         className="flex flex-col items-center text-center mb-12"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -153,30 +152,70 @@ const Goals = () => {
             <FaFire className="mr-2" /> My Journey Tracker
           </span>
         </motion.div>
-        
+
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           Personal <span className="gradient-text">Goals</span> & Milestones
         </h1>
-        
+
         <p className="text-lg md:text-xl max-w-3xl text-gray dark:text-gray">
-          Transparency is key! Here's where I'm headed, what I'm learning, 
-          and how I'm progressing. No smoke and mirrors, just real goals 
+          Transparency is key! Here's where I'm headed, what I'm learning,
+          and how I'm progressing. No smoke and mirrors, just real goals
           with real progress tracking.
         </p>
 
-        <div className="mt-8">
-          <img
-            src={illustration}
-            alt="Goals Illustration"
-            className="w-full max-w-sm md:max-w-md mx-auto"
-          />
-          <p className="text-xs text-center mt-2">
-            Illustration by{" "}
-            <a href="https://icons8.com/illustrations/author/56v7RIkExgol" className="underline">
-              Anna Żołnierowicz
-            </a>
-          </p>
-        </div>
+        {/* Animated Emoji */}
+        <motion.div
+          className="relative flex justify-center items-center mt-12"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="relative">
+            <motion.div
+              className="text-[100px] md:text-[150px] select-none"
+              animate={{
+                rotate: [-5, 5, -5],
+                y: [0, -10, 0]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              🎯
+            </motion.div>
+
+            {/* Progress indicators */}
+            <motion.div
+              className="absolute -top-3 -right-5 text-5xl"
+              animate={{
+                scale: [1, 1.0, 1],
+                rotate: [0, 180, 360]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity
+              }}
+            >
+              📈
+            </motion.div>
+
+            <motion.div
+              className="absolute bottom-5 -left-10 text-4xl"
+              animate={{
+                y: [0, -15, 0]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                delay: 0.5
+              }}
+            >
+              🏆
+            </motion.div>
+          </div>
+        </motion.div>
       </motion.div>
 
       {/* Goals Grid */}
@@ -186,7 +225,7 @@ const Goals = () => {
           <p className="mt-4 text-lg">Loading goals...</p>
         </div>
       ) : goals.length === 0 ? (
-        <motion.div 
+        <motion.div
           className="text-center py-20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -204,7 +243,7 @@ const Goals = () => {
 
       {/* Summary Stats */}
       {goals.length > 0 && (
-        <motion.div 
+        <motion.div
           className="mt-12 p-8 bg-gradient-to-br from-cartoon-pink to-cartoon-purple text-white rounded-cartoon shadow-cartoon"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -219,7 +258,7 @@ const Goals = () => {
               </div>
               <div>
                 <p className="text-4xl font-bold">
-                  {goals.reduce((acc, goal) => 
+                  {goals.reduce((acc, goal) =>
                     acc + goal.steps.filter(s => s.completed).length, 0
                   )}
                 </p>

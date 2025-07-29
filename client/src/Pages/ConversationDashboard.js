@@ -50,6 +50,18 @@ const ConversationDashboard = () => {
     }
   };
 
+  // Inizializza stats con valori di default se non esistono
+  useEffect(() => {
+    if (!stats) {
+      setStats({
+        statusCounts: { new: 0, read: 0, replied: 0, archived: 0 },
+        total: 0,
+        today: 0,
+        recent: []
+      });
+    }
+  }, [stats]);
+
   const handleSelectConversation = async (conversation) => {
     setSelectedConversation(conversation);
 
@@ -135,34 +147,42 @@ const ConversationDashboard = () => {
         <h1 className="text-3xl md:text-4xl font-bold mb-4">Conversation Dashboard</h1>
 
         {/* Stats Cards */}
-        {stats?.statusCounts && (
+        {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <motion.div
               whileHover={{ y: -5 }}
               className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
             >
-              <h3 className="text-2xl font-bold text-cartoon-pink">{stats?.statusCounts?.new ?? 0}</h3>
+              <h3 className="text-2xl font-bold text-cartoon-pink">
+                {stats.statusCounts?.new || 0}
+              </h3>
               <p className="text-sm text-gray-600">New Messages</p>
             </motion.div>
             <motion.div
               whileHover={{ y: -5 }}
               className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
             >
-              <h3 className="text-2xl font-bold text-cartoon-blue">{stats.today || 0}</h3>
+              <h3 className="text-2xl font-bold text-cartoon-blue">
+                {stats.today || 0}
+              </h3>
               <p className="text-sm text-gray-600">Today</p>
             </motion.div>
             <motion.div
               whileHover={{ y: -5 }}
               className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
             >
-              <h3 className="text-2xl font-bold text-cartoon-purple">{stats?.statusCounts?.replied ?? 0}</h3>
+              <h3 className="text-2xl font-bold text-cartoon-purple">
+                {stats.statusCounts?.replied || 0}
+              </h3>
               <p className="text-sm text-gray-600">Replied</p>
             </motion.div>
             <motion.div
               whileHover={{ y: -5 }}
               className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
             >
-              <h3 className="text-2xl font-bold text-cartoon-orange">{stats.total || 0}</h3>
+              <h3 className="text-2xl font-bold text-cartoon-orange">
+                {stats.total || 0}
+              </h3>
               <p className="text-sm text-gray-600">Total</p>
             </motion.div>
           </div>

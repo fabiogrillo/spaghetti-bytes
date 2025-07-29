@@ -144,7 +144,7 @@ const StoryPublisher = () => {
 
       <div className="card my-8 space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-cartoon shadow-cartoon border-2 border-black">
         <div className="form-control items-center w-full">
-          <label className="label font-mono text-center">
+          <label className="label font-mono text-center text-black">
             {id ? "Edit the title of your story" : "Start with a title"}
           </label>
           <input
@@ -167,7 +167,7 @@ const StoryPublisher = () => {
         </div>
 
         <div className="form-control items-center w-full">
-          <label className="label font-mono text-center">
+          <label className="label font-mono text-center text-black">
             {id ? "Edit the summary of your story" : "Brief description"}
           </label>
           <textarea
@@ -189,7 +189,7 @@ const StoryPublisher = () => {
         </div>
 
         <div className="form-control items-center w-full">
-          <label className="label font-mono text-center">
+          <label className="label font-mono text-center text-black">
             {id ? "Edit your tags" : "Add some tags (at least 3)"}
           </label>
           <div className="input-group flex flex-row justify-between space-x-2 w-full">
@@ -241,7 +241,7 @@ const StoryPublisher = () => {
         </div>
 
         <div className="form-control items-center w-full">
-          <label className="label font-mono text-center mb-4">
+          <label className="label font-mono text-center text-black mb-4">
             {id ? "Edit your story" : "Now write your story"}
           </label>
           <TipTapEditor
@@ -255,7 +255,7 @@ const StoryPublisher = () => {
         </div>
 
         <div className="form-control flex items-center w-full">
-          <label className="label font-mono text-center">
+          <label className="label font-mono text-center text-black">
             {id
               ? "Edit your Medium sharing settings"
               : "Share your story on Medium?"}
@@ -267,7 +267,7 @@ const StoryPublisher = () => {
               checked={shareOnMedium}
               onChange={(e) => setShareOnMedium(e.target.checked)}
             />
-            <FaMedium className="text-3xl" />
+            <FaMedium className="text-3xl text-cartoon-blue-dark" />
           </div>
         </div>
       </div>

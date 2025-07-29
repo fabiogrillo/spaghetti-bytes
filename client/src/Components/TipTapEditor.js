@@ -64,7 +64,7 @@ const MenuBar = ({ editor }) => {
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('bold') ? 'bg-cartoon-pink text-white' : 'bg-white'
+          editor.isActive('bold') ? 'bg-cartoon-pink text-white' : 'bg-white text-cartoon-pink'
         }`}
       >
         <FaBold />
@@ -74,7 +74,7 @@ const MenuBar = ({ editor }) => {
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('italic') ? 'bg-cartoon-pink text-white' : 'bg-white'
+          editor.isActive('italic') ? 'bg-cartoon-pink text-white' : 'bg-white text-cartoon-yellow'
         }`}
       >
         <FaItalic />
@@ -84,7 +84,7 @@ const MenuBar = ({ editor }) => {
         onClick={() => editor.chain().focus().toggleStrike().run()}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('strike') ? 'bg-cartoon-pink text-white' : 'bg-white'
+          editor.isActive('strike') ? 'bg-cartoon-pink text-white' : 'bg-white text-cartoon-purple'
         }`}
       >
         <FaStrikethrough />
@@ -94,7 +94,7 @@ const MenuBar = ({ editor }) => {
         onClick={() => editor.chain().focus().toggleCode().run()}
         disabled={!editor.can().chain().focus().toggleCode().run()}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('code') ? 'bg-cartoon-pink text-white' : 'bg-white'
+          editor.isActive('code') ? 'bg-cartoon-pink text-white' : 'bg-white text-cartoon-orange'
         }`}
       >
         <FaCode />
@@ -105,7 +105,7 @@ const MenuBar = ({ editor }) => {
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('heading', { level: 2 }) ? 'bg-cartoon-blue text-white' : 'bg-white'
+          editor.isActive('heading', { level: 2 }) ? 'bg-cartoon-blue text-white' : 'bg-white text-cartoon-blue'
         }`}
       >
         <FaHeading />
@@ -114,7 +114,7 @@ const MenuBar = ({ editor }) => {
       <button
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('bulletList') ? 'bg-cartoon-blue text-white' : 'bg-white'
+          editor.isActive('bulletList') ? 'bg-cartoon-blue text-white' : 'bg-white text-cartoon-pink'
         }`}
       >
         <FaListUl />
@@ -123,7 +123,7 @@ const MenuBar = ({ editor }) => {
       <button
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('orderedList') ? 'bg-cartoon-blue text-white' : 'bg-white'
+          editor.isActive('orderedList') ? 'bg-cartoon-blue text-white' : 'bg-white text-cartoon-yellow'
         }`}
       >
         <FaListOl />
@@ -132,7 +132,7 @@ const MenuBar = ({ editor }) => {
       <button
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('codeBlock') ? 'bg-cartoon-blue text-white' : 'bg-white'
+          editor.isActive('codeBlock') ? 'bg-cartoon-blue text-white' : 'bg-white text-cartoon-blue'
         }`}
       >
         <BiCodeBlock />
@@ -141,7 +141,7 @@ const MenuBar = ({ editor }) => {
       <button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('blockquote') ? 'bg-cartoon-blue text-white' : 'bg-white'
+          editor.isActive('blockquote') ? 'bg-cartoon-blue text-white' : 'bg-white text-cartoon-purple'
         }`}
       >
         <FaQuoteLeft />
@@ -152,7 +152,7 @@ const MenuBar = ({ editor }) => {
       <button
         onClick={setLink}
         className={`btn btn-sm shadow-cartoon-sm hover:shadow-cartoon transition-all ${
-          editor.isActive('link') ? 'bg-cartoon-purple text-white' : 'bg-white'
+          editor.isActive('link') ? 'bg-cartoon-purple text-white' : 'bg-white text-cartoon-orange'
         }`}
       >
         <FaLink />
@@ -160,7 +160,7 @@ const MenuBar = ({ editor }) => {
       
       <button
         onClick={addImage}
-        className="btn btn-sm bg-white shadow-cartoon-sm hover:shadow-cartoon transition-all"
+        className="btn btn-sm bg-white shadow-cartoon-sm hover:shadow-cartoon transition-all text-cartoon-pink"
       >
         <FaImage />
       </button>
@@ -170,7 +170,7 @@ const MenuBar = ({ editor }) => {
       <button
         onClick={() => editor.chain().focus().undo().run()}
         disabled={!editor.can().chain().focus().undo().run()}
-        className="btn btn-sm bg-white shadow-cartoon-sm hover:shadow-cartoon transition-all"
+        className="btn btn-sm bg-white shadow-cartoon-sm hover:shadow-cartoon transition-all text-cartoon-purple"
       >
         <FaUndo />
       </button>
@@ -178,7 +178,7 @@ const MenuBar = ({ editor }) => {
       <button
         onClick={() => editor.chain().focus().redo().run()}
         disabled={!editor.can().chain().focus().redo().run()}
-        className="btn btn-sm bg-white shadow-cartoon-sm hover:shadow-cartoon transition-all"
+        className="btn btn-sm bg-white shadow-cartoon-sm hover:shadow-cartoon transition-all text-cartoon-orange"
       >
         <FaRedo />
       </button>

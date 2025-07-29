@@ -47,7 +47,7 @@ const ResponsiveTable = ({
               className="border-b-2 border-gray-200 hover:bg-gray-50 transition-colors"
             >
               {columns.map((col) => (
-                <td key={col.key} className="px-6 py-4">
+                <td key={col.key} className="px-6 py-4 text-grey">
                   {col.render ? col.render(item) : item[col.key]}
                 </td>
               ))}
@@ -57,7 +57,7 @@ const ResponsiveTable = ({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => onEdit(item._id)}
-                    className="btn btn-sm bg-cartoon-yellow text-black shadow-cartoon-sm hover:shadow-cartoon"
+                    className="btn btn-sm bg-cartoon-yellow text-black shadow-cartoon-sm "
                   >
                     <FaEdit />
                   </motion.button>
@@ -91,7 +91,7 @@ const ResponsiveTable = ({
         >
           {/* Card Header */}
           <div
-            className={`bg-${colorScheme} text-white p-4 flex justify-between items-center cursor-pointer`}
+            className={`bg-${colorScheme} text-gray p-4 flex justify-between items-center cursor-pointer`}
             onClick={() => toggleRow(item._id)}
           >
             <h3 className="font-bold text-lg line-clamp-1">
@@ -118,10 +118,10 @@ const ResponsiveTable = ({
                 <div className="p-4 space-y-3">
                   {columns.map((col) => (
                     <div key={col.key} className="flex flex-col">
-                      <span className="text-sm text-gray-600 font-semibold">
+                      <span className="text-sm text-gray font-semibold">
                         {col.label}:
                       </span>
-                      <span className="text-gray-800">
+                      <span className="text-gray">
                         {col.render ? col.render(item) : item[col.key]}
                       </span>
                     </div>
@@ -166,7 +166,7 @@ const ResponsiveTable = ({
       {/* Table Header */}
       <div className="mb-6 text-center">
         <h2 className="text-3xl font-bold mb-2">{title}</h2>
-        <div className="flex items-center justify-center gap-2 text-gray-600">
+        <div className="flex items-center justify-center gap-2 text-gray">
           <BiTime />
           <span>{data.length} items total</span>
         </div>
@@ -175,8 +175,8 @@ const ResponsiveTable = ({
       {/* Table Content */}
       {data.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-cartoon shadow-cartoon border-2 border-black">
-          <p className="text-xl text-gray-500">No items found</p>
-          <p className="text-gray-400 mt-2">Create your first one to get started!</p>
+          <p className="text-xl text-gray">No items found</p>
+          <p className="text-gray mt-2">Create your first one to get started!</p>
         </div>
       ) : (
         <>

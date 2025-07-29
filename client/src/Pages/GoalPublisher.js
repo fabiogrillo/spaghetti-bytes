@@ -107,7 +107,7 @@ const GoalPublisher = () => {
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             {id ? "Refine Your" : "Create a New"} <span className="gradient-text-fixed">Goal</span>
           </h1>
-          <p className="py-2 md:text-base max-w-3xl mx-auto text-gray-600 dark:text-gray-300">
+          <p className="py-2 md:text-base max-w-3xl mx-auto dark:text-gray">
             {id
               ? "Fine-tune your goal details and track your progress. Every step counts! 📈"
               : "Transform your dreams into achievable milestones. Start with a clear vision! 🚀"}
@@ -149,7 +149,7 @@ const GoalPublisher = () => {
             whileHover={{ y: -2 }}
             className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon border-2 border-black hover:shadow-cartoon-hover transition-all"
           >
-            <label className="block font-bold text-lg mb-3 flex items-center gap-2">
+            <label className="block font-bold text-lg text-white mb-3 flex items-center gap-2">
               <FaFire className="text-cartoon-orange" />
               Goal Title
             </label>
@@ -169,7 +169,7 @@ const GoalPublisher = () => {
             whileHover={{ y: -2 }}
             className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon border-2 border-black hover:shadow-cartoon-hover transition-all"
           >
-            <label className="block font-bold text-lg mb-3">Description</label>
+            <label className="block font-bold text-lg text-white mb-3">Description</label>
             <textarea
               name="description"
               className="textarea textarea-bordered w-full rounded-cartoon"
@@ -185,7 +185,7 @@ const GoalPublisher = () => {
           <motion.div
             className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon border-2 border-black"
           >
-            <label className="block font-bold text-lg mb-4 flex items-center gap-2">
+            <label className="block font-bold text-lg text-white mb-4 flex items-center gap-2">
               <BiTask className="text-cartoon-blue" />
               Action Steps
             </label>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ImprovedStoryCard from "./ImprovedStoryCard";
-import rocketImage from "../Assets/Images/juicy-woman-is-reading-a-book-at-home.gif";
 import { FaRegBookmark, FaSearch } from "react-icons/fa";
 import { LuTags } from "react-icons/lu";
 import { BsStars } from "react-icons/bs";
@@ -106,20 +105,74 @@ const Wall = () => {
           Let the stats guide you through my storytelling journey! 🚀
         </p>
 
-        <div className="my-8">
-          <img
-            src={rocketImage}
-            alt="Illustration Reading"
-            className="w-full max-w-sm md:max-w-lg animate-float"
-          />
-          <p className="text-xs text-center mt-2">
-            Illustration by{" "}
-            <a href="https://icons8.com/illustrations/author/mNCLibjicqSz" className="underline hover:text-cartoon-pink">
-              Julia K
-            </a>{" "}
-            from <a href="https://icons8.com/illustrations" className="underline hover:text-cartoon-pink">Ouch!</a>
-          </p>
-        </div>
+        {/* Animated Emoji */}
+        <motion.div
+          className="relative flex justify-center items-center my-8"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="relative">
+            <motion.div
+              className="text-[100px] md:text-[150px] select-none"
+              animate={{
+                y: [0, -30, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              📖
+            </motion.div>
+
+            {/* Floating elements */}
+            <motion.div
+              className="absolute -top-5 -right-10 text-4xl"
+              animate={{
+                rotate: [0, 360],
+                scale: [1, 1.0, 1]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity
+              }}
+            >
+              ✨
+            </motion.div>
+
+            <motion.div
+              className="absolute bottom-0 -left-10 text-4xl"
+              animate={{
+                y: [0, -10, 0],
+                x: [-5, 5, -5]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                delay: 0.5
+              }}
+            >
+              🔖
+            </motion.div>
+
+            <motion.div
+              className="absolute top-10 left-20 text-3xl"
+              animate={{
+                scale: [0.8, 1.1, 0.8],
+                opacity: [0.6, 1, 0.6]
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                delay: 1
+              }}
+            >
+              💡
+            </motion.div>
+          </div>
+        </motion.div>
       </motion.div>
 
       {/* Stats Section with Pop-Cartoon Style */}

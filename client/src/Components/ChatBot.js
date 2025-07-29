@@ -223,7 +223,7 @@ const ChatBot = () => {
                   <button
                     key={index}
                     onClick={() => handleQuickReply(reply)}
-                    className="btn btn-sm btn-outline rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
+                    className="btn btn-sm btn-outline rounded-cartoon shadow-cartoon-sm text-cartoon-orange hover:shadow-cartoon"
                   >
                     {reply}
                   </button>
@@ -250,7 +250,7 @@ const ChatBot = () => {
                 <button
                   type="submit"
                   disabled={!inputMessage.trim()}
-                  className="btn btn-circle bg-cartoon-pink text-white shadow-cartoon-sm hover:shadow-cartoon disabled:opacity-990"
+                  className="btn btn-circle bg-cartoon-pink text-black shadow-cartoon-sm hover:shadow-cartoon hover:text-success disabled:opacity-900 disabled:bg-error"
                 >
                   <BiSend size={20} />
                 </button>
