@@ -135,13 +135,13 @@ const ConversationDashboard = () => {
         <h1 className="text-3xl md:text-4xl font-bold mb-4">Conversation Dashboard</h1>
 
         {/* Stats Cards */}
-        {stats && (
+        {stats?.statusCounts && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <motion.div
               whileHover={{ y: -5 }}
               className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
             >
-              <h3 className="text-2xl font-bold text-cartoon-pink">{stats.statusCounts.new || 0}</h3>
+              <h3 className="text-2xl font-bold text-cartoon-pink">{stats?.statusCounts?.new ?? 0}</h3>
               <p className="text-sm text-gray-600">New Messages</p>
             </motion.div>
             <motion.div
@@ -155,7 +155,7 @@ const ConversationDashboard = () => {
               whileHover={{ y: -5 }}
               className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
             >
-              <h3 className="text-2xl font-bold text-cartoon-purple">{stats.statusCounts.replied || 0}</h3>
+              <h3 className="text-2xl font-bold text-cartoon-purple">{stats?.statusCounts?.replied ?? 0}</h3>
               <p className="text-sm text-gray-600">Replied</p>
             </motion.div>
             <motion.div
