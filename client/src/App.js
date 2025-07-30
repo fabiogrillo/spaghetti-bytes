@@ -34,7 +34,7 @@ const App = () => {
     return isAuthenticated ? children : <Navigate to="/login" />;
   };
 
-  useAnalytics();
+  // useAnalytics();
 
   return (
     <Router>
