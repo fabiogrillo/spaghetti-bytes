@@ -29,7 +29,7 @@ const Privacy = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="prose prose-lg max-w-none bg-white dark:bg-gray-800 p-8 rounded-cartoon shadow-cartoon border-2 border-black"
+                className="prose prose-lg max-w-none bg-white dark:bg-gray-800 p-8 rounded-cartoon shadow-cartoon border-2 border-black text-gray-900 dark:text-gray-100 prose-headings:text-gray-900 dark:prose-headings:text-white prose-strong:text-gray-900 dark:prose-strong:text-gray-100 prose-li:text-gray-900 dark:prose-li:text-gray-100"
             >
                 <p className="lead">
                     Last Update: {new Date().toLocaleDateString('it-IT')}

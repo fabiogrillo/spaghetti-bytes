@@ -71,11 +71,11 @@ const CookieSettings = () => {
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg"
+                        className="fixed inset-0 flex items-center justify-center z-50 p-4"
                     >
-                        <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6">
+                        <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-bold flex items-center gap-2">
+                                <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
                                     <BiCookie className="text-cartoon-yellow" />
                                     Cookie Preferences
                                 </h2>
@@ -92,7 +92,7 @@ const CookieSettings = () => {
                                 <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1">
-                                            <h3 className="font-semibold">Essential Cookies</h3>
+                                            <h3 className="font-semibold text-gray-900 dark:text-white">Essential Cookies</h3>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                                 Required for the website to function properly
                                             </p>
@@ -110,7 +110,7 @@ const CookieSettings = () => {
                                 <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1">
-                                            <h3 className="font-semibold">Analytics Cookies</h3>
+                                            <h3 className="font-semibold text-gray-900 dark:text-white">Analytics Cookies</h3>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                                 Help us understand how you use the website
                                             </p>
@@ -131,7 +131,7 @@ const CookieSettings = () => {
                                 <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1">
-                                            <h3 className="font-semibold">Marketing Cookies</h3>
+                                            <h3 className="font-semibold text-gray-900 dark:text-white">Marketing Cookies</h3>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                                 Used for targeted advertising (currently not used)
                                             </p>

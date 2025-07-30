@@ -125,15 +125,41 @@ const ChatBot = () => {
         {!isOpen && (
           <motion.button
             initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            animate={{
+              scale: 1,
+              boxShadow: [
+                "0 0 0 0 rgba(255, 107, 157, 0.4)",
+                "0 0 0 20px rgba(255, 107, 157, 0)",
+                "0 0 0 0 rgba(255, 107, 157, 0)",
+              ]
+            }}
             exit={{ scale: 0 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
+            transition={{
+              scale: { duration: 0.3 },
+              boxShadow: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
             onClick={() => setIsOpen(true)}
             className="fixed bottom-6 right-6 z-50 btn btn-circle btn-lg bg-cartoon-pink text-white shadow-cartoon hover:shadow-cartoon-hover hover:translate-x-1 hover:translate-y-1 transition-all"
             aria-label="Open chat"
           >
-            <BiChat size={28} />
+            <motion.div
+              animate={{
+                rotate: [0, -10, 10, -10, 0]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                delay: 1
+              }}
+            >
+              <BiChat size={28} />
+            </motion.div>
           </motion.button>
         )}
       </AnimatePresence>

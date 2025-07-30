@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; // Sostituisci con il tuo ID
+const GA_MEASUREMENT_ID = 'G-DQTSBB55KE'; // Sostituisci con il tuo ID
 
 export const useAnalytics = () => {
     const location = useLocation();

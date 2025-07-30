@@ -21,21 +21,22 @@ import TableGoals from "./Pages/TableGoals";
 import ChatBot from "./Components/ChatBot";
 import ConversationDashboard from "./Pages/ConversationDashboard";
 import CookieBanner from "./Components/CookieBanner";
-import Privacy from "./Pages/Privacy";
-import Visualizations from "./Pages/Visaulizations";
 import CookieSettings from "./Components/CookieSettings";
+import Privacy from "./Pages/Privacy";
+import Visualizations from "./Pages/Visualizations";
+import { useAnalytics } from "./hooks/useAnalytics";
 
-const App = () => {
-  const [isAuthenticated, setAuthenticated] = useState(false);
-  const [username, setUsername] = useState("");
+// Crea un componente wrapper per le routes
+const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername }) => {
+  // Qui useAnalytics funziona perché siamo dentro il Router
+  useAnalytics();
 
   const ProtectedRoute = ({ children }) => {
     return isAuthenticated ? children : <Navigate to="/login" />;
   };
 
-
   return (
-    <Router>
+    <>
       <ImprovedNavbar
         authenticated={isAuthenticated}
         username={username}
@@ -129,13 +130,28 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route path="/privacy"
-          element={<Privacy />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Routes>
       <Footer />
       <ChatBot />
       <CookieBanner />
       <CookieSettings />
+    </>
+  );
+};
+
+const App = () => {
+  const [isAuthenticated, setAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
+
+  return (
+    <Router>
+      <AppContent
+        isAuthenticated={isAuthenticated}
+        setAuthenticated={setAuthenticated}
+        username={username}
+        setUsername={setUsername}
+      />
     </Router>
   );
 };

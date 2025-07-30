@@ -120,7 +120,7 @@ const Visualizations = () => {
               onClick={() => setTimeRange(range)}
               className={`btn btn-sm rounded-cartoon capitalize ${timeRange === range
                   ? "bg-cartoon-purple text-white shadow-cartoon"
-                  : "btn-ghost"
+                  : "btn-ghost text-gray-900 dark:text-gray-100"
                 }`}
             >
               {range}
