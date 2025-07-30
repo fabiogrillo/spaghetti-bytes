@@ -2,10 +2,11 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FaGithub, FaLinkedin, FaMedium } from "react-icons/fa";
 import { BiHeart } from "react-icons/bi";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  
+
   const socialLinks = [
     {
       icon: FaGithub,
@@ -97,6 +98,23 @@ const Footer = () => {
               © {currentYear} Spaghetti Bytes. All rights reserved.
             </p>
           </motion.div>
+
+          {/* Policy Links */}
+          <div className="flex gap-4 text-xs">
+            <Link to="/privacy" className="hover:text-cartoon-pink transition-colors">
+              Privacy Policy
+            </Link>
+            <span className="text-gray-400">•</span>
+            <button
+              onClick={() => {
+                // Trigger cookie settings
+                document.querySelector('[aria-label="Cookie settings"]')?.click();
+              }}
+              className="hover:text-cartoon-pink transition-colors cursor-pointer"
+            >
+              Cookie Settings
+            </button>
+          </div>
 
           {/* Fun Easter Egg */}
           <motion.div

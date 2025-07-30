@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { BiShield } from "react-icons/bi";
 import {
   IoIosLogIn,
   IoIosLogOut,
@@ -318,6 +319,16 @@ const ImprovedNavbar = ({
                         >
                           <IoMdBook className="text-xl" />
                           <span className="ml-3">Conversations</span>
+                        </motion.button>
+                      </Link>
+                      <Link to="/privacy" onClick={() => setIsSidebarOpen(false)}>
+                        <motion.button
+                          whileHover={{ x: 10 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100"
+                        >
+                          <BiShield className="text-xl" />
+                          <span className="ml-3">Privacy Policy</span>
                         </motion.button>
                       </Link>
                     </>

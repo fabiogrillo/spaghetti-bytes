@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   FaChartLine,
@@ -7,8 +7,7 @@ import {
   FaClock,
   FaEye,
   FaBookOpen,
-  FaLink,
-  FaCalendarAlt
+  FaLink
 } from "react-icons/fa";
 import { BiStats } from "react-icons/bi";
 import { BsGraphUp } from "react-icons/bs";
@@ -52,37 +51,6 @@ const Visualizations = () => {
       { day: "Sun", visitors: 1543 }
     ]
   });
-
-  // Metriche aggiuntive da tracciare
-  const analytics = {
-    // Visite
-    pageViews: { total, unique, byPage },
-    visitors: { new, returning, geographic },
-
-    // Engagement
-    avgTimeOnPage: "3m 42s",
-    bounceRate: "32%",
-    scrollDepth: "68%",
-
-    // Sorgenti traffico
-    referrers: {
-      direct: 40,
-      google: 30,
-      social: 20,
-      other: 10
-    },
-
-    // Device stats
-    devices: {
-      mobile: 55,
-      desktop: 40,
-      tablet: 5
-    },
-
-    // Content performance
-    topArticles: [/* sorted by views */],
-    articleEngagement: {/* likes, shares, time */ }
-  };
 
   const StatCard = ({ icon: Icon, title, value, subtitle, color }) => (
     <motion.div
@@ -135,7 +103,7 @@ const Visualizations = () => {
         </motion.div>
 
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Site <span className="gradient-text-fixed">Statistics</span>
+          Site <span className="gradient-text">Statistics</span>
         </h1>
 
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">

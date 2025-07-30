@@ -22,6 +22,9 @@ import ChatBot from "./Components/ChatBot";
 import ConversationDashboard from "./Pages/ConversationDashboard";
 import CookieBanner from "./Components/CookieBanner";
 import Privacy from "./Pages/Privacy";
+import Visualizations from "./Pages/Visaulizations";
+import CookieSettings from "./Components/CookieSettings";
+import { useAnalytics } from "./hooks/useAnalytics";
 
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
@@ -30,6 +33,8 @@ const App = () => {
   const ProtectedRoute = ({ children }) => {
     return isAuthenticated ? children : <Navigate to="/login" />;
   };
+
+  useAnalytics();
 
   return (
     <Router>
@@ -103,6 +108,14 @@ const App = () => {
           }
         />
         <Route
+          path="/visualizations"
+          element={
+            <ProtectedRoute>
+              <Visualizations />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/create-goal/:id"
           element={
             <ProtectedRoute>
@@ -124,6 +137,7 @@ const App = () => {
       <Footer />
       <ChatBot />
       <CookieBanner />
+      <CookieSettings />
     </Router>
   );
 };
