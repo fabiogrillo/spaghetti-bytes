@@ -22,7 +22,6 @@ import ConversationDashboard from "./Pages/ConversationDashboard";
 import CookieBanner from "./Components/CookieBanner";
 import CookieSettings from "./Components/CookieSettings";
 import Privacy from "./Pages/Privacy";
-import Visualizations from "./Pages/Visualizations";
 import { useAnalytics } from "./hooks/useAnalytics";
 
 // Crea un componente wrapper per le routes
@@ -101,14 +100,6 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername }
           element={
             <ProtectedRoute>
               <TableGoals />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/visualizations"
-          element={
-            <ProtectedRoute>
-              <Visualizations />
             </ProtectedRoute>
           }
         />
