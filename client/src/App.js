@@ -24,7 +24,6 @@ import CookieBanner from "./Components/CookieBanner";
 import Privacy from "./Pages/Privacy";
 import Visualizations from "./Pages/Visaulizations";
 import CookieSettings from "./Components/CookieSettings";
-import { useAnalytics } from "./hooks/useAnalytics";
 
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
@@ -34,7 +33,6 @@ const App = () => {
     return isAuthenticated ? children : <Navigate to="/login" />;
   };
 
-  // useAnalytics();
 
   return (
     <Router>
