@@ -20,6 +20,8 @@ import GoalPublisher from "./Pages/GoalPublisher";
 import TableGoals from "./Pages/TableGoals";
 import ChatBot from "./Components/ChatBot";
 import ConversationDashboard from "./Pages/ConversationDashboard";
+import CookieBanner from "./Components/CookieBanner";
+import Privacy from "./Pages/Privacy";
 
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
@@ -116,9 +118,12 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/privacy"
+          element={<Privacy />} />
       </Routes>
       <Footer />
       <ChatBot />
+      <CookieBanner />
     </Router>
   );
 };

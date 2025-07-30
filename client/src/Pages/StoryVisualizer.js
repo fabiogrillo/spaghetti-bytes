@@ -4,6 +4,7 @@ import TipTapEditor from "../Components/TipTapEditor";
 import { BsArrowLeft } from "react-icons/bs";
 import { BiTime, BiBookReader } from "react-icons/bi";
 import { motion } from "framer-motion";
+import ShareButtons from "../Components/ShareButtons";
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ const StoryVisualizer = () => {
         <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
           {story.title}
         </h1>
-        
+
         <div className="flex flex-wrap justify-center items-center gap-4 text-gray-600 mb-6">
           <div className="flex items-center gap-2">
             <BiTime className="text-xl" />
@@ -109,6 +110,20 @@ const StoryVisualizer = () => {
         <p className="text-lg italic text-center">{story.summary}</p>
       </motion.div>
 
+      {/* Share Buttons */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="flex justify-center mb-8"
+      >
+        <ShareButtons
+          url={window.location.href}
+          title={story.title}
+          summary={story.summary}
+        />
+      </motion.div>
+
       <div className="divider"></div>
 
       {/* Content */}
@@ -139,7 +154,7 @@ const StoryVisualizer = () => {
         >
           <BsArrowLeft /> Back to Blog
         </button>
-        
+
         {story.sharedOnMedium && (
           <div className="badge badge-lg bg-black text-white">
             Also on Medium
