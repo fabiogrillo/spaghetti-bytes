@@ -6,6 +6,7 @@ import { GoGoal } from "react-icons/go";
 import { FaProjectDiagram, FaRocket } from "react-icons/fa";
 import { BiCodeAlt, BiHeart } from "react-icons/bi";
 import { BsStars } from "react-icons/bs";
+import NewsletterWidget from "../Components/NewsletterWidget";
 
 const Home = () => {
   const fadeInUp = {
@@ -444,6 +445,18 @@ const Home = () => {
               </motion.button>
             </div>
           </motion.div>
+        </div>
+      </motion.section>
+      
+      {/* Newsletter Section */}
+      <motion.section
+        className="py-20 px-6 md:px-12 bg-base-200"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <div className="container mx-auto max-w-2xl">
+          <NewsletterWidget source="homepage" variant="default" />
         </div>
       </motion.section>
     </div>

@@ -10,6 +10,7 @@ const User = require("./models/User");
 const storyRoutes = require("./routes/storyRoute");
 const goalRoutes = require("./routes/goalRoute");
 const conversationRoutes = require("./routes/conversationRoute");
+const newsletterRoutes = require("./routes/newsletterRoute");
 
 // Configurazione variabili ambiente
 dotenv.config();
@@ -83,6 +84,7 @@ mongoose
 app.use("/api/stories", storyRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 
 // Route di registrazione
 app.post("/api/register", async (req, res) => {

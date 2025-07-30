@@ -5,6 +5,7 @@ import { BsArrowLeft } from "react-icons/bs";
 import { BiTime, BiBookReader } from "react-icons/bi";
 import { motion } from "framer-motion";
 import ShareButtons from "../Components/ShareButtons";
+import NewsletterWidget from "../Components/NewsletterWidget";
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();
@@ -140,6 +141,9 @@ const StoryVisualizer = () => {
       </motion.div>
 
       <div className="divider mt-12"></div>
+      <div className="my-12">
+        <NewsletterWidget source="article" variant="inline" />
+      </div>
 
       {/* Footer */}
       <motion.div
