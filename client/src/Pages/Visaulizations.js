@@ -14,7 +14,7 @@ import { BsGraphUp } from "react-icons/bs";
 
 const Visualizations = () => {
   const [timeRange, setTimeRange] = useState("week");
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalVisitors: 12847,
     uniqueVisitors: 8234,
     pageViews: 34521,
