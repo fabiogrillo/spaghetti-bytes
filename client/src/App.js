@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -10,7 +10,6 @@ import Home from "./Pages/Home";
 import Blog from "./Pages/Blog";
 import Goals from "./Pages/Goals";
 import Footer from "./Components/Footer";
-import Contacts from "./Pages/Contacts";
 import Login from "./Pages/Login";
 import StoryManager from "./Pages/StoryManager";
 import StoryPublisher from "./Pages/StoryPublisher";
@@ -47,7 +46,6 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername }
         <Route path="/" element={<Home />} />
         <Route path="/goals" element={<Goals />} />
         <Route path="/blog" element={<Blog />} />
-        <Route path="/contacts" element={<Contacts />} />
         <Route
           path="/editor"
           element={
