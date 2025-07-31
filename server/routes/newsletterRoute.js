@@ -8,24 +8,16 @@ const {
     getSubscriberStats,
     createCampaign,
     getCampaigns,
-    sendCampaign
+    sendCampaign,
+    getAnalytics
 } = require("../controllers/newsletterController");
 
 // Middleware
 function requireAuth(req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated && req.isAuthenticated()) {
         return next();
     }
     res.status(401).json({ error: "Unauthorized" });
-}
-
-function requireAdmin(req, res, next) {
-    // For now, any authenticated user is admin
-    // You can add role checking here
-    if (req.user) {
-        return next();
-    }
-    res.status(403).json({ error: "Admin access required" });
 }
 
 // Public routes
@@ -33,13 +25,12 @@ router.post("/subscribe", subscribe);
 router.get("/confirm/:token", confirmSubscription);
 router.get("/unsubscribe/:token", unsubscribe);
 
-// Admin routes
-router.get("/subscribers", requireAuth, requireAdmin, getSubscribers);
-router.get("/subscribers/stats", requireAuth, requireAdmin, getSubscriberStats);
-
-// Campaign routes
-router.get("/campaigns", requireAuth, requireAdmin, getCampaigns);
-router.post("/campaigns", requireAuth, requireAdmin, createCampaign);
-router.post("/campaigns/:campaignId/send", requireAuth, requireAdmin, sendCampaign);
+// Protected routes
+router.get("/subscribers", requireAuth, getSubscribers);
+router.get("/subscribers/stats", requireAuth, getSubscriberStats);
+router.get("/campaigns", requireAuth, getCampaigns);
+router.post("/campaigns", requireAuth, createCampaign);
+router.post("/campaigns/:campaignId/send", requireAuth, sendCampaign);
+router.get("/analytics", requireAuth, getAnalytics);
 
 module.exports = router;

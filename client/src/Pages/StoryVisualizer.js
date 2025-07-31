@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TipTapEditor from "../Components/TipTapEditor";
 import { BsArrowLeft } from "react-icons/bs";
@@ -6,14 +6,14 @@ import { BiTime, BiBookReader } from "react-icons/bi";
 import { motion } from "framer-motion";
 import ShareButtons from "../Components/ShareButtons";
 import NewsletterWidget from "../Components/NewsletterWidget";
-// import DonationButton from '../Components/DonationButton';
-// import ArticleReactions from '../Components/ArticleReactions';
+import ArticleReactions from '../Components/ArticleReactions';
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();
   const { storyId } = useParams();
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { id } = useParams(); // This line gets the id from the URL
 
   useEffect(() => {
     const fetchStory = async () => {
@@ -143,6 +143,9 @@ const StoryVisualizer = () => {
       </motion.div>
 
       <div className="divider mt-12"></div>
+      <div className="max-w-2xl mx-auto my-6">
+        <ArticleReactions articleId={id} compact={true} />
+      </div>
       <div className="my-12">
         <NewsletterWidget source="article" variant="inline" />
       </div>

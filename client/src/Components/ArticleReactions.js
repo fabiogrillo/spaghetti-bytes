@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../Api';
 
-const ArticleReactions = ({ articleId }) => {
+const ArticleReactions = ({ articleId, compact = false }) => {
     const [reactions, setReactions] = useState({
         love: 0,
         spaghetti: 0,
@@ -22,25 +22,27 @@ const ArticleReactions = ({ articleId }) => {
     ];
 
     useEffect(() => {
-        // fetchReactions();
-        loadUserReactions();
+        const fetchReactions = async () => {
+            try {
+                const response = await api.get(`/api/articles/${articleId}/reactions`);
+                setReactions(response.data.reactions);
+            } catch (error) {
+                console.error('Error fetching reactions:', error);
+            }
+        };
+
+        const loadUserReactions = () => {
+            const stored = localStorage.getItem(`reactions_${articleId}`);
+            if (stored) {
+                setUserReactions(JSON.parse(stored));
+            }
+        };
+
+        if (articleId) {
+            fetchReactions();
+            loadUserReactions();
+        }
     }, [articleId]);
-
-    const fetchReactions = async () => {
-        try {
-            const response = await api.get(`/api/articles/${articleId}/reactions`);
-            setReactions(response.data.reactions);
-        } catch (error) {
-            console.error('Error fetching reactions:', error);
-        }
-    };
-
-    const loadUserReactions = () => {
-        const stored = localStorage.getItem(`reactions_${articleId}`);
-        if (stored) {
-            setUserReactions(JSON.parse(stored));
-        }
-    };
 
     const handleReaction = async (reactionKey) => {
         // Check if user already reacted with this emoji
@@ -80,13 +82,15 @@ const ArticleReactions = ({ articleId }) => {
     };
 
     return (
-        <div className="my-8">
-            <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6">
-                <h3 className="text-xl font-bold mb-4 text-center">
-                    How did you like this article? 🤔
-                </h3>
+        <div className={compact ? "my-4" : "my-8"}>
+            <div className={`bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black ${compact ? 'p-4' : 'p-6'}`}>
+                {!compact && (
+                    <h3 className="text-xl font-bold mb-4 text-center">
+                        How did you like this article? 🤔
+                    </h3>
+                )}
 
-                <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex flex-wrap justify-center gap-3">
                     {reactionEmojis.map(({ key, emoji, label }) => {
                         const hasReacted = userReactions.includes(key);
                         const count = reactions[key] || 0;
@@ -101,14 +105,14 @@ const ArticleReactions = ({ articleId }) => {
                                 disabled={hasReacted}
                             >
                                 <div className={`
-                                    flex flex-col items-center p-3 rounded-cartoon border-2 border-black
+                                    flex flex-col items-center ${compact ? 'p-2' : 'p-3'} rounded-cartoon border-2 border-black
                                     ${hasReacted
                                         ? 'bg-cartoon-yellow shadow-cartoon'
                                         : 'bg-white hover:shadow-cartoon shadow-cartoon-sm'
                                     }
                                     transition-all duration-200
                                 `}>
-                                    <span className="text-4xl mb-1">{emoji}</span>
+                                    <span className={compact ? "text-2xl" : "text-4xl mb-1"}>{emoji}</span>
                                     {count > 0 && (
                                         <span className="text-sm font-bold">{count}</span>
                                     )}

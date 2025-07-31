@@ -23,6 +23,9 @@ import CookieBanner from "./Components/CookieBanner";
 import CookieSettings from "./Components/CookieSettings";
 import Privacy from "./Pages/Privacy";
 import { useAnalytics } from "./hooks/useAnalytics";
+import CampaignManager from "./Pages/CampaignManager";
+import NewsletterAnalytics from "./Components/NewsletterAnalytics";
+import DonationButton from "./Components/DonationButton";
 
 // Crea un componente wrapper per le routes
 const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername }) => {
@@ -119,12 +122,29 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername }
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/newsletter/campaigns"
+          element={
+            <ProtectedRoute>
+              <CampaignManager />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/newsletter/analytics"
+          element={
+            <ProtectedRoute>
+              <NewsletterAnalytics />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/privacy" element={<Privacy />} />
       </Routes>
       <Footer />
       <ChatBot />
       <CookieBanner />
       <CookieSettings />
+      <DonationButton variant="floating" />
     </>
   );
 };

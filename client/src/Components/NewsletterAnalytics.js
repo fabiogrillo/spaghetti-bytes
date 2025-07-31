@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -6,10 +6,11 @@ import {
 } from 'recharts';
 import {
     BiTrendingUp, BiTrendingDown, BiEnvelope, BiUser,
-    BiTime, BiCheck, BiX, BiMouse, BiMapPin
+    BiCheck, BiMouse, BiMapPin
 } from 'react-icons/bi';
 import { format, subDays, eachDayOfInterval } from 'date-fns';
 import api from '../Api';
+import { BiBarChart } from 'react-icons/bi';
 
 const NewsletterAnalytics = () => {
     const [timeRange, setTimeRange] = useState('7d');
@@ -17,19 +18,19 @@ const NewsletterAnalytics = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const fetchAnalytics = async () => {
+            try {
+                const response = await api.get(`/api/newsletter/analytics?range=${timeRange}`);
+                setAnalyticsData(response.data);
+            } catch (error) {
+                console.error('Error fetching analytics:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchAnalytics();
     }, [timeRange]);
-
-    const fetchAnalytics = async () => {
-        try {
-            const response = await api.get(`/api/newsletter/analytics?range=${timeRange}`);
-            setAnalyticsData(response.data);
-        } catch (error) {
-            console.error('Error fetching analytics:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) {
         return (

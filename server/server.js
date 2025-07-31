@@ -13,6 +13,7 @@ const conversationRoutes = require("./routes/conversationRoute");
 const newsletterRoutes = require("./routes/newsletterRoute");
 const newsletterRoute = require("./routes/newsletterRoute");
 const rssRoute = require("./routes/rssRoute");
+const cors = require("cors");
 
 // Configurazione variabili ambiente
 dotenv.config();
@@ -81,6 +82,14 @@ mongoose
   .catch((err) => {
     console.error("Error connecting to MongoDB", err);
   });
+
+// CORS configuration (before routes)
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 // Configurazione delle rotte API
 app.use("/api/stories", storyRoutes);

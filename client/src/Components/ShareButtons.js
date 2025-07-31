@@ -74,7 +74,7 @@ const ShareButtons = ({ url, title, summary }) => {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleShare(share.link)}
-                        className={`btn btn-circle btn-sm bg-gray-200 dark:bg-gray-700 ${share.color} hover:text-white transition-colors`}
+                        className={`btn btn-circle btn-sm dark:bg-gray ${share.color} hover:text-white transition-colors`}
                         aria-label={`Share on ${share.name}`}
                     >
                         <Icon size={16} />
@@ -107,7 +107,7 @@ const ShareButtons = ({ url, title, summary }) => {
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => handleShare(share.link)}
-                                className={`btn btn-circle btn-sm bg-gray-200 dark:bg-gray-700 ${share.color} hover:text-white transition-colors`}
+                                className={`btn btn-circle btn-sm dark:bg-gray ${share.color} hover:text-white transition-colors`}
                                 aria-label={`Share on ${share.name}`}
                             >
                                 <Icon size={16} />
@@ -122,7 +122,7 @@ const ShareButtons = ({ url, title, summary }) => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={copyToClipboard}
-                className="btn btn-circle btn-sm bg-gray-200 dark:bg-gray-700 hover:bg-cartoon-purple hover:text-white transition-colors"
+                className="btn btn-circle btn-sm dark:bg-gray hover:bg-cartoon-purple hover:text-white transition-colors"
                 aria-label="Copy link"
             >
                 <FaLink size={16} />

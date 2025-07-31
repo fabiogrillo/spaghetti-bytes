@@ -134,7 +134,7 @@ const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="form-control">
                     <label className="label">
-                        <span className="label-text flex items-center gap-2">
+                        <span className="label-text flex items-center gap-2 text-gray-700 dark:text-gray-300">
                             <BiEnvelope className="text-cartoon-pink" />
                             Your email address
                         </span>

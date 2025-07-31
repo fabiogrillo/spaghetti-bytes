@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BiCoffee, BiHeart } from 'react-icons/bi';
 
-const DonationButton = ({ variant = 'floating' }) => {
+const PAYPAL_USERNAME = process.env.REACT_APP_PAYPAL_USERNAME;
+
+const DonationButton = ({ variant = 'floating', compact = false }) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedAmount, setSelectedAmount] = useState(5);
     const [customAmount, setCustomAmount] = useState('');
@@ -16,8 +18,8 @@ const DonationButton = ({ variant = 'floating' }) => {
 
     const handleDonation = () => {
         const amount = customAmount || selectedAmount;
-        // Integrate with payment provider (Stripe, PayPal, etc.)
-        window.open(`https://www.paypal.com/donate?hosted_button_id=YOUR_BUTTON_ID&amount=${amount}`, '_blank');
+        // Replace YOUR_PAYPAL_EMAIL with your actual PayPal email
+        window.open(`https://www.paypal.com/paypalme/${PAYPAL_USERNAME}/${amount}EUR`, '_blank');
     };
 
     if (variant === 'floating') {
@@ -51,23 +53,27 @@ const DonationButton = ({ variant = 'floating' }) => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-r from-cartoon-orange to-cartoon-pink p-6 rounded-cartoon shadow-cartoon border-2 border-black my-8"
+                className={`bg-gradient-to-r from-cartoon-orange to-cartoon-pink ${compact ? 'p-4' : 'p-6'} rounded-cartoon shadow-cartoon border-2 border-black`}
             >
-                <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                    <BiHeart className="animate-pulse" />
-                    Enjoying the content?
-                </h3>
-                <p className="text-white/90 mb-4">
-                    Support Spaghetti Bytes with a virtual coffee! ☕
-                </p>
+                {!compact && (
+                    <>
+                        <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                            <BiHeart className="animate-pulse" />
+                            Enjoying the content?
+                        </h3>
+                        <p className="text-white/90 mb-4">
+                            Support Spaghetti Bytes with a virtual coffee! ☕
+                        </p>
+                    </>
+                )}
                 <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowModal(true)}
-                    className="btn bg-white text-cartoon-pink rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
+                    className={`btn bg-white text-cartoon-pink rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon ${compact ? 'btn-sm w-full' : ''}`}
                 >
-                    <BiCoffee size={20} />
-                    Buy me a coffee
+                    <BiCoffee size={compact ? 16 : 20} />
+                    {compact ? 'Donate' : 'Buy me a coffee'}
                 </motion.button>
 
                 <AnimatePresence>
@@ -118,7 +124,7 @@ const DonationButton = ({ variant = 'floating' }) => {
                                     }`}
                             >
                                 <div className="text-3xl mb-1">{amount.emoji}</div>
-                                <div className="font-bold">${amount.value}</div>
+                                <div className="font-bold">€{amount.value}</div>
                                 <div className="text-xs text-gray-600">{amount.label}</div>
                             </motion.button>
                         ))}
@@ -130,7 +136,7 @@ const DonationButton = ({ variant = 'floating' }) => {
                             <span className="label-text">Or enter custom amount:</span>
                         </label>
                         <div className="input-group">
-                            <span className="bg-cartoon-pink text-white">$</span>
+                            <span className="bg-cartoon-pink text-white">€</span>
                             <input
                                 type="number"
                                 value={customAmount}
@@ -158,7 +164,7 @@ const DonationButton = ({ variant = 'floating' }) => {
                             className="btn bg-gradient-to-r from-cartoon-orange to-cartoon-pink text-white rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover flex-1"
                         >
                             <BiHeart />
-                            Donate ${customAmount || selectedAmount}
+                            Donate €{customAmount || selectedAmount}
                         </motion.button>
                     </div>
 

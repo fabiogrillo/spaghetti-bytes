@@ -23,7 +23,7 @@ const emailQueue = new Bull('email-queue', {
 // Process email queue
 emailQueue.process(async (job) => {
     const { campaignId, subscriberBatch } = job.data;
-    
+
     for (const subscriber of subscriberBatch) {
         await sendCampaignEmail(campaignId, subscriber);
         // Small delay between emails to avoid rate limits
@@ -111,7 +111,7 @@ const confirmSubscription = async (req, res) => {
 
         // Send welcome email
         await sendWelcomeEmail(subscriber);
-        
+
         // Send admin notification
         await sendAdminNotification(subscriber);
 
@@ -186,7 +186,7 @@ const sendAdminNotification = async (subscriber) => {
         </div>
         `
     };
-    
+
     await transporter.sendMail(adminMailOptions);
 };
 
@@ -259,7 +259,7 @@ const getCampaigns = async (req, res) => {
 const sendCampaign = async (req, res) => {
     try {
         const { campaignId } = req.params;
-        
+
         const campaign = await Campaign.findById(campaignId);
         if (!campaign) {
             return res.status(404).json({ error: "Campaign not found" });
@@ -271,7 +271,7 @@ const sendCampaign = async (req, res) => {
 
         // Get active subscribers
         const subscribers = await Subscriber.find({ status: 'active' });
-        
+
         // Update campaign status
         campaign.status = 'sending';
         campaign.recipients.total = subscribers.length;
@@ -302,11 +302,11 @@ const sendCampaign = async (req, res) => {
 const sendCampaignEmail = async (campaignId, subscriber) => {
     try {
         const campaign = await Campaign.findById(campaignId);
-        
+
         // Personalize content
         let htmlContent = campaign.content.html;
         htmlContent = htmlContent.replace(/{{email}}/g, subscriber.email);
-        htmlContent = htmlContent.replace(/{{unsubscribe_link}}/g, 
+        htmlContent = htmlContent.replace(/{{unsubscribe_link}}/g,
             `${process.env.SITE_URL}/api/newsletter/unsubscribe/${subscriber.tokens.unsubscribeToken}`
         );
 
@@ -319,7 +319,7 @@ const sendCampaignEmail = async (campaignId, subscriber) => {
         };
 
         await transporter.sendMail(mailOptions);
-        
+
         // Update campaign stats
         await Campaign.findByIdAndUpdate(campaignId, {
             $inc: { 'recipients.sent': 1 }
@@ -424,7 +424,7 @@ const getEmailTemplate = (templateName, variables = {}) => {
                 </div>
             </div>
         `,
-        
+
         newsletter: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background-color: #FF6B9D; padding: 40px 20px; text-align: center;">
@@ -446,13 +446,13 @@ const getEmailTemplate = (templateName, variables = {}) => {
             </div>
         `
     };
-    
+
     // Replace variables in template
     let template = templates[templateName] || templates.newsletter;
     Object.keys(variables).forEach(key => {
         template = template.replace(new RegExp(`{{${key}}}`, 'g'), variables[key]);
     });
-    
+
     return template;
 };
 
@@ -518,6 +518,25 @@ const getSubscribers = async (req, res) => {
     }
 };
 
+const getAnalytics = async (req, res) => {
+    try {
+        const { range = '7d' } = req.query;
+
+        // For now, return mock data
+        res.json({
+            overview: {
+                totalSubscribers: await Subscriber.countDocuments(),
+                activeSubscribers: await Subscriber.countDocuments({ status: 'active' }),
+                monthlyGrowth: 12.5,
+                avgOpenRate: 24.5,
+                avgClickRate: 8.3
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+};
+
 module.exports = {
     subscribe,
     confirmSubscription,
@@ -526,5 +545,6 @@ module.exports = {
     getSubscriberStats,
     createCampaign,
     getCampaigns,
-    sendCampaign
+    sendCampaign,
+    getAnalytics
 };

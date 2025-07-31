@@ -4,18 +4,26 @@ import { useNavigate } from 'react-router-dom';
 import api from '../Api';
 import {
     BiEnvelope, BiUser, BiSend, BiEdit,
-    BiTrash, BiCalendar, BiBarChart, BiCheckCircle
+    BiCalendar, BiBarChart, BiCheckCircle
 } from 'react-icons/bi';
 import { HiOutlineTemplate, HiSparkles } from 'react-icons/hi';
 import { format, formatDistanceToNow } from 'date-fns';
 
 const CampaignManager = () => {
-    // const navigate = useNavigate();
     const [campaigns, setCampaigns] = useState([]);
     const [subscribers, setSubscribers] = useState({ active: 0, total: 0 });
     const [loading, setLoading] = useState(true);
     const [selectedTab, setSelectedTab] = useState('campaigns');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [setFormData] = useState({
+        subject: '',
+        preheader: '',
+        content: {
+            html: '',
+            text: ''
+        }
+    });
+
 
     useEffect(() => {
         fetchData();
@@ -129,8 +137,8 @@ const CampaignManager = () => {
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setSelectedTab(tab.id)}
                             className={`tab tab-lg gap-2 ${selectedTab === tab.id
-                                    ? 'tab-active bg-cartoon-pink text-white'
-                                    : ''
+                                ? 'tab-active bg-cartoon-pink text-white'
+                                : ''
                                 }`}
                         >
                             <tab.icon size={20} />
@@ -148,7 +156,12 @@ const CampaignManager = () => {
                         />
                     )}
                     {selectedTab === 'templates' && (
-                        <TemplatesList />
+                        <TemplatesList
+                            onSelectTemplate={(templateData) => {
+                                setFormData(templateData);
+                                setShowCreateModal(true);
+                            }}
+                        />
                     )}
                     {selectedTab === 'subscribers' && (
                         <SubscribersList />
@@ -275,7 +288,7 @@ const CampaignsList = ({ campaigns, onRefresh }) => {
 };
 
 // Templates List Component
-const TemplatesList = () => {
+const TemplatesList = ({ setFormData, setShowCreateModal }) => {
     const templates = [
         {
             id: 1,
@@ -319,6 +332,22 @@ const TemplatesList = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="btn btn-sm bg-cartoon-blue text-white rounded-cartoon w-full"
+                        onClick={() => {
+                            // Populate create modal with template
+                            setFormData({
+                                subject: template.name === 'Weekly Newsletter'
+                                    ? '🍝 This Week in Spaghetti Bytes'
+                                    : template.name === 'Product Launch'
+                                        ? '🚀 Exciting News from Spaghetti Bytes!'
+                                        : '📅 Monthly Digest - Spaghetti Bytes',
+                                preheader: template.description,
+                                content: {
+                                    html: getTemplateHTML(template.name),
+                                    text: ''
+                                }
+                            });
+                            setShowCreateModal(true);
+                        }}
                     >
                         Use Template
                     </motion.button>
@@ -336,20 +365,20 @@ const SubscribersList = () => {
     const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
+        const fetchSubscribers = async () => {
+            try {
+                const response = await api.get(`/api/newsletter/subscribers?page=${page}&limit=10`);
+                setSubscribers(response.data.subscribers);
+                setTotalPages(response.data.pagination.pages);
+            } catch (error) {
+                console.error('Error fetching subscribers:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchSubscribers();
     }, [page]);
-
-    const fetchSubscribers = async () => {
-        try {
-            const response = await api.get(`/api/newsletter/subscribers?page=${page}&limit=10`);
-            setSubscribers(response.data.subscribers);
-            setTotalPages(response.data.pagination.pages);
-        } catch (error) {
-            console.error('Error fetching subscribers:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) {
         return (
@@ -383,10 +412,10 @@ const SubscribersList = () => {
                                 <td className="font-medium">{subscriber.email}</td>
                                 <td>
                                     <span className={`badge ${subscriber.status === 'active'
-                                            ? 'badge-success'
-                                            : subscriber.status === 'pending'
-                                                ? 'badge-warning'
-                                                : 'badge-error'
+                                        ? 'badge-success'
+                                        : subscriber.status === 'pending'
+                                            ? 'badge-warning'
+                                            : 'badge-error'
                                         }`}>
                                         {subscriber.status}
                                     </span>
@@ -473,8 +502,8 @@ const AnalyticsDashboard = ({ campaigns }) => {
 };
 
 // Create Campaign Modal Component
-const CreateCampaignModal = ({ onClose, onSuccess }) => {
-    const [formData, setFormData] = useState({
+const CreateCampaignModal = ({ onClose, onSuccess, initialData }) => {
+    const [formData, setFormData] = useState(initialData || {
         subject: '',
         preheader: '',
         content: {
@@ -574,5 +603,19 @@ const CreateCampaignModal = ({ onClose, onSuccess }) => {
         </motion.div>
     );
 };
+
+const getTemplateHTML = (templateName) => {
+    switch (templateName) {
+        case 'Weekly Newsletter':
+            return '<h1>Weekly Update</h1><p>Here is what’s new this week...</p>';
+        case 'Product Launch':
+            return '<h1>🚀 New Product Alert!</h1><p>We’ve just launched something amazing...</p>';
+        case 'Monthly Roundup':
+            return '<h1>📅 This Month in Review</h1><p>A quick look back at our highlights...</p>';
+        default:
+            return '<p>Start writing your content here...</p>';
+    }
+};
+
 
 export default CampaignManager;
