@@ -6,6 +6,8 @@ const {
   createStory,
   updateStory,
   deleteStory,
+  getReactions,
+  addReaction,
 } = require("../controllers/storyController");
 
 // Route to get all stories
@@ -22,5 +24,8 @@ router.put("/:id", updateStory);
 
 // Route to delete a story by ID
 router.delete("/:id", deleteStory);
+
+router.post("/articles/:id/reactions", addReaction);
+router.get("/articles/:id/reactions", getReactions);
 
 module.exports = router;

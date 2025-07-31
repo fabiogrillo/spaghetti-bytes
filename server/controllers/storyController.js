@@ -102,10 +102,55 @@ const publishOnMedium = async (story) => {
   }
 };
 
+const addReaction = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { reaction } = req.body;
+        
+        const validReactions = ['love', 'spaghetti', 'fire', 'mind_blown', 'clap'];
+        if (!validReactions.includes(reaction)) {
+            return res.status(400).json({ error: 'Invalid reaction type' });
+        }
+        
+        const story = await Story.findByIdAndUpdate(
+            id,
+            { $inc: { [`reactions.${reaction}`]: 1 } },
+            { new: true }
+        );
+        
+        if (!story) {
+            return res.status(404).json({ error: 'Story not found' });
+        }
+        
+        res.json({ reactions: story.reactions });
+    } catch (error) {
+        console.error('Add reaction error:', error);
+        res.status(500).json({ error: 'Failed to add reaction' });
+    }
+};
+
+const getReactions = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const story = await Story.findById(id).select('reactions');
+        
+        if (!story) {
+            return res.status(404).json({ error: 'Story not found' });
+        }
+        
+        res.json({ reactions: story.reactions });
+    } catch (error) {
+        console.error('Get reactions error:', error);
+        res.status(500).json({ error: 'Failed to get reactions' });
+    }
+};
+
 module.exports = {
   getStories,
   getStoryById,
   createStory,
   updateStory,
   deleteStory,
+  getReactions,
+  addReaction,
 };

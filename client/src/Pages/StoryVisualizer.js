@@ -6,6 +6,8 @@ import { BiTime, BiBookReader } from "react-icons/bi";
 import { motion } from "framer-motion";
 import ShareButtons from "../Components/ShareButtons";
 import NewsletterWidget from "../Components/NewsletterWidget";
+// import DonationButton from '../Components/DonationButton';
+// import ArticleReactions from '../Components/ArticleReactions';
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();

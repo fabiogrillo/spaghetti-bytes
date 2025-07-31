@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { BiShield } from "react-icons/bi";
@@ -11,11 +11,11 @@ import {
   IoMdMenu,
   IoMdClose,
   IoMdSettings,
-  IoMdStats,
 } from "react-icons/io";
 import { BiSun, BiMoon } from "react-icons/bi";
 import { doLogout } from "../Api";
 import Logo from "./Logo";
+import { BiEnvelope, BiBarChart } from "react-icons/bi";
 
 const ImprovedNavbar = ({
   authenticated,
@@ -94,7 +94,7 @@ const ImprovedNavbar = ({
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-300 bg-base-100 ${scrolled ? "shadow-lg backdrop-blur-md" : ""
+      className={`sticky top-0 z-50 transition-all duration-300 bg-base-100 ${scrolled ? "shadow-lg backdrop-blur-md" : ""
         }`}
     >
       <div className="navbar p-4 max-w-7xl mx-auto">
@@ -130,23 +130,6 @@ const ImprovedNavbar = ({
               );
             })}
           </nav>
-
-          {authenticated && (
-            <Link to="/visualizations">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={
-                  isActive("/visualizations")
-                    ? "btn rounded-cartoon shadow-cartoon btn-pop bg-cartoon-orange text-white"
-                    : "btn rounded-cartoon shadow-cartoon-sm btn-pop bg-white text-gray-700 hover:shadow-cartoon"
-                }
-              >
-                <IoMdStats className="text-xl" />
-                <span className="ml-1">Stats</span>
-              </motion.button>
-            </Link>
-          )}
 
           <motion.button
             whileHover={{ rotate: 180 }}
@@ -192,6 +175,22 @@ const ImprovedNavbar = ({
                     className="rounded-cartoon hover:bg-cartoon-blue hover:text-white"
                   >
                     <IoMdBook /> Conversations
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate("/newsletter/campaigns")}
+                    className="rounded-cartoon hover:bg-cartoon-pink hover:text-white"
+                  >
+                    <BiEnvelope /> Newsletter Campaigns
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate("/newsletter/analytics")}
+                    className="rounded-cartoon hover:bg-cartoon-yellow hover:text-black"
+                  >
+                    <BiBarChart /> Newsletter Analytics
                   </button>
                 </li>
                 <li>
@@ -293,20 +292,6 @@ const ImprovedNavbar = ({
 
                   {authenticated && (
                     <>
-                      <Link to="/visualizations" onClick={() => setIsSidebarOpen(false)}>
-                        <motion.button
-                          whileHover={{ x: 10 }}
-                          whileTap={{ scale: 0.95 }}
-                          className={
-                            isActive("/visualizations")
-                              ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-orange text-white"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100"
-                          }
-                        >
-                          <IoMdStats className="text-xl" />
-                          <span className="ml-3">Stats</span>
-                        </motion.button>
-                      </Link>
                       <Link to="/conversations" onClick={() => setIsSidebarOpen(false)}>
                         <motion.button
                           whileHover={{ x: 10 }}
@@ -319,6 +304,35 @@ const ImprovedNavbar = ({
                         >
                           <IoMdBook className="text-xl" />
                           <span className="ml-3">Conversations</span>
+                        </motion.button>
+                      </Link>
+                      <Link to="/newsletter/campaigns" onClick={() => setIsSidebarOpen(false)}>
+                        <motion.button
+                          whileHover={{ x: 10 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={
+                            isActive("/newsletter/campaigns")
+                              ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-pink text-white"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100"
+                          }
+                        >
+                          <BiEnvelope className="text-xl" />
+                          <span className="ml-3">Newsletter</span>
+                        </motion.button>
+                      </Link>
+
+                      <Link to="/newsletter/analytics" onClick={() => setIsSidebarOpen(false)}>
+                        <motion.button
+                          whileHover={{ x: 10 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={
+                            isActive("/newsletter/analytics")
+                              ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-yellow text-black"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100"
+                          }
+                        >
+                          <BiBarChart className="text-xl" />
+                          <span className="ml-3">Analytics</span>
                         </motion.button>
                       </Link>
                       <Link to="/privacy" onClick={() => setIsSidebarOpen(false)}>

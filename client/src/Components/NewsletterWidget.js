@@ -58,13 +58,13 @@ const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
                     Get weekly updates on new articles, tips, and resources.
                 </p>
 
-                <form onSubmit={handleSubmit} className="flex gap-2">
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="your@email.com"
-                        className="input input-bordered flex-1 rounded-cartoon"
+                        className="input input-bordered flex-1 rounded-cartoon w-full"
                         disabled={status === 'loading' || status === 'success'}
                     />
                     <motion.button
@@ -72,7 +72,7 @@ const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
                         whileTap={{ scale: 0.95 }}
                         type="submit"
                         disabled={status === 'loading' || status === 'success'}
-                        className="btn bg-white text-cartoon-purple rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
+                        className="btn bg-white text-cartoon-purple rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon w-full sm:w-auto px-6"
                     >
                         {status === 'loading' ? (
                             <span className="loading loading-spinner"></span>
@@ -155,8 +155,8 @@ const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
                     type="submit"
                     disabled={status === 'loading' || status === 'success'}
                     className={`btn w-full rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover ${status === 'success'
-                            ? 'bg-green-500 text-white'
-                            : 'bg-cartoon-pink text-white'
+                        ? 'bg-green-500 text-white'
+                        : 'bg-cartoon-pink text-white'
                         }`}
                 >
                     {status === 'loading' ? (

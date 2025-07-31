@@ -11,6 +11,8 @@ const storyRoutes = require("./routes/storyRoute");
 const goalRoutes = require("./routes/goalRoute");
 const conversationRoutes = require("./routes/conversationRoute");
 const newsletterRoutes = require("./routes/newsletterRoute");
+const newsletterRoute = require("./routes/newsletterRoute");
+const rssRoute = require("./routes/rssRoute");
 
 // Configurazione variabili ambiente
 dotenv.config();
@@ -85,6 +87,8 @@ app.use("/api/stories", storyRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/newsletter", newsletterRoutes);
+app.use("/api/newsletter", newsletterRoute);
+app.use("/", rssRoute); // RSS at root level
 
 // Route di registrazione
 app.post("/api/register", async (req, res) => {
