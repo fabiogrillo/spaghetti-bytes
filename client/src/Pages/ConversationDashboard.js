@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   BiChat,
@@ -26,18 +26,12 @@ const ConversationDashboard = () => {
   const [replyText, setReplyText] = useState("");
   const [filter, setFilter] = useState("all");
 
-  useEffect(() => {
-    fetchConversations();
-    fetchStats();
-  }, [filter]);
-
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     try {
       setLoading(true);
       const query = filter !== "all" ? `?status=${filter}` : "";
       const response = await api.get(`/conversations${query}`);
 
-      // Ensure conversations is always an array
       const conversationsData = response.data.conversations || [];
       setConversations(Array.isArray(conversationsData) ? conversationsData : []);
     } catch (error) {
@@ -46,7 +40,13 @@ const ConversationDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
+
+
+  useEffect(() => {
+    fetchConversations();
+    fetchStats();
+  }, [fetchConversations]);
 
   const fetchStats = async () => {
     try {
@@ -187,8 +187,8 @@ const ConversationDashboard = () => {
               key={status}
               onClick={() => setFilter(status)}
               className={`btn btn-sm rounded-cartoon capitalize ${filter === status
-                  ? "bg-cartoon-pink text-white shadow-cartoon"
-                  : "btn-outline"
+                ? "bg-cartoon-pink text-white shadow-cartoon"
+                : "btn-outline"
                 }`}
             >
               {status}
