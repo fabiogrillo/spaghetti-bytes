@@ -11,11 +11,17 @@ import {
 } from "react-icons/bi";
 import { BsCircleFill } from "react-icons/bs";
 import { format, formatDistanceToNow } from "date-fns";
+import api from "../Api";
 
 const ConversationDashboard = () => {
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({
+    statusCounts: { new: 0, read: 0, replied: 0, archived: 0 },
+    total: 0,
+    today: 0,
+    recent: []
+  });
   const [loading, setLoading] = useState(true);
   const [replyText, setReplyText] = useState("");
   const [filter, setFilter] = useState("all");
@@ -23,18 +29,20 @@ const ConversationDashboard = () => {
   useEffect(() => {
     fetchConversations();
     fetchStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   const fetchConversations = async () => {
     try {
       setLoading(true);
       const query = filter !== "all" ? `?status=${filter}` : "";
-      const response = await fetch(`/api/conversations${query}`);
-      const data = await response.json();
-      setConversations(data.conversations);
+      const response = await api.get(`/conversations${query}`);
+
+      // Ensure conversations is always an array
+      const conversationsData = response.data.conversations || [];
+      setConversations(Array.isArray(conversationsData) ? conversationsData : []);
     } catch (error) {
       console.error("Error fetching conversations:", error);
+      setConversations([]);
     } finally {
       setLoading(false);
     }
@@ -42,25 +50,18 @@ const ConversationDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("/api/conversations/stats");
-      const data = await response.json();
-      setStats(data);
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-    }
-  };
-
-  // Inizializza stats con valori di default se non esistono
-  useEffect(() => {
-    if (!stats) {
-      setStats({
+      const response = await api.get("/conversations/stats");
+      setStats(response.data || {
         statusCounts: { new: 0, read: 0, replied: 0, archived: 0 },
         total: 0,
         today: 0,
         recent: []
       });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      // Keep default stats on error
     }
-  }, [stats]);
+  };
 
   const handleSelectConversation = async (conversation) => {
     setSelectedConversation(conversation);
@@ -73,11 +74,7 @@ const ConversationDashboard = () => {
 
   const updateStatus = async (id, status) => {
     try {
-      await fetch(`/api/conversations/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status })
-      });
+      await api.put(`/conversations/${id}`, { status });
       fetchConversations();
       fetchStats();
     } catch (error) {
@@ -89,18 +86,15 @@ const ConversationDashboard = () => {
     if (!replyText.trim() || !selectedConversation) return;
 
     try {
-      const response = await fetch(`/api/conversations/${selectedConversation._id}/reply`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: replyText })
+      const response = await api.post(`/conversations/${selectedConversation._id}/reply`, {
+        text: replyText
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         setReplyText("");
         fetchConversations();
         // Refresh selected conversation
-        const updatedConversation = await response.json();
-        setSelectedConversation(updatedConversation);
+        setSelectedConversation(response.data);
       }
     } catch (error) {
       console.error("Error sending reply:", error);
@@ -111,7 +105,7 @@ const ConversationDashboard = () => {
     if (!window.confirm("Are you sure you want to delete this conversation?")) return;
 
     try {
-      await fetch(`/api/conversations/${id}`, { method: "DELETE" });
+      await api.delete(`/conversations/${id}`);
       fetchConversations();
       if (selectedConversation?._id === id) {
         setSelectedConversation(null);
@@ -147,46 +141,44 @@ const ConversationDashboard = () => {
         <h1 className="text-3xl md:text-4xl font-bold mb-4">Conversation Dashboard</h1>
 
         {/* Stats Cards */}
-        {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
-            >
-              <h3 className="text-2xl font-bold text-cartoon-pink">
-                {stats.statusCounts?.new || 0}
-              </h3>
-              <p className="text-sm text-gray-600">New Messages</p>
-            </motion.div>
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
-            >
-              <h3 className="text-2xl font-bold text-cartoon-blue">
-                {stats.today || 0}
-              </h3>
-              <p className="text-sm text-gray-600">Today</p>
-            </motion.div>
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
-            >
-              <h3 className="text-2xl font-bold text-cartoon-purple">
-                {stats.statusCounts?.replied || 0}
-              </h3>
-              <p className="text-sm text-gray-600">Replied</p>
-            </motion.div>
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
-            >
-              <h3 className="text-2xl font-bold text-cartoon-orange">
-                {stats.total || 0}
-              </h3>
-              <p className="text-sm text-gray-600">Total</p>
-            </motion.div>
-          </div>
-        )}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
+          >
+            <h3 className="text-2xl font-bold text-cartoon-pink">
+              {stats?.statusCounts?.new || 0}
+            </h3>
+            <p className="text-sm text-gray-600">New Messages</p>
+          </motion.div>
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
+          >
+            <h3 className="text-2xl font-bold text-cartoon-blue">
+              {stats?.today || 0}
+            </h3>
+            <p className="text-sm text-gray-600">Today</p>
+          </motion.div>
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
+          >
+            <h3 className="text-2xl font-bold text-cartoon-purple">
+              {stats?.statusCounts?.replied || 0}
+            </h3>
+            <p className="text-sm text-gray-600">Replied</p>
+          </motion.div>
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white p-4 rounded-cartoon shadow-cartoon border-2 border-black"
+          >
+            <h3 className="text-2xl font-bold text-cartoon-orange">
+              {stats?.total || 0}
+            </h3>
+            <p className="text-sm text-gray-600">Total</p>
+          </motion.div>
+        </div>
 
         {/* Filter Buttons */}
         <div className="flex flex-wrap justify-center gap-2 mb-6">
@@ -195,8 +187,8 @@ const ConversationDashboard = () => {
               key={status}
               onClick={() => setFilter(status)}
               className={`btn btn-sm rounded-cartoon capitalize ${filter === status
-                ? "bg-cartoon-pink text-white shadow-cartoon"
-                : "btn-outline"
+                  ? "bg-cartoon-pink text-white shadow-cartoon"
+                  : "btn-outline"
                 }`}
             >
               {status}
@@ -216,7 +208,7 @@ const ConversationDashboard = () => {
         <div className="lg:col-span-1">
           <div className="bg-white rounded-cartoon shadow-cartoon border-2 border-black h-[600px] overflow-hidden">
             <div className="bg-cartoon-yellow p-4 border-b-2 border-black">
-              <h2 className="font-bold text-lg text-white">Conversations</h2>
+              <h2 className="font-bold text-lg">Conversations</h2>
             </div>
 
             <div className="overflow-y-auto h-[calc(100%-60px)]">
@@ -245,14 +237,16 @@ const ConversationDashboard = () => {
                               {getStatusIcon(conv.status)}
                             </span>
                             <h3 className="font-semibold truncate">
-                              {conv.userInfo.name}
+                              {conv.userInfo?.name || "Unknown"}
                             </h3>
                           </div>
                           <p className="text-sm text-gray-600 truncate">
-                            {conv.userInfo.email}
+                            {conv.userInfo?.email || "No email"}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
-                            {formatDistanceToNow(new Date(conv.createdAt), { addSuffix: true })}
+                            {conv.createdAt
+                              ? formatDistanceToNow(new Date(conv.createdAt), { addSuffix: true })
+                              : "Unknown time"}
                           </p>
                         </div>
                       </div>
@@ -269,22 +263,30 @@ const ConversationDashboard = () => {
           {selectedConversation ? (
             <div className="bg-white rounded-cartoon shadow-cartoon border-2 border-black h-[600px] flex flex-col">
               {/* Header */}
-              <div className="bg-cartoon-blue text-white p-4 border-b-2 border-black rounded-t-cartoon">
-                <div className="flex justify-between items-start">
+              <div className="bg-cartoon-blue p-4 border-b-2 border-black text-white">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="font-bold text-xl">{selectedConversation.userInfo.name}</h2>
-                    <p className="text-sm opacity-80">{selectedConversation.userInfo.email}</p>
+                    <h2 className="font-bold text-lg">
+                      {selectedConversation.userInfo?.name || "Unknown"}
+                    </h2>
+                    <p className="text-sm opacity-90">
+                      {selectedConversation.userInfo?.email || "No email"}
+                    </p>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => updateStatus(selectedConversation._id, "archived")}
-                      className="btn btn-sm btn-ghost"
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={selectedConversation.status}
+                      onChange={(e) => updateStatus(selectedConversation._id, e.target.value)}
+                      className="select select-sm rounded-cartoon text-black"
                     >
-                      <BiArchive />
-                    </button>
+                      <option value="new">New</option>
+                      <option value="read">Read</option>
+                      <option value="replied">Replied</option>
+                      <option value="archived">Archived</option>
+                    </select>
                     <button
                       onClick={() => handleDelete(selectedConversation._id)}
-                      className="btn btn-sm btn-ghost text-red-500"
+                      className="btn btn-sm btn-error rounded-cartoon"
                     >
                       <BiTrash />
                     </button>
@@ -294,11 +296,12 @@ const ConversationDashboard = () => {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {selectedConversation.messages.map((message, index) => (
+                {selectedConversation.messages?.map((message, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
                     className={`flex ${message.sender === "user" ? "justify-start" : "justify-end"}`}
                   >
                     <div
@@ -306,13 +309,15 @@ const ConversationDashboard = () => {
                         max-w-[80%] p-4 rounded-cartoon shadow-cartoon-sm
                         ${message.sender === "user"
                           ? "bg-gray-100 text-black"
-                          : "bg-cartoon-purple text-black"
+                          : "bg-cartoon-purple text-white"
                         }
                       `}
                     >
                       <p className="text-sm">{message.text}</p>
                       <p className="text-xs opacity-60 mt-2">
-                        {format(new Date(message.timestamp), "MMM d, HH:mm")}
+                        {message.timestamp
+                          ? format(new Date(message.timestamp), "MMM d, HH:mm")
+                          : "Unknown time"}
                       </p>
                     </div>
                   </motion.div>

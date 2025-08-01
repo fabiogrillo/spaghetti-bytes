@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -26,13 +26,21 @@ import { useAnalytics } from "./hooks/useAnalytics";
 import CampaignManager from "./Pages/CampaignManager";
 import NewsletterAnalytics from "./Components/NewsletterAnalytics";
 import DonationButton from "./Components/DonationButton";
+import api from "./Api";
 
 // Crea un componente wrapper per le routes
-const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername }) => {
+const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, checkingAuth }) => {
   // Qui useAnalytics funziona perché siamo dentro il Router
   useAnalytics();
 
   const ProtectedRoute = ({ children }) => {
+    if (checkingAuth) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <span className="loading loading-spinner loading-lg text-cartoon-pink"></span>
+        </div>
+      );
+    }
     return isAuthenticated ? children : <Navigate to="/login" />;
   };
 
@@ -152,6 +160,26 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername }
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  // Check if user is already authenticated on app load
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await api.get('/auth/check');
+        if (response.data.authenticated) {
+          setAuthenticated(true);
+          setUsername(response.data.username);
+        }
+      } catch (error) {
+        console.log('Auth check failed:', error);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   return (
     <Router>
@@ -160,6 +188,7 @@ const App = () => {
         setAuthenticated={setAuthenticated}
         username={username}
         setUsername={setUsername}
+        checkingAuth={checkingAuth}
       />
     </Router>
   );
