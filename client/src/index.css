@@ -79,8 +79,15 @@ html {
 
 /* Custom animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .animate-float {
@@ -140,24 +147,24 @@ html {
   .steps-vertical {
     @apply flex flex-col items-center;
   }
-  
+
   .steps-vertical .step {
     @apply flex flex-row items-center justify-center w-full;
   }
-  
+
   .steps-vertical .step::before {
     @apply relative;
   }
-  
+
   .steps-vertical .step span {
     @apply ml-3;
   }
-  
+
   /* Alternating text position for mobile steps */
   .steps-vertical .step:nth-child(odd) {
     @apply flex-row-reverse;
   }
-  
+
   .steps-vertical .step:nth-child(odd) span {
     @apply mr-3 ml-0;
   }
@@ -170,4 +177,14 @@ html {
   right: 0 !important;
   bottom: 0 !important;
   left: 0 !important;
+}
+
+.zebra-fix tbody tr:nth-child(even) {
+  color: #1f2937;
+  /* text-gray-800 */
+}
+
+[data-theme="night"] .zebra-fix tbody tr:nth-child(even) {
+  color: #d1d5db;
+  /* text-gray-300 */
 }

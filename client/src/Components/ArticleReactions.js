@@ -23,6 +23,8 @@ const ArticleReactions = ({ articleId, compact = false }) => {
 
     useEffect(() => {
         const fetchReactions = async () => {
+            if (!articleId) return;
+
             try {
                 const response = await api.get(`/api/articles/${articleId}/reactions`);
                 setReactions(response.data.reactions);
@@ -32,19 +34,21 @@ const ArticleReactions = ({ articleId, compact = false }) => {
         };
 
         const loadUserReactions = () => {
+            if (!articleId) return;
+
             const stored = localStorage.getItem(`reactions_${articleId}`);
             if (stored) {
                 setUserReactions(JSON.parse(stored));
             }
         };
 
-        if (articleId) {
-            fetchReactions();
-            loadUserReactions();
-        }
+        fetchReactions();
+        loadUserReactions();
     }, [articleId]);
 
     const handleReaction = async (reactionKey) => {
+        if (!articleId) return;
+
         // Check if user already reacted with this emoji
         if (userReactions.includes(reactionKey)) {
             return;
@@ -82,73 +86,86 @@ const ArticleReactions = ({ articleId, compact = false }) => {
     };
 
     return (
-        <div className={compact ? "my-4" : "my-8"}>
-            <div className={`bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black ${compact ? 'p-4' : 'p-6'}`}>
-                {!compact && (
-                    <h3 className="text-xl font-bold mb-4 text-center">
-                        How did you like this article? 🤔
-                    </h3>
-                )}
+        <div className={`flex items-center gap-3 ${compact ? 'justify-start' : 'justify-center'} my-6`}>
+            {reactionEmojis.map(({ key, emoji, label }) => {
+                const hasReacted = userReactions.includes(key);
+                const count = reactions[key] || 0;
 
-                <div className="flex flex-wrap justify-center gap-3">
-                    {reactionEmojis.map(({ key, emoji, label }) => {
-                        const hasReacted = userReactions.includes(key);
-                        const count = reactions[key] || 0;
+                return (
+                    <motion.button
+                        key={key}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{
+                            scale: 1,
+                            opacity: 1,
+                            y: [0, -5, 0]
+                        }}
+                        transition={{
+                            duration: 0.5,
+                            delay: reactionEmojis.findIndex(r => r.key === key) * 0.1,
+                            y: {
+                                repeat: Infinity,
+                                repeatDelay: 5,
+                                duration: 1
+                            }
+                        }}
+                        whileHover={{
+                            scale: 1.2,
+                            rotate: [0, -10, 10, -10, 0],
+                            transition: { duration: 0.3 }
+                        }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleReaction(key)}
+                        className={`relative group ${hasReacted ? 'cursor-default' : 'cursor-pointer'}`}
+                        disabled={hasReacted}
+                    >
+                        <div className={`
+                            flex flex-col items-center
+                            ${hasReacted ? 'opacity-100' : 'opacity-70 hover:opacity-100'}
+                            transition-opacity duration-200
+                        `}>
+                            <span className="text-3xl">{emoji}</span>
+                            {count > 0 && (
+                                <span className={`text-xs font-bold mt-1 ${hasReacted ? 'text-cartoon-pink' : 'text-gray-600 dark:text-gray-300'
+                                    }`}>
+                                    {count}
+                                </span>
+                            )}
+                        </div>
 
-                        return (
-                            <motion.button
-                                key={key}
-                                whileHover={{ scale: hasReacted ? 1 : 1.1 }}
-                                whileTap={{ scale: hasReacted ? 1 : 0.9 }}
-                                onClick={() => handleReaction(key)}
-                                className={`relative group ${hasReacted ? 'cursor-default' : 'cursor-pointer'}`}
-                                disabled={hasReacted}
-                            >
-                                <div className={`
-                                    flex flex-col items-center ${compact ? 'p-2' : 'p-3'} rounded-cartoon border-2 border-black
-                                    ${hasReacted
-                                        ? 'bg-cartoon-yellow shadow-cartoon'
-                                        : 'bg-white hover:shadow-cartoon shadow-cartoon-sm'
-                                    }
-                                    transition-all duration-200
-                                `}>
-                                    <span className={compact ? "text-2xl" : "text-4xl mb-1"}>{emoji}</span>
-                                    {count > 0 && (
-                                        <span className="text-sm font-bold">{count}</span>
-                                    )}
-                                </div>
+                        {/* Tooltip */}
+                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            <div className="bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                                {label}
+                            </div>
+                        </div>
 
-                                {/* Tooltip */}
-                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <div className="bg-black text-white text-xs px-2 py-1 rounded">
-                                        {label}
-                                    </div>
-                                </div>
+                        {/* Animation on click */}
+                        <AnimatePresence>
+                            {showAnimation === key && (
+                                <motion.div
+                                    initial={{ scale: 0, y: 0 }}
+                                    animate={{ scale: 2, y: -50, opacity: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                                >
+                                    <span className="text-6xl">{emoji}</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.button>
+                );
+            })}
 
-                                {/* Animation on click */}
-                                <AnimatePresence>
-                                    {showAnimation === key && (
-                                        <motion.div
-                                            initial={{ scale: 0, y: 0 }}
-                                            animate={{ scale: 2, y: -50, opacity: 0 }}
-                                            exit={{ opacity: 0 }}
-                                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                                        >
-                                            <span className="text-6xl">{emoji}</span>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </motion.button>
-                        );
-                    })}
-                </div>
-
-                {userReactions.length > 0 && (
-                    <p className="text-center text-sm text-gray-500 mt-4">
-                        Thanks for your feedback! 🎉
-                    </p>
-                )}
-            </div>
+            {userReactions.length > 0 && (
+                <motion.p
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-sm text-gray-500 dark:text-gray-400 ml-4"
+                >
+                    Thanks! 🎉
+                </motion.p>
+            )}
         </div>
     );
 };

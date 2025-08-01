@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../Api';
@@ -10,20 +10,13 @@ import { HiOutlineTemplate, HiSparkles } from 'react-icons/hi';
 import { format, formatDistanceToNow } from 'date-fns';
 
 const CampaignManager = () => {
+    const navigate = useNavigate();
     const [campaigns, setCampaigns] = useState([]);
     const [subscribers, setSubscribers] = useState({ active: 0, total: 0 });
     const [loading, setLoading] = useState(true);
     const [selectedTab, setSelectedTab] = useState('campaigns');
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [setFormData] = useState({
-        subject: '',
-        preheader: '',
-        content: {
-            html: '',
-            text: ''
-        }
-    });
-
+    const [selectedTemplateData, setSelectedTemplateData] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -43,6 +36,11 @@ const CampaignManager = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleTemplateSelect = (templateData) => {
+        setSelectedTemplateData(templateData);
+        setShowCreateModal(true);
     };
 
     const tabs = [
@@ -67,15 +65,15 @@ const CampaignManager = () => {
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6 mb-6"
+                    className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6 mb-6"
                 >
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold flex items-center gap-2">
+                            <h1 className="text-3xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-100">
                                 <BiEnvelope className="text-cartoon-pink" />
                                 Newsletter Manager
                             </h1>
-                            <p className="text-gray-600 mt-1">
+                            <p className="text-gray-600 dark:text-gray-300 mt-1">
                                 Manage campaigns, templates, and subscribers
                             </p>
                         </div>
@@ -83,7 +81,10 @@ const CampaignManager = () => {
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => setShowCreateModal(true)}
+                            onClick={() => {
+                                setSelectedTemplateData(null);
+                                setShowCreateModal(true);
+                            }}
                             className="btn bg-cartoon-pink text-white rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover"
                         >
                             <HiSparkles />
@@ -97,9 +98,9 @@ const CampaignManager = () => {
                             <div className="stat-figure text-cartoon-yellow">
                                 <BiUser size={32} />
                             </div>
-                            <div className="stat-title">Active Subscribers</div>
-                            <div className="stat-value">{subscribers.active}</div>
-                            <div className="stat-desc">
+                            <div className="stat-title text-gray-700 dark:text-gray-300">Active Subscribers</div>
+                            <div className="stat-value text-gray-900 dark:text-gray-100">{subscribers.active}</div>
+                            <div className="stat-desc text-gray-600 dark:text-gray-400">
                                 {subscribers.total} total subscribers
                             </div>
                         </div>
@@ -108,11 +109,11 @@ const CampaignManager = () => {
                             <div className="stat-figure text-cartoon-blue">
                                 <BiEnvelope size={32} />
                             </div>
-                            <div className="stat-title">Campaigns Sent</div>
-                            <div className="stat-value">
+                            <div className="stat-title text-gray-700 dark:text-gray-300">Campaigns Sent</div>
+                            <div className="stat-value text-gray-900 dark:text-gray-100">
                                 {campaigns.filter(c => c.status === 'sent').length}
                             </div>
-                            <div className="stat-desc">
+                            <div className="stat-desc text-gray-600 dark:text-gray-400">
                                 {campaigns.filter(c => c.status === 'draft').length} drafts
                             </div>
                         </div>
@@ -121,15 +122,15 @@ const CampaignManager = () => {
                             <div className="stat-figure text-cartoon-purple">
                                 <BiCheckCircle size={32} />
                             </div>
-                            <div className="stat-title">Avg. Open Rate</div>
-                            <div className="stat-value">24.5%</div>
-                            <div className="stat-desc">↗︎ 2.1% from last month</div>
+                            <div className="stat-title text-gray-700 dark:text-gray-300">Avg. Open Rate</div>
+                            <div className="stat-value text-gray-900 dark:text-gray-100">24.5%</div>
+                            <div className="stat-desc text-gray-600 dark:text-gray-400">↗︎ 2.1% from last month</div>
                         </div>
                     </div>
                 </motion.div>
 
                 {/* Tabs */}
-                <div className="tabs tabs-boxed bg-white rounded-cartoon shadow-cartoon border-2 border-black p-2 mb-6">
+                <div className="tabs tabs-boxed bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-2 mb-6">
                     {tabs.map((tab) => (
                         <motion.button
                             key={tab.id}
@@ -137,8 +138,8 @@ const CampaignManager = () => {
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setSelectedTab(tab.id)}
                             className={`tab tab-lg gap-2 ${selectedTab === tab.id
-                                ? 'tab-active bg-cartoon-pink text-white'
-                                : ''
+                                    ? 'tab-active bg-cartoon-pink text-white'
+                                    : 'text-gray-700 dark:text-gray-300'
                                 }`}
                         >
                             <tab.icon size={20} />
@@ -153,15 +154,11 @@ const CampaignManager = () => {
                         <CampaignsList
                             campaigns={campaigns}
                             onRefresh={fetchData}
+                            navigate={navigate}
                         />
                     )}
                     {selectedTab === 'templates' && (
-                        <TemplatesList
-                            onSelectTemplate={(templateData) => {
-                                setFormData(templateData);
-                                setShowCreateModal(true);
-                            }}
-                        />
+                        <TemplatesList onSelectTemplate={handleTemplateSelect} />
                     )}
                     {selectedTab === 'subscribers' && (
                         <SubscribersList />
@@ -174,9 +171,14 @@ const CampaignManager = () => {
                 {/* Create Campaign Modal */}
                 {showCreateModal && (
                     <CreateCampaignModal
-                        onClose={() => setShowCreateModal(false)}
+                        initialData={selectedTemplateData}
+                        onClose={() => {
+                            setShowCreateModal(false);
+                            setSelectedTemplateData(null);
+                        }}
                         onSuccess={() => {
                             setShowCreateModal(false);
+                            setSelectedTemplateData(null);
                             fetchData();
                         }}
                     />
@@ -187,9 +189,7 @@ const CampaignManager = () => {
 };
 
 // Campaigns List Component
-const CampaignsList = ({ campaigns, onRefresh }) => {
-    const navigate = useNavigate();
-
+const CampaignsList = ({ campaigns, onRefresh, navigate }) => {
     const getStatusBadge = (status) => {
         const badges = {
             draft: { bg: 'bg-gray-200', text: 'text-gray-700', label: 'Draft' },
@@ -208,10 +208,10 @@ const CampaignsList = ({ campaigns, onRefresh }) => {
             className="space-y-4"
         >
             {campaigns.length === 0 ? (
-                <div className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-12 text-center">
+                <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-12 text-center">
                     <BiEnvelope size={64} className="mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-xl font-bold mb-2">No campaigns yet</h3>
-                    <p className="text-gray-600">Create your first newsletter campaign!</p>
+                    <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">No campaigns yet</h3>
+                    <p className="text-gray-600 dark:text-gray-300">Create your first newsletter campaign!</p>
                 </div>
             ) : (
                 campaigns.map((campaign) => {
@@ -220,22 +220,22 @@ const CampaignsList = ({ campaigns, onRefresh }) => {
                         <motion.div
                             key={campaign._id}
                             whileHover={{ scale: 1.01 }}
-                            className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6"
+                            className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6"
                         >
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-2">
-                                        <h3 className="text-xl font-bold">{campaign.subject}</h3>
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">{campaign.subject}</h3>
                                         <span className={`badge ${status.bg} ${status.text}`}>
                                             {status.label}
                                         </span>
                                     </div>
 
                                     {campaign.preheader && (
-                                        <p className="text-gray-600 mb-2">{campaign.preheader}</p>
+                                        <p className="text-gray-600 dark:text-gray-300 mb-2">{campaign.preheader}</p>
                                     )}
 
-                                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                                         <span className="flex items-center gap-1">
                                             <BiCalendar />
                                             {format(new Date(campaign.createdAt), 'MMM d, yyyy')}
@@ -288,7 +288,7 @@ const CampaignsList = ({ campaigns, onRefresh }) => {
 };
 
 // Templates List Component
-const TemplatesList = ({ setFormData, setShowCreateModal }) => {
+const TemplatesList = ({ onSelectTemplate }) => {
     const templates = [
         {
             id: 1,
@@ -310,6 +310,46 @@ const TemplatesList = ({ setFormData, setShowCreateModal }) => {
         }
     ];
 
+    const getTemplateHTML = (templateName) => {
+        const templates = {
+            'Weekly Newsletter': `
+                <h2>This Week's Highlights 🍝</h2>
+                <p>Hey there, fellow code chef!</p>
+                <h3>📚 Latest Articles</h3>
+                <p>[Add your articles here]</p>
+                <h3>💡 Tip of the Week</h3>
+                <p>[Add your tip here]</p>
+                <h3>🔗 Useful Resources</h3>
+                <p>[Add resources here]</p>
+            `,
+            'Product Launch': `
+                <h2>🚀 Big Announcement!</h2>
+                <p>I'm excited to share something new with you...</p>
+                <h3>What's New?</h3>
+                <p>[Describe your launch]</p>
+                <h3>Key Features</h3>
+                <ul>
+                    <li>[Feature 1]</li>
+                    <li>[Feature 2]</li>
+                    <li>[Feature 3]</li>
+                </ul>
+            `,
+            'Monthly Roundup': `
+                <h2>📅 Monthly Digest</h2>
+                <p>Here's what happened this month in Spaghetti Bytes...</p>
+                <h3>Top Articles</h3>
+                <ol>
+                    <li>[Article 1]</li>
+                    <li>[Article 2]</li>
+                    <li>[Article 3]</li>
+                </ol>
+                <h3>Community Highlights</h3>
+                <p>[Add highlights]</p>
+            `
+        };
+        return templates[templateName] || '';
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -321,11 +361,11 @@ const TemplatesList = ({ setFormData, setShowCreateModal }) => {
                 <motion.div
                     key={template.id}
                     whileHover={{ scale: 1.02 }}
-                    className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6"
+                    className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6"
                 >
-                    <h3 className="text-lg font-bold mb-2">{template.name}</h3>
-                    <p className="text-gray-600 mb-4">{template.description}</p>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">{template.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">{template.description}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                         Last used: {format(template.lastUsed, 'MMM d, yyyy')}
                     </p>
                     <motion.button
@@ -333,8 +373,7 @@ const TemplatesList = ({ setFormData, setShowCreateModal }) => {
                         whileTap={{ scale: 0.95 }}
                         className="btn btn-sm bg-cartoon-blue text-white rounded-cartoon w-full"
                         onClick={() => {
-                            // Populate create modal with template
-                            setFormData({
+                            const templateData = {
                                 subject: template.name === 'Weekly Newsletter'
                                     ? '🍝 This Week in Spaghetti Bytes'
                                     : template.name === 'Product Launch'
@@ -345,8 +384,8 @@ const TemplatesList = ({ setFormData, setShowCreateModal }) => {
                                     html: getTemplateHTML(template.name),
                                     text: ''
                                 }
-                            });
-                            setShowCreateModal(true);
+                            };
+                            onSelectTemplate(templateData);
                         }}
                     >
                         Use Template
@@ -393,12 +432,12 @@ const SubscribersList = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-white rounded-cartoon shadow-cartoon border-2 border-black overflow-hidden"
+            className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black overflow-hidden"
         >
             <div className="overflow-x-auto">
-                <table className="table table-zebra">
+                <table className="table table-zebra zebra-fix">
                     <thead>
-                        <tr>
+                        <tr className="text-gray-700 dark:text-gray-300">
                             <th>Email</th>
                             <th>Status</th>
                             <th>Source</th>
@@ -408,14 +447,14 @@ const SubscribersList = () => {
                     </thead>
                     <tbody>
                         {subscribers.map((subscriber) => (
-                            <tr key={subscriber._id}>
+                            <tr key={subscriber._id} className="text-gray-800 dark:text-gray-200">
                                 <td className="font-medium">{subscriber.email}</td>
                                 <td>
                                     <span className={`badge ${subscriber.status === 'active'
-                                        ? 'badge-success'
-                                        : subscriber.status === 'pending'
-                                            ? 'badge-warning'
-                                            : 'badge-error'
+                                            ? 'badge-success'
+                                            : subscriber.status === 'pending'
+                                                ? 'badge-warning'
+                                                : 'badge-error'
                                         }`}>
                                         {subscriber.status}
                                     </span>
@@ -467,7 +506,7 @@ const AnalyticsDashboard = ({ campaigns }) => {
             {/* Charts would go here - for now, placeholder */}
             <div className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6">
                 <h3 className="text-xl font-bold mb-4">Email Performance Over Time</h3>
-                <div className="h-64 bg-gray-100 rounded-cartoon flex items-center justify-center">
+                <div className="h-64 rounded-cartoon flex items-center justify-center">
                     <p className="text-gray-500">Chart visualization coming soon</p>
                 </div>
             </div>
@@ -603,19 +642,5 @@ const CreateCampaignModal = ({ onClose, onSuccess, initialData }) => {
         </motion.div>
     );
 };
-
-const getTemplateHTML = (templateName) => {
-    switch (templateName) {
-        case 'Weekly Newsletter':
-            return '<h1>Weekly Update</h1><p>Here is what’s new this week...</p>';
-        case 'Product Launch':
-            return '<h1>🚀 New Product Alert!</h1><p>We’ve just launched something amazing...</p>';
-        case 'Monthly Roundup':
-            return '<h1>📅 This Month in Review</h1><p>A quick look back at our highlights...</p>';
-        default:
-            return '<p>Start writing your content here...</p>';
-    }
-};
-
 
 export default CampaignManager;

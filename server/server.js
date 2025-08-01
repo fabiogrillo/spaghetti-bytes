@@ -13,6 +13,7 @@ const conversationRoutes = require("./routes/conversationRoute");
 const newsletterRoutes = require("./routes/newsletterRoute");
 const newsletterRoute = require("./routes/newsletterRoute");
 const rssRoute = require("./routes/rssRoute");
+const analyticsRoutes = require("./routes/analyticsRoute");
 const cors = require("cors");
 
 // Configurazione variabili ambiente
@@ -85,10 +86,10 @@ mongoose
 
 // CORS configuration (before routes)
 app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+  origin: "http://localhost:3000",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 // Configurazione delle rotte API
@@ -98,6 +99,7 @@ app.use("/api/conversations", conversationRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/newsletter", newsletterRoute);
 app.use("/", rssRoute); // RSS at root level
+app.use("/api/newsletter", analyticsRoutes);
 
 // Route di registrazione
 app.post("/api/register", async (req, res) => {

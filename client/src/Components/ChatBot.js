@@ -118,6 +118,26 @@ const ChatBot = () => {
     handleSendMessage();
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      // Prevent body scroll on mobile
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      // Restore body scroll
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
+
   return (
     <>
       {/* Floating Chat Button */}
@@ -195,7 +215,13 @@ const ChatBot = () => {
             </div>
 
             {/* Messages Container */}
-            <div className="h-96 overflow-y-auto p-4 space-y-4 bg-base-100">
+            <div
+              className="flex-1 overflow-y-auto p-4 space-y-2"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain'
+              }}
+            >
               {messages.map((message) => (
                 <motion.div
                   key={message.id}

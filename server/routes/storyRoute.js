@@ -25,7 +25,7 @@ router.put("/:id", updateStory);
 // Route to delete a story by ID
 router.delete("/:id", deleteStory);
 
-router.post("/articles/:id/reactions", addReaction);
-router.get("/articles/:id/reactions", getReactions);
+router.post("/stories/:id/reactions", addReaction);
+router.get("/stories/:id/reactions", getReactions);
 
 module.exports = router;
