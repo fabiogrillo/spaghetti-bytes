@@ -11,7 +11,7 @@ const ArticleReactions = ({ articleId, compact = false }) => {
         clap: 0
     });
     const [userReactions, setUserReactions] = useState([]);
-    const [showAnimation, setShowAnimation] = useState(null);
+    const [animatingEmojis, setAnimatingEmojis] = useState([]);
 
     const reactionEmojis = [
         { key: 'love', emoji: '❤️', label: 'Love it!' },
@@ -26,7 +26,7 @@ const ArticleReactions = ({ articleId, compact = false }) => {
             if (!articleId) return;
 
             try {
-                const response = await api.get(`/api/articles/${articleId}/reactions`);
+                const response = await api.get(`/api/stories/${articleId}/reactions`);
                 setReactions(response.data.reactions);
             } catch (error) {
                 console.error('Error fetching reactions:', error);
@@ -46,7 +46,7 @@ const ArticleReactions = ({ articleId, compact = false }) => {
         loadUserReactions();
     }, [articleId]);
 
-    const handleReaction = async (reactionKey) => {
+    const handleReaction = async (reactionKey, emoji) => {
         if (!articleId) return;
 
         // Check if user already reacted with this emoji
@@ -65,13 +65,16 @@ const ArticleReactions = ({ articleId, compact = false }) => {
         setUserReactions(newUserReactions);
         localStorage.setItem(`reactions_${articleId}`, JSON.stringify(newUserReactions));
 
-        // Show animation
-        setShowAnimation(reactionKey);
-        setTimeout(() => setShowAnimation(null), 1000);
+        // Show animation - emoji flying to counter
+        const animationId = Date.now();
+        setAnimatingEmojis(prev => [...prev, { id: animationId, emoji, key: reactionKey }]);
+        setTimeout(() => {
+            setAnimatingEmojis(prev => prev.filter(e => e.id !== animationId));
+        }, 1500);
 
         // Send to server
         try {
-            await api.post(`/api/articles/${articleId}/reactions`, {
+            await api.post(`/api/stories/${articleId}/reactions`, {
                 reaction: reactionKey
             });
         } catch (error) {
@@ -85,87 +88,133 @@ const ArticleReactions = ({ articleId, compact = false }) => {
         }
     };
 
+    // Calculate total reactions
+    const totalReactions = Object.values(reactions).reduce((sum, count) => sum + count, 0);
+
     return (
-        <div className={`flex items-center gap-3 ${compact ? 'justify-start' : 'justify-center'} my-6`}>
-            {reactionEmojis.map(({ key, emoji, label }) => {
-                const hasReacted = userReactions.includes(key);
-                const count = reactions[key] || 0;
-
-                return (
-                    <motion.button
-                        key={key}
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{
-                            scale: 1,
-                            opacity: 1,
-                            y: [0, -5, 0]
-                        }}
-                        transition={{
-                            duration: 0.5,
-                            delay: reactionEmojis.findIndex(r => r.key === key) * 0.1,
-                            y: {
-                                repeat: Infinity,
-                                repeatDelay: 5,
-                                duration: 1
-                            }
-                        }}
-                        whileHover={{
-                            scale: 1.2,
-                            rotate: [0, -10, 10, -10, 0],
-                            transition: { duration: 0.3 }
-                        }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => handleReaction(key)}
-                        className={`relative group ${hasReacted ? 'cursor-default' : 'cursor-pointer'}`}
-                        disabled={hasReacted}
-                    >
-                        <div className={`
-                            flex flex-col items-center
-                            ${hasReacted ? 'opacity-100' : 'opacity-70 hover:opacity-100'}
-                            transition-opacity duration-200
-                        `}>
-                            <span className="text-3xl">{emoji}</span>
-                            {count > 0 && (
-                                <span className={`text-xs font-bold mt-1 ${hasReacted ? 'text-cartoon-pink' : 'text-gray-600 dark:text-gray-300'
-                                    }`}>
-                                    {count}
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Tooltip */}
-                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                            <div className="bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                                {label}
-                            </div>
-                        </div>
-
-                        {/* Animation on click */}
-                        <AnimatePresence>
-                            {showAnimation === key && (
-                                <motion.div
-                                    initial={{ scale: 0, y: 0 }}
-                                    animate={{ scale: 2, y: -50, opacity: 0 }}
-                                    exit={{ opacity: 0 }}
-                                    className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                                >
-                                    <span className="text-6xl">{emoji}</span>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </motion.button>
-                );
-            })}
-
-            {userReactions.length > 0 && (
-                <motion.p
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="text-sm text-gray-500 dark:text-gray-400 ml-4"
+        <div className="relative">
+            {/* Reaction Counter - positioned at top right */}
+            {totalReactions > 0 && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute -top-16 right-0 bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon-sm border-2 border-black p-3"
                 >
-                    Thanks! 🎉
-                </motion.p>
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold">Reactions:</span>
+                        <div className="flex gap-1">
+                            {reactionEmojis.map(({ key, emoji }) => {
+                                const count = reactions[key];
+                                if (count === 0) return null;
+                                return (
+                                    <div key={key} className="flex items-center">
+                                        <span className="text-lg">{emoji}</span>
+                                        <span className="text-xs font-bold ml-0.5">{count}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </motion.div>
             )}
+
+            {/* Reaction Buttons - positioned at bottom right */}
+            <div className={`flex items-center gap-3 justify-end ${compact ? 'mt-4' : 'mt-6'}`}>
+                {reactionEmojis.map(({ key, emoji, label }, index) => {
+                    const hasReacted = userReactions.includes(key);
+                    const count = reactions[key] || 0;
+
+                    return (
+                        <motion.button
+                            key={key}
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{
+                                scale: 1,
+                                opacity: 1,
+                                transition: {
+                                    delay: index * 0.1,
+                                    type: "spring",
+                                    stiffness: 260,
+                                    damping: 20
+                                }
+                            }}
+                            whileHover={!hasReacted ? {
+                                scale: 1.3,
+                                rotate: [0, -10, 10, -10, 0],
+                                transition: { duration: 0.3 }
+                            } : {}}
+                            whileTap={!hasReacted ? { scale: 0.8 } : {}}
+                            onClick={() => handleReaction(key, emoji)}
+                            className={`relative group ${hasReacted ? 'cursor-default' : 'cursor-pointer'}`}
+                            disabled={hasReacted}
+                        >
+                            <div className={`
+                                flex flex-col items-center p-2 rounded-cartoon
+                                ${hasReacted
+                                    ? 'bg-cartoon-pink/20 opacity-100'
+                                    : 'bg-gray-100 dark:bg-gray-700 opacity-80 hover:opacity-100 hover:bg-cartoon-yellow/20'
+                                }
+                                transition-all duration-200
+                            `}>
+                                <span className="text-2xl md:text-3xl">{emoji}</span>
+                                {count > 0 && (
+                                    <span className={`text-xs font-bold mt-1 ${hasReacted ? 'text-cartoon-pink' : 'text-gray-600 dark:text-gray-300'
+                                        }`}>
+                                        {count}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Tooltip */}
+                            {!hasReacted && (
+                                <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                    <div className="bg-black text-white text-xs px-3 py-1 rounded-cartoon whitespace-nowrap">
+                                        {label}
+                                    </div>
+                                    <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[5px] border-t-black absolute left-1/2 transform -translate-x-1/2"></div>
+                                </div>
+                            )}
+                        </motion.button>
+                    );
+                })}
+
+                {userReactions.length > 0 && (
+                    <motion.p
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="text-sm text-gray-500 dark:text-gray-400 ml-4 hidden md:block"
+                    >
+                        Thanks! 🎉
+                    </motion.p>
+                )}
+            </div>
+
+            {/* Flying emoji animations */}
+            <AnimatePresence>
+                {animatingEmojis.map(({ id, emoji, key }) => (
+                    <motion.div
+                        key={id}
+                        initial={{
+                            scale: 2,
+                            opacity: 1,
+                            x: 0,
+                            y: 0
+                        }}
+                        animate={{
+                            scale: 0.8,
+                            opacity: 0,
+                            x: 100,
+                            y: -80
+                        }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        className="absolute bottom-4 right-4 pointer-events-none z-20"
+                        style={{ fontSize: '3rem' }}
+                    >
+                        {emoji}
+                    </motion.div>
+                ))}
+            </AnimatePresence>
         </div>
     );
 };

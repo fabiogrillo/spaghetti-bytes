@@ -13,7 +13,6 @@ const StoryVisualizer = () => {
   const { storyId } = useParams();
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { id } = useParams(); // This line gets the id from the URL
 
   useEffect(() => {
     const fetchStory = async () => {
@@ -143,9 +142,18 @@ const StoryVisualizer = () => {
       </motion.div>
 
       <div className="divider mt-12"></div>
-      <div className="max-w-2xl mx-auto my-6">
-        <ArticleReactions articleId={id} compact={true} />
-      </div>
+
+      {/* Reactions Section - positioned at bottom right */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="relative mt-8 mb-8"
+      >
+        <ArticleReactions articleId={storyId} compact={true} />
+      </motion.div>
+
+      {/* Newsletter Widget */}
       <div className="my-12">
         <NewsletterWidget source="article" variant="inline" />
       </div>

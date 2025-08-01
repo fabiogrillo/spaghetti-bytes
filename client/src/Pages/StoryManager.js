@@ -1,162 +1,214 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { IoIosSettings } from "react-icons/io";
-import { FaRocket } from "react-icons/fa";
-import { BiBookAdd, BiTargetLock, BiEnvelope, BiBarChart } from "react-icons/bi";
+import { BiBookAdd, BiTargetLock, BiEnvelope, BiBarChart, BiBook, BiTrophy, BiMessageSquareDetail } from "react-icons/bi";
 
 const StoryManager = ({ username }) => {
   const navigate = useNavigate();
 
-  const buttonGroups = [
+  const sections = [
     {
-      label: "Stories",
+      title: "📚 Stories Management",
+      description: "Create and manage your blog content",
+      color: "from-cartoon-pink/20 to-cartoon-purple/20",
+      borderColor: "border-cartoon-pink",
       buttons: [
         {
-          label: "New Story",
-          icon: <BiBookAdd size={28} />,
+          label: "Write New Story",
+          icon: <BiBookAdd size={24} />,
           action: () => navigate("/editor"),
           description: "Create a new masterpiece",
-          color: "bg-cartoon-pink",
+          color: "bg-cartoon-pink hover:bg-cartoon-pink/90",
           emoji: "✍️",
         },
         {
           label: "Manage Stories",
-          icon: <IoIosSettings size={28} />,
+          icon: <BiBook size={24} />,
           action: () => navigate("/storyTable"),
           description: "Edit your existing stories",
-          color: "bg-cartoon-blue",
-          emoji: "📚",
+          color: "bg-cartoon-blue hover:bg-cartoon-blue/90",
+          emoji: "📝",
         },
       ]
     },
     {
-      label: "Goals",
+      title: "🎯 Goals Management",
+      description: "Set and track your achievements",
+      color: "from-cartoon-yellow/20 to-cartoon-orange/20",
+      borderColor: "border-cartoon-yellow",
       buttons: [
         {
-          label: "New Goal",
-          icon: <BiTargetLock size={28} />,
+          label: "Create New Goal",
+          icon: <BiTargetLock size={24} />,
           action: () => navigate("/create-goal"),
           description: "Set a new achievement",
-          color: "bg-cartoon-yellow",
+          color: "bg-cartoon-yellow hover:bg-cartoon-yellow/90",
           emoji: "🎯",
         },
         {
           label: "Manage Goals",
-          icon: <IoIosSettings size={28} />,
+          icon: <BiTrophy size={24} />,
           action: () => navigate("/goalsTable"),
           description: "Track your progress",
-          color: "bg-cartoon-purple",
+          color: "bg-cartoon-purple hover:bg-cartoon-purple/90",
           emoji: "📊",
         },
       ]
     },
     {
-      label: "Newsletter",
+      title: "💌 Communication & Analytics",
+      description: "Engage with your audience",
+      color: "from-cartoon-blue/20 to-cartoon-blue-dark/20",
+      borderColor: "border-cartoon-blue",
       buttons: [
         {
           label: "Conversations",
-          icon: <BiBookAdd size={28} />,
+          icon: <BiMessageSquareDetail size={24} />,
           action: () => navigate("/conversations"),
-          description: "Manage your inbox & replies",
-          color: "bg-cartoon-blue-dark",
+          description: "Manage inbox & replies",
+          color: "bg-cartoon-blue-dark hover:bg-cartoon-blue-dark/90",
           emoji: "💬",
         },
         {
-          label: "Campaigns",
-          icon: <BiEnvelope size={28} />,
+          label: "Email Campaigns",
+          icon: <BiEnvelope size={24} />,
           action: () => navigate("/newsletter/campaigns"),
-          description: "Create and send newsletters",
-          color: "bg-cartoon-orange",
-          emoji: "📨",
+          description: "Create newsletters",
+          color: "bg-cartoon-orange hover:bg-cartoon-orange/90",
+          emoji: "📧",
         },
         {
           label: "Analytics",
-          icon: <BiBarChart size={28} />,
+          icon: <BiBarChart size={24} />,
           action: () => navigate("/newsletter/analytics"),
-          description: "Track performance",
-          color: "bg-cartoon-yellow",
+          description: "View statistics",
+          color: "bg-cartoon-green hover:bg-cartoon-green/90",
           emoji: "📈",
         },
       ]
     }
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const sectionVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
+
   return (
-    <div className="container mx-auto p-8">
+    <div className="min-h-screen py-12 px-4">
       <motion.div
-        className="flex flex-col items-center text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-12"
       >
-        <motion.div
-          className="inline-block mb-6"
-          whileHover={{ scale: 1.05 }}
-        >
-          <span className="badge badge-lg bg-cartoon-orange text-white shadow-cartoon-sm px-6 py-3">
-            <FaRocket className="mr-2" /> Creator Dashboard
-          </span>
-        </motion.div>
-
-        <h1 className="text-4xl md:text-5xl font-bold mb-8">
-          Welcome back, <span className="gradient-text-fixed">{username}</span>! 🍝
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          Welcome back, <span className="text-cartoon-pink">{username}</span>! 🍝
         </h1>
-
-        <p className="text-lg md:text-xl max-w-3xl dark:text-gray mb-12">
+        <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-600 dark:text-gray-300">
           Your creative kitchen awaits! What amazing content shall we cook up today?
         </p>
+      </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {buttonGroups.map((group, groupIndex) => (
-            <div key={groupIndex} className="mb-12 w-full">
-              <h2 className="text-2xl font-bold mb-6 text-center">{group.label}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                {group.buttons.map((button, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -5 }}
-                    className="group"
-                  >
-                    <button
-                      className={`
-              w-full p-8 rounded-cartoon shadow-cartoon border-2 border-black
-              hover:shadow-cartoon-hover transform transition-all 
-              hover:translate-x-1 hover:translate-y-1
-              ${button.color} text-white
-            `}
-                      onClick={button.action}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-4xl opacity-80">{button.emoji}</span>
-                        <div className="p-3 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
-                          {button.icon}
-                        </div>
-                      </div>
-                      <h3 className="text-2xl font-bold mb-2">{button.label}</h3>
-                      <p className="text-sm opacity-90">{button.description}</p>
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="max-w-7xl mx-auto space-y-8"
+      >
+        {sections.map((section, sectionIndex) => (
+          <motion.div
+            key={sectionIndex}
+            variants={sectionVariants}
+            className={`bg-gradient-to-br ${section.color} rounded-cartoon border-2 ${section.borderColor} shadow-cartoon p-6 md:p-8`}
+          >
+            <div className="mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">{section.title}</h2>
+              <p className="text-gray-600 dark:text-gray-300">{section.description}</p>
             </div>
-          ))}
-        </div>
 
-        {/* Quick Stats */}
+            <div className={`grid grid-cols-1 md:grid-cols-${section.buttons.length === 2 ? '2' : '3'} gap-4`}>
+              {section.buttons.map((button, buttonIndex) => (
+                <motion.button
+                  key={buttonIndex}
+                  whileHover={{
+                    scale: 1.02,
+                    translateY: -2,
+                    boxShadow: "0 10px 20px rgba(0,0,0,0.1)"
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={button.action}
+                  className={`
+                    group relative overflow-hidden
+                    ${button.color} text-white
+                    p-6 rounded-cartoon shadow-lg
+                    border-2 border-black/10
+                    transition-all duration-300
+                    hover:shadow-xl
+                  `}
+                >
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-3xl opacity-80">{button.emoji}</span>
+                      <div className="p-2 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
+                        {button.icon}
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-bold mb-1 text-left">{button.label}</h3>
+                    <p className="text-sm opacity-90 text-left">{button.description}</p>
+                  </div>
+
+                  {/* Hover effect background */}
+                  <div className="absolute inset-0 bg-white/10 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        ))}
+
+        {/* Quick Stats Card */}
         <motion.div
-          className="mt-12 p-6 bg-gradient-to-br from-cartoon-pink/20 to-cartoon-purple/20 rounded-cartoon border-2 border-black shadow-cartoon"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          variants={sectionVariants}
+          className="mt-12 p-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-cartoon border-2 border-gray-300 dark:border-gray-600 shadow-cartoon"
         >
-          <h3 className="text-xl font-bold mb-4">Quick Tip! 💡</h3>
-          <p className="dark:text-gray">
-            Remember to add engaging titles and summaries to your stories.
-            They're the first things readers see!
-          </p>
+          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <span className="text-2xl">💡</span> Pro Tips
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="flex items-start gap-2">
+              <span className="text-cartoon-pink">•</span>
+              <p className="text-gray-700 dark:text-gray-300">
+                Use engaging titles to capture readers' attention from the first glance
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-cartoon-yellow">•</span>
+              <p className="text-gray-700 dark:text-gray-300">
+                Add relevant tags to help readers discover your amazing content
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-cartoon-blue">•</span>
+              <p className="text-gray-700 dark:text-gray-300">
+                Check analytics regularly to understand what resonates with your audience
+              </p>
+            </div>
+          </div>
         </motion.div>
       </motion.div>
     </div>

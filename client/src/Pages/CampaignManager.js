@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BiEnvelope, BiTime, BiUser, BiTrash, BiEdit, BiSend, BiCheck } from 'react-icons/bi';
+import { BsArrowLeft } from 'react-icons/bs';
+import { HiTemplate, HiSparkles } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
-import api from '../Api';
-import {
-    BiEnvelope, BiUser, BiSend, BiEdit,
-    BiCalendar, BiBarChart, BiCheckCircle
-} from 'react-icons/bi';
-import { HiOutlineTemplate, HiSparkles } from 'react-icons/hi';
-import { format, formatDistanceToNow } from 'date-fns';
+import api from '../Api'; // Import the Api module
+import CampaignEditor from '../Components/CampaignEditor';
 
 const CampaignManager = () => {
     const navigate = useNavigate();
     const [campaigns, setCampaigns] = useState([]);
-    const [subscribers, setSubscribers] = useState({ active: 0, total: 0 });
+    const [templates, setTemplates] = useState([]);
+    const [stats, setStats] = useState({
+        active: 0,
+        total: 0,
+        pending: 0,
+        unsubscribed: 0
+    });
     const [loading, setLoading] = useState(true);
-    const [selectedTab, setSelectedTab] = useState('campaigns');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [selectedCampaign, setSelectedCampaign] = useState(null);
     const [selectedTemplateData, setSelectedTemplateData] = useState(null);
 
     useEffect(() => {
@@ -24,31 +28,148 @@ const CampaignManager = () => {
 
     const fetchData = async () => {
         try {
-            const [campaignsRes, subscribersRes] = await Promise.all([
-                api.get('/api/newsletter/campaigns'),
-                api.get('/api/newsletter/subscribers/stats')
+            setLoading(true);
+            // Use api module instead of fetch
+            const [campaignsRes, statsRes] = await Promise.all([
+                api.get('/newsletter/campaigns'),
+                api.get('/newsletter/subscribers/stats')
             ]);
 
             setCampaigns(campaignsRes.data.campaigns || []);
-            setSubscribers(subscribersRes.data);
+            setStats(statsRes.data || {
+                active: 0,
+                total: 0,
+                pending: 0,
+                unsubscribed: 0
+            });
+
+            // Load templates
+            setTemplates([
+                {
+                    id: 1,
+                    name: 'Welcome Series',
+                    description: 'Perfect for new subscribers',
+                    thumbnail: '👋',
+                    content: {
+                        subject: 'Welcome to Spaghetti Bytes! 🍝',
+                        preheader: 'Start your journey with us',
+                        body: `
+                            <h1>Welcome aboard! 👋</h1>
+                            <p>We're thrilled to have you join our community of tech enthusiasts and pasta lovers!</p>
+                            <p>Here's what you can expect from us:</p>
+                            <ul>
+                                <li>Weekly insights on web development</li>
+                                <li>Tips and tricks for better coding</li>
+                                <li>Exclusive content just for subscribers</li>
+                            </ul>
+                            <p>Stay tuned for our next newsletter!</p>
+                        `
+                    }
+                },
+                {
+                    id: 2,
+                    name: 'Weekly Digest',
+                    description: 'Share your latest articles',
+                    thumbnail: '📰',
+                    content: {
+                        subject: 'This Week at Spaghetti Bytes 🍝',
+                        preheader: 'Your weekly dose of tech insights',
+                        body: `
+                            <h1>Weekly Digest 📰</h1>
+                            <p>Here's what we've been cooking up this week:</p>
+                            <h2>Featured Articles</h2>
+                            <p>[Article summaries will go here]</p>
+                            <h2>Community Highlights</h2>
+                            <p>[Community updates]</p>
+                        `
+                    }
+                },
+                {
+                    id: 3,
+                    name: 'Special Announcement',
+                    description: 'For important updates',
+                    thumbnail: '🎉',
+                    content: {
+                        subject: 'Exciting News from Spaghetti Bytes! 🎉',
+                        preheader: 'We have something special to share',
+                        body: `
+                            <h1>Special Announcement 🎉</h1>
+                            <p>[Your announcement here]</p>
+                        `
+                    }
+                }
+            ]);
         } catch (error) {
             console.error('Error fetching data:', error);
+            // Set default values on error
+            setCampaigns([]);
+            setStats({
+                active: 0,
+                total: 0,
+                pending: 0,
+                unsubscribed: 0
+            });
         } finally {
             setLoading(false);
         }
     };
 
-    const handleTemplateSelect = (templateData) => {
-        setSelectedTemplateData(templateData);
-        setShowCreateModal(true);
+    const handleSendCampaign = async (campaignId) => {
+        try {
+            await api.post(`/newsletter/campaigns/${campaignId}/send`);
+            // Refresh campaigns
+            fetchData();
+        } catch (error) {
+            console.error('Error sending campaign:', error);
+        }
     };
 
-    const tabs = [
-        { id: 'campaigns', label: 'Campaigns', icon: BiEnvelope },
-        { id: 'templates', label: 'Templates', icon: HiOutlineTemplate },
-        { id: 'subscribers', label: 'Subscribers', icon: BiUser },
-        { id: 'analytics', label: 'Analytics', icon: BiBarChart }
-    ];
+    const handleDeleteCampaign = async (campaignId) => {
+        if (!window.confirm('Are you sure you want to delete this campaign?')) return;
+
+        try {
+            await api.delete(`/newsletter/campaigns/${campaignId}`);
+            setCampaigns(campaigns.filter(c => c._id !== campaignId));
+        } catch (error) {
+            console.error('Error deleting campaign:', error);
+        }
+    };
+
+    const handleSaveCampaign = async (campaignData) => {
+        try {
+            if (selectedCampaign) {
+                // Update existing
+                await api.put(`/newsletter/campaigns/${selectedCampaign._id}`, campaignData);
+            } else {
+                // Create new
+                await api.post('/newsletter/campaigns', campaignData);
+            }
+            fetchData();
+            setShowCreateModal(false);
+            setSelectedCampaign(null);
+        } catch (error) {
+            console.error('Error saving campaign:', error);
+        }
+    };
+
+    const StatusBadge = ({ status }) => {
+        const statusConfig = {
+            draft: { color: 'badge-warning', icon: BiEdit, text: 'Draft' },
+            scheduled: { color: 'badge-info', icon: BiTime, text: 'Scheduled' },
+            sending: { color: 'badge-primary', icon: BiSend, text: 'Sending' },
+            sent: { color: 'badge-success', icon: BiCheck, text: 'Sent' }
+        };
+
+        const config = statusConfig[status] || statusConfig.draft;
+        const Icon = config.icon;
+
+        return (
+            <span className={`badge ${config.color} gap-1`}>
+                <Icon size={14} />
+                {config.text}
+            </span>
+        );
+    };
 
     if (loading) {
         return (
@@ -93,553 +214,157 @@ const CampaignManager = () => {
                     </div>
 
                     {/* Stats Overview */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                        <div className="stat bg-cartoon-yellow/20 rounded-cartoon border-2 border-black">
-                            <div className="stat-figure text-cartoon-yellow">
-                                <BiUser size={32} />
-                            </div>
-                            <div className="stat-title text-gray-700 dark:text-gray-300">Active Subscribers</div>
-                            <div className="stat-value text-gray-900 dark:text-gray-100">{subscribers.active}</div>
-                            <div className="stat-desc text-gray-600 dark:text-gray-400">
-                                {subscribers.total} total subscribers
-                            </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                        <div className="text-center">
+                            <p className="text-2xl font-bold text-cartoon-pink">{stats.active}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Active Subscribers</p>
                         </div>
-
-                        <div className="stat bg-cartoon-blue/20 rounded-cartoon border-2 border-black">
-                            <div className="stat-figure text-cartoon-blue">
-                                <BiEnvelope size={32} />
-                            </div>
-                            <div className="stat-title text-gray-700 dark:text-gray-300">Campaigns Sent</div>
-                            <div className="stat-value text-gray-900 dark:text-gray-100">
-                                {campaigns.filter(c => c.status === 'sent').length}
-                            </div>
-                            <div className="stat-desc text-gray-600 dark:text-gray-400">
-                                {campaigns.filter(c => c.status === 'draft').length} drafts
-                            </div>
+                        <div className="text-center">
+                            <p className="text-2xl font-bold text-cartoon-blue">{stats.total}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Total Subscribers</p>
                         </div>
-
-                        <div className="stat bg-cartoon-purple/20 rounded-cartoon border-2 border-black">
-                            <div className="stat-figure text-cartoon-purple">
-                                <BiCheckCircle size={32} />
-                            </div>
-                            <div className="stat-title text-gray-700 dark:text-gray-300">Avg. Open Rate</div>
-                            <div className="stat-value text-gray-900 dark:text-gray-100">24.5%</div>
-                            <div className="stat-desc text-gray-600 dark:text-gray-400">↗︎ 2.1% from last month</div>
+                        <div className="text-center">
+                            <p className="text-2xl font-bold text-cartoon-yellow">{campaigns.length}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Campaigns</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-2xl font-bold text-cartoon-purple">{templates.length}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Templates</p>
                         </div>
                     </div>
                 </motion.div>
 
-                {/* Tabs */}
-                <div className="tabs tabs-boxed bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-2 mb-6">
-                    {tabs.map((tab) => (
-                        <motion.button
-                            key={tab.id}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => setSelectedTab(tab.id)}
-                            className={`tab tab-lg gap-2 ${selectedTab === tab.id
-                                    ? 'tab-active bg-cartoon-pink text-white'
-                                    : 'text-gray-700 dark:text-gray-300'
-                                }`}
-                        >
-                            <tab.icon size={20} />
-                            {tab.label}
-                        </motion.button>
-                    ))}
+                {/* Templates Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="mb-8"
+                >
+                    <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <HiTemplate className="text-cartoon-purple" />
+                        Quick Start Templates
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {templates.map((template) => (
+                            <motion.div
+                                key={template.id}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => {
+                                    setSelectedTemplateData(template.content);
+                                    setShowCreateModal(true);
+                                }}
+                                className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6 cursor-pointer hover:shadow-cartoon-hover transition-all"
+                            >
+                                <div className="text-4xl mb-3">{template.thumbnail}</div>
+                                <h3 className="text-lg font-bold mb-1">{template.name}</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">{template.description}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* Campaigns List */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                >
+                    <h2 className="text-2xl font-bold mb-4">Recent Campaigns</h2>
+                    {campaigns.length === 0 ? (
+                        <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-12 text-center">
+                            <BiEnvelope className="text-6xl text-gray-300 mx-auto mb-4" />
+                            <p className="text-gray-600 dark:text-gray-400">No campaigns yet. Create your first one!</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {campaigns.map((campaign) => (
+                                <motion.div
+                                    key={campaign._id}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6"
+                                >
+                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                        <div className="flex-1">
+                                            <h3 className="text-xl font-bold mb-1">{campaign.subject}</h3>
+                                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                                                {campaign.preheader || 'No preheader text'}
+                                            </p>
+                                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                                                <span className="flex items-center gap-1">
+                                                    <BiTime />
+                                                    {new Date(campaign.createdAt).toLocaleDateString()}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                    <BiUser />
+                                                    {campaign.recipients?.sent || 0} recipients
+                                                </span>
+                                                <StatusBadge status={campaign.status} />
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {campaign.status === 'draft' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => {
+                                                            setSelectedCampaign(campaign);
+                                                            setShowCreateModal(true);
+                                                        }}
+                                                        className="btn btn-ghost btn-sm rounded-cartoon"
+                                                    >
+                                                        <BiEdit />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleSendCampaign(campaign._id)}
+                                                        className="btn btn-primary btn-sm rounded-cartoon"
+                                                    >
+                                                        <BiSend /> Send
+                                                    </button>
+                                                </>
+                                            )}
+                                            <button
+                                                onClick={() => handleDeleteCampaign(campaign._id)}
+                                                className="btn btn-ghost btn-sm text-error rounded-cartoon"
+                                            >
+                                                <BiTrash />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                </motion.div>
+
+                {/* Back Button */}
+                <div className="mt-8">
+                    <button
+                        onClick={() => navigate('/manager')}
+                        className="btn btn-ghost rounded-cartoon"
+                    >
+                        <BsArrowLeft /> Back to Manager
+                    </button>
                 </div>
+            </div>
 
-                {/* Tab Content */}
-                <AnimatePresence mode="wait">
-                    {selectedTab === 'campaigns' && (
-                        <CampaignsList
-                            campaigns={campaigns}
-                            onRefresh={fetchData}
-                            navigate={navigate}
-                        />
-                    )}
-                    {selectedTab === 'templates' && (
-                        <TemplatesList onSelectTemplate={handleTemplateSelect} />
-                    )}
-                    {selectedTab === 'subscribers' && (
-                        <SubscribersList />
-                    )}
-                    {selectedTab === 'analytics' && (
-                        <AnalyticsDashboard campaigns={campaigns} />
-                    )}
-                </AnimatePresence>
-
-                {/* Create Campaign Modal */}
+            {/* Create/Edit Modal */}
+            <AnimatePresence>
                 {showCreateModal && (
-                    <CreateCampaignModal
-                        initialData={selectedTemplateData}
+                    <CampaignEditor
+                        campaign={selectedCampaign}
+                        templateData={selectedTemplateData}
+                        onSave={handleSaveCampaign}
                         onClose={() => {
                             setShowCreateModal(false);
+                            setSelectedCampaign(null);
                             setSelectedTemplateData(null);
-                        }}
-                        onSuccess={() => {
-                            setShowCreateModal(false);
-                            setSelectedTemplateData(null);
-                            fetchData();
                         }}
                     />
                 )}
-            </div>
+            </AnimatePresence>
         </div>
-    );
-};
-
-// Campaigns List Component
-const CampaignsList = ({ campaigns, onRefresh, navigate }) => {
-    const getStatusBadge = (status) => {
-        const badges = {
-            draft: { bg: 'bg-gray-200', text: 'text-gray-700', label: 'Draft' },
-            scheduled: { bg: 'bg-cartoon-yellow', text: 'text-black', label: 'Scheduled' },
-            sending: { bg: 'bg-cartoon-blue', text: 'text-white', label: 'Sending' },
-            sent: { bg: 'bg-cartoon-green', text: 'text-white', label: 'Sent' }
-        };
-        return badges[status] || badges.draft;
-    };
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-4"
-        >
-            {campaigns.length === 0 ? (
-                <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-12 text-center">
-                    <BiEnvelope size={64} className="mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">No campaigns yet</h3>
-                    <p className="text-gray-600 dark:text-gray-300">Create your first newsletter campaign!</p>
-                </div>
-            ) : (
-                campaigns.map((campaign) => {
-                    const status = getStatusBadge(campaign.status);
-                    return (
-                        <motion.div
-                            key={campaign._id}
-                            whileHover={{ scale: 1.01 }}
-                            className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6"
-                        >
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">{campaign.subject}</h3>
-                                        <span className={`badge ${status.bg} ${status.text}`}>
-                                            {status.label}
-                                        </span>
-                                    </div>
-
-                                    {campaign.preheader && (
-                                        <p className="text-gray-600 dark:text-gray-300 mb-2">{campaign.preheader}</p>
-                                    )}
-
-                                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                                        <span className="flex items-center gap-1">
-                                            <BiCalendar />
-                                            {format(new Date(campaign.createdAt), 'MMM d, yyyy')}
-                                        </span>
-
-                                        {campaign.status === 'sent' && campaign.sentAt && (
-                                            <span className="flex items-center gap-1">
-                                                <BiSend />
-                                                Sent {formatDistanceToNow(new Date(campaign.sentAt), { addSuffix: true })}
-                                            </span>
-                                        )}
-
-                                        {campaign.recipients && campaign.recipients.total > 0 && (
-                                            <span className="flex items-center gap-1">
-                                                <BiUser />
-                                                {campaign.recipients.total} recipients
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <motion.button
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 0.9 }}
-                                        onClick={() => navigate(`/newsletter/campaign/${campaign._id}/edit`)}
-                                        className="btn btn-circle btn-ghost"
-                                    >
-                                        <BiEdit size={20} />
-                                    </motion.button>
-
-                                    {campaign.status === 'draft' && (
-                                        <motion.button
-                                            whileHover={{ scale: 1.1 }}
-                                            whileTap={{ scale: 0.9 }}
-                                            onClick={() => navigate(`/newsletter/campaign/${campaign._id}/send`)}
-                                            className="btn btn-circle bg-cartoon-pink text-white"
-                                        >
-                                            <BiSend size={20} />
-                                        </motion.button>
-                                    )}
-                                </div>
-                            </div>
-                        </motion.div>
-                    );
-                })
-            )}
-        </motion.div>
-    );
-};
-
-// Templates List Component
-const TemplatesList = ({ onSelectTemplate }) => {
-    const templates = [
-        {
-            id: 1,
-            name: 'Weekly Newsletter',
-            description: 'Standard weekly update template with featured articles',
-            lastUsed: new Date('2024-01-15')
-        },
-        {
-            id: 2,
-            name: 'Product Launch',
-            description: 'Template for announcing new features or products',
-            lastUsed: new Date('2024-01-10')
-        },
-        {
-            id: 3,
-            name: 'Monthly Roundup',
-            description: 'Monthly summary with top articles and stats',
-            lastUsed: new Date('2023-12-30')
-        }
-    ];
-
-    const getTemplateHTML = (templateName) => {
-        const templates = {
-            'Weekly Newsletter': `
-                <h2>This Week's Highlights 🍝</h2>
-                <p>Hey there, fellow code chef!</p>
-                <h3>📚 Latest Articles</h3>
-                <p>[Add your articles here]</p>
-                <h3>💡 Tip of the Week</h3>
-                <p>[Add your tip here]</p>
-                <h3>🔗 Useful Resources</h3>
-                <p>[Add resources here]</p>
-            `,
-            'Product Launch': `
-                <h2>🚀 Big Announcement!</h2>
-                <p>I'm excited to share something new with you...</p>
-                <h3>What's New?</h3>
-                <p>[Describe your launch]</p>
-                <h3>Key Features</h3>
-                <ul>
-                    <li>[Feature 1]</li>
-                    <li>[Feature 2]</li>
-                    <li>[Feature 3]</li>
-                </ul>
-            `,
-            'Monthly Roundup': `
-                <h2>📅 Monthly Digest</h2>
-                <p>Here's what happened this month in Spaghetti Bytes...</p>
-                <h3>Top Articles</h3>
-                <ol>
-                    <li>[Article 1]</li>
-                    <li>[Article 2]</li>
-                    <li>[Article 3]</li>
-                </ol>
-                <h3>Community Highlights</h3>
-                <p>[Add highlights]</p>
-            `
-        };
-        return templates[templateName] || '';
-    };
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
-            {templates.map((template) => (
-                <motion.div
-                    key={template.id}
-                    whileHover={{ scale: 1.02 }}
-                    className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6"
-                >
-                    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">{template.name}</h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">{template.description}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                        Last used: {format(template.lastUsed, 'MMM d, yyyy')}
-                    </p>
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="btn btn-sm bg-cartoon-blue text-white rounded-cartoon w-full"
-                        onClick={() => {
-                            const templateData = {
-                                subject: template.name === 'Weekly Newsletter'
-                                    ? '🍝 This Week in Spaghetti Bytes'
-                                    : template.name === 'Product Launch'
-                                        ? '🚀 Exciting News from Spaghetti Bytes!'
-                                        : '📅 Monthly Digest - Spaghetti Bytes',
-                                preheader: template.description,
-                                content: {
-                                    html: getTemplateHTML(template.name),
-                                    text: ''
-                                }
-                            };
-                            onSelectTemplate(templateData);
-                        }}
-                    >
-                        Use Template
-                    </motion.button>
-                </motion.div>
-            ))}
-        </motion.div>
-    );
-};
-
-// Subscribers List Component
-const SubscribersList = () => {
-    const [subscribers, setSubscribers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-
-    useEffect(() => {
-        const fetchSubscribers = async () => {
-            try {
-                const response = await api.get(`/api/newsletter/subscribers?page=${page}&limit=10`);
-                setSubscribers(response.data.subscribers);
-                setTotalPages(response.data.pagination.pages);
-            } catch (error) {
-                console.error('Error fetching subscribers:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchSubscribers();
-    }, [page]);
-
-    if (loading) {
-        return (
-            <div className="flex justify-center p-8">
-                <span className="loading loading-spinner loading-lg"></span>
-            </div>
-        );
-    }
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black overflow-hidden"
-        >
-            <div className="overflow-x-auto">
-                <table className="table table-zebra zebra-fix">
-                    <thead>
-                        <tr className="text-gray-700 dark:text-gray-300">
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Source</th>
-                            <th>Subscribed</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {subscribers.map((subscriber) => (
-                            <tr key={subscriber._id} className="text-gray-800 dark:text-gray-200">
-                                <td className="font-medium">{subscriber.email}</td>
-                                <td>
-                                    <span className={`badge ${subscriber.status === 'active'
-                                            ? 'badge-success'
-                                            : subscriber.status === 'pending'
-                                                ? 'badge-warning'
-                                                : 'badge-error'
-                                        }`}>
-                                        {subscriber.status}
-                                    </span>
-                                </td>
-                                <td>{subscriber.metadata?.source || 'Unknown'}</td>
-                                <td>{format(new Date(subscriber.dates.subscribedAt), 'MMM d, yyyy')}</td>
-                                <td>
-                                    <button className="btn btn-ghost btn-xs">Details</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="flex justify-center p-4">
-                <div className="join">
-                    <button
-                        className="join-item btn"
-                        disabled={page === 1}
-                        onClick={() => setPage(p => p - 1)}
-                    >
-                        «
-                    </button>
-                    <button className="join-item btn">Page {page}</button>
-                    <button
-                        className="join-item btn"
-                        disabled={page === totalPages}
-                        onClick={() => setPage(p => p + 1)}
-                    >
-                        »
-                    </button>
-                </div>
-            </div>
-        </motion.div>
-    );
-};
-
-// Analytics Dashboard Component
-const AnalyticsDashboard = ({ campaigns }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-6"
-        >
-            {/* Charts would go here - for now, placeholder */}
-            <div className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6">
-                <h3 className="text-xl font-bold mb-4">Email Performance Over Time</h3>
-                <div className="h-64 rounded-cartoon flex items-center justify-center">
-                    <p className="text-gray-500">Chart visualization coming soon</p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6">
-                    <h3 className="text-lg font-bold mb-4">Top Performing Campaigns</h3>
-                    <div className="space-y-2">
-                        {campaigns
-                            .filter(c => c.status === 'sent')
-                            .slice(0, 5)
-                            .map((campaign) => (
-                                <div key={campaign._id} className="flex justify-between items-center">
-                                    <span className="truncate flex-1">{campaign.subject}</span>
-                                    <span className="text-sm text-gray-500">
-                                        {campaign.recipients?.opened || 0} opens
-                                    </span>
-                                </div>
-                            ))}
-                    </div>
-                </div>
-
-                <div className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6">
-                    <h3 className="text-lg font-bold mb-4">Subscriber Growth</h3>
-                    <div className="h-40 bg-gray-100 rounded-cartoon flex items-center justify-center">
-                        <p className="text-gray-500">Growth chart coming soon</p>
-                    </div>
-                </div>
-            </div>
-        </motion.div>
-    );
-};
-
-// Create Campaign Modal Component
-const CreateCampaignModal = ({ onClose, onSuccess, initialData }) => {
-    const [formData, setFormData] = useState(initialData || {
-        subject: '',
-        preheader: '',
-        content: {
-            html: '',
-            text: ''
-        }
-    });
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await api.post('/api/newsletter/campaigns', formData);
-            onSuccess();
-        } catch (error) {
-            console.error('Error creating campaign:', error);
-        }
-    };
-
-    return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-            onClick={onClose}
-        >
-            <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <h2 className="text-2xl font-bold mb-4">Create New Campaign</h2>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text">Subject Line</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.subject}
-                            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                            className="input input-bordered rounded-cartoon"
-                            placeholder="🍝 This Week in Spaghetti Bytes"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text">Preheader Text</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.preheader}
-                            onChange={(e) => setFormData({ ...formData, preheader: e.target.value })}
-                            className="input input-bordered rounded-cartoon"
-                            placeholder="A quick preview of what's inside..."
-                        />
-                    </div>
-
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text">Content (HTML)</span>
-                        </label>
-                        <textarea
-                            value={formData.content.html}
-                            onChange={(e) => setFormData({
-                                ...formData,
-                                content: { ...formData.content, html: e.target.value }
-                            })}
-                            className="textarea textarea-bordered rounded-cartoon h-32"
-                            placeholder="Email content HTML..."
-                            required
-                        />
-                    </div>
-
-                    <div className="flex gap-2 justify-end">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="btn btn-ghost rounded-cartoon"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            className="btn bg-cartoon-pink text-white rounded-cartoon"
-                        >
-                            Create Campaign
-                        </button>
-                    </div>
-                </form>
-            </motion.div>
-        </motion.div>
     );
 };
 

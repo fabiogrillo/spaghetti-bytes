@@ -1,15 +1,42 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
-// Create axios instance with default config
+// Create axios instance with dynamic base URL
 const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
+  baseURL: process.env.NODE_ENV === 'production'
+    ? '/api'  // In production, use relative path
+    : 'http://localhost:5000/api',  // In development, use full URL
+  withCredentials: true,  // Important for cookies/session
   headers: {
-    "Content-Type": "application/json",
-  },
+    'Content-Type': 'application/json',
+  }
 });
+
+// Add request interceptor for debugging
+api.interceptors.request.use(
+  (config) => {
+    console.log('Making request to:', config.url);
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for error handling
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401) {
+      // Handle unauthorized access
+      console.log('Unauthorized access - redirecting to login');
+      // You might want to redirect to login page here
+      // window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const doLogin = async (email, password) => {
   try {
