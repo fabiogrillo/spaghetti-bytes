@@ -88,8 +88,10 @@ const ArticleReactions = ({ articleId, compact = false }) => {
         }
     };
 
-    // Calculate total reactions
-    const totalReactions = Object.values(reactions).reduce((sum, count) => sum + count, 0);
+    // Calculate total reactions - with null check
+    const totalReactions = reactions && typeof reactions === 'object'
+        ? Object.values(reactions).reduce((sum, count) => sum + (count || 0), 0)
+        : 0;
 
     return (
         <div className="relative">
