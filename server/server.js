@@ -9,6 +9,9 @@ const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 const path = require("path");
 
+// Load environment variables
+dotenv.config();
+
 // Models
 const User = require("./models/User");
 
@@ -20,9 +23,6 @@ const newsletterRoutes = require("./routes/newsletterRoute");
 const analyticsRoutes = require("./routes/analyticsRoute");
 const rssRoute = require("./routes/rssRoute");
 const imageUploadRoutes = require("./routes/imageUploadRoute");
-
-
-dotenv.config();
 
 const app = express();
 
@@ -63,18 +63,22 @@ app.use(cors(corsOptions));
 
 // Session configuration - MUST come before passport.initialize()
 const sessionConfig = {
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  secret: process.env.SESSION_SECRET || process.env.SECRET_KEY || 'fallback-secret-key',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
-    touchAfter: 24 * 3600 // lazy session update
+    touchAfter: 24 * 3600, // lazy session update
+    mongoOptions: {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
   }),
   cookie: {
     secure: process.env.NODE_ENV === 'production', // true in production
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // important for cross-origin requests
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   }
 };
 
@@ -85,7 +89,6 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(session(sessionConfig));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 
 // Passport middleware
 app.use(passport.initialize());
@@ -107,6 +110,7 @@ passport.use(
         }
         return done(null, user);
       } catch (err) {
+        console.error("Passport authentication error:", err);
         return done(err);
       }
     }
@@ -122,20 +126,36 @@ passport.deserializeUser(async (id, done) => {
     const user = await User.findById(id);
     done(null, user);
   } catch (err) {
+    console.error("Passport deserialize error:", err);
     done(err);
   }
 });
 
-// Connect to MongoDB
+// Connect to MongoDB with better error handling
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
   .then(() => {
     console.log("Connected to MongoDB");
   })
   .catch((err) => {
-    console.error("Error connecting to MongoDB", err);
+    console.error("Error connecting to MongoDB:", err);
+    process.exit(1); // Exit if can't connect to DB
   });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    mongoConnected: mongoose.connection.readyState === 1,
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Test endpoint
 app.get('/api/test', (req, res) => {
   res.json({
     message: 'API is working',
@@ -144,17 +164,16 @@ app.get('/api/test', (req, res) => {
   });
 });
 
-// API Routes
+// API Routes with error handling wrapper
 app.use("/api/stories", storyRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/newsletter", newsletterRoutes);
-app.use("/api/newsletter", analyticsRoutes);
+app.use("/api/analytics", analyticsRoutes);
 app.use("/", rssRoute); // RSS at root level
 app.use("/api/upload", imageUploadRoutes);
 
-
-// Auth routes
+// Auth routes with better error handling
 app.post("/api/register", async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -169,21 +188,35 @@ app.post("/api/register", async (req, res) => {
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error registering user", error });
+    console.error("Registration error:", error);
+    res.status(500).json({
+      message: "Error registering user",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
 app.post("/api/login", (req, res, next) => {
+  console.log("Login attempt for:", req.body.email);
+
   passport.authenticate("local", (err, user, info) => {
     if (err) {
-      return res.status(500).json({ message: "Authentication error", error: err });
+      console.error("Authentication error:", err);
+      return res.status(500).json({
+        message: "Authentication error",
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+      });
     }
     if (!user) {
       return res.status(401).json({ message: info.message || "Login failed" });
     }
     req.logIn(user, (err) => {
       if (err) {
-        return res.status(500).json({ message: "Login error", error: err });
+        console.error("Login error:", err);
+        return res.status(500).json({
+          message: "Login error",
+          error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
       }
       res.json({
         message: "Logged in successfully",
@@ -197,11 +230,19 @@ app.post("/api/login", (req, res, next) => {
 app.post("/api/logout", (req, res) => {
   req.logout((err) => {
     if (err) {
-      return res.status(500).json({ message: "Logout error", error: err });
+      console.error("Logout error:", err);
+      return res.status(500).json({
+        message: "Logout error",
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+      });
     }
     req.session.destroy((err) => {
       if (err) {
-        return res.status(500).json({ message: "Session destruction error", error: err });
+        console.error("Session destruction error:", err);
+        return res.status(500).json({
+          message: "Session destruction error",
+          error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
       }
       res.clearCookie('connect.sid');
       res.json({ message: "Logged out successfully" });
@@ -231,14 +272,46 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Error handling middleware
+// Global error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Something went wrong!", error: err.message });
+  console.error("Global error handler:", err.stack);
+
+  // CORS errors
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({
+      code: "403",
+      message: "CORS policy violation"
+    });
+  }
+
+  // MongoDB errors
+  if (err.name === 'MongoError' || err.name === 'MongooseError') {
+    return res.status(500).json({
+      code: "500",
+      message: "Database error occurred"
+    });
+  }
+
+  // Default error response
+  res.status(500).json({
+    code: "500",
+    message: "A server error has occurred",
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+
+// Handle 404
+app.use((req, res) => {
+  res.status(404).json({
+    code: "404",
+    message: "Route not found"
+  });
 });
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`MongoDB URI: ${process.env.MONGODB_URI ? 'Connected' : 'Not configured'}`);
 });
