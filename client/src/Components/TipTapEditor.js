@@ -105,12 +105,17 @@ const ImageModal = ({ isOpen, onClose, editor }) => {
   };
 
   // Stop camera
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
       setCameraStream(null);
     }
-  };
+  }, [cameraStream]);
+
+  React.useEffect(() => {
+    return () => stopCamera();
+  }, [stopCamera]);
+
 
   // Capture photo
   const capturePhoto = () => {
@@ -174,7 +179,7 @@ const ImageModal = ({ isOpen, onClose, editor }) => {
   // Cleanup
   React.useEffect(() => {
     return () => stopCamera();
-  }, []);
+  }, [stopCamera]);
 
   if (!isOpen) return null;
 
@@ -216,8 +221,8 @@ const ImageModal = ({ isOpen, onClose, editor }) => {
             <button
               onClick={() => setActiveTab('url')}
               className={`flex-1 p-3 font-medium transition-colors ${activeTab === 'url'
-                  ? 'bg-cartoon-blue text-white'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'bg-cartoon-blue text-white'
+                : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
             >
               <FaLink className="inline mr-2" />
@@ -226,8 +231,8 @@ const ImageModal = ({ isOpen, onClose, editor }) => {
             <button
               onClick={() => setActiveTab('upload')}
               className={`flex-1 p-3 font-medium transition-colors ${activeTab === 'upload'
-                  ? 'bg-cartoon-yellow text-black'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'bg-cartoon-yellow text-black'
+                : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
             >
               <BiUpload className="inline mr-2" />
@@ -239,8 +244,8 @@ const ImageModal = ({ isOpen, onClose, editor }) => {
                 startCamera();
               }}
               className={`flex-1 p-3 font-medium transition-colors ${activeTab === 'camera'
-                  ? 'bg-cartoon-pink text-white'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'bg-cartoon-pink text-white'
+                : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
             >
               <BiCamera className="inline mr-2" />
@@ -249,8 +254,8 @@ const ImageModal = ({ isOpen, onClose, editor }) => {
             <button
               onClick={() => setActiveTab('ai')}
               className={`flex-1 p-3 font-medium transition-colors ${activeTab === 'ai'
-                  ? 'bg-cartoon-purple text-white'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'bg-cartoon-purple text-white'
+                : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
             >
               <BiSolidMagicWand className="inline mr-2" />
