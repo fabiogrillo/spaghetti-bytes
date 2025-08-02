@@ -29,8 +29,8 @@ import {
   FaHeading
 } from 'react-icons/fa';
 import {
-  BiCodeBlock, BiCamera, BiUpload,
-  BiX, BiLoaderAlt, BiSolidMagicWand
+  BiCodeBlock, BiCamera, BiSolidMagicWand, BiUpload,
+  BiX, BiLoaderAlt
 } from 'react-icons/bi';
 
 const lowlight = createLowlight();
@@ -112,10 +112,6 @@ const ImageModal = ({ isOpen, onClose, editor }) => {
     }
   }, [cameraStream]);
 
-  React.useEffect(() => {
-    return () => stopCamera();
-  }, [stopCamera]);
-
 
   // Capture photo
   const capturePhoto = () => {
@@ -145,7 +141,7 @@ const ImageModal = ({ isOpen, onClose, editor }) => {
 
     setGenerating(true);
     try {
-      const response = await api.post('/generate/image', { prompt: aiPrompt });
+      const response = await api.post('/upload/generate', { prompt: aiPrompt });
       insertImage(response.data.url);
       onClose();
       setAiPrompt('');
@@ -175,11 +171,6 @@ const ImageModal = ({ isOpen, onClose, editor }) => {
     if (!editor || !url) return;
     editor.chain().focus().setImage({ src: url }).run();
   };
-
-  // Cleanup
-  React.useEffect(() => {
-    return () => stopCamera();
-  }, [stopCamera]);
 
   if (!isOpen) return null;
 

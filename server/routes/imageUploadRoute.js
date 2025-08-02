@@ -3,7 +3,6 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const fetch = require('node-fetch');
 
 // Create upload directory if it doesn't exist
 const uploadDir = path.join(__dirname, '../uploads/images');
@@ -47,8 +46,6 @@ router.post('/image', upload.single('image'), async (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        // In production, you would upload to cloud storage (AWS S3, Cloudinary, etc.)
-        // For now, we'll serve from local storage
         const imageUrl = `/uploads/images/${req.file.filename}`;
 
         res.json({
@@ -62,7 +59,7 @@ router.post('/image', upload.single('image'), async (req, res) => {
     }
 });
 
-// AI Image Generation with Hugging Face
+// AI Image Generation endpoint
 router.post('/generate', async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -71,40 +68,44 @@ router.post('/generate', async (req, res) => {
             return res.status(400).json({ error: 'Prompt is required' });
         }
 
-        // Check if Hugging Face API key is configured
-        if (!process.env.HUGGINGFACE_API_KEY) {
-            console.warn('HUGGINGFACE_API_KEY not configured, using placeholder');
-            // Fallback to placeholder
+        // Check if we have node-fetch installed
+        let fetch;
+        try {
+            fetch = require('node-fetch');
+        } catch (e) {
+            console.log('node-fetch not installed, using placeholder');
             const placeholderUrl = `https://via.placeholder.com/800x600.png?text=${encodeURIComponent(prompt)}`;
             return res.json({
                 success: true,
                 url: placeholderUrl,
                 prompt: prompt,
-                message: 'Using placeholder. Add HUGGINGFACE_API_KEY to .env for AI generation'
+                message: 'Install node-fetch for Hugging Face integration'
+            });
+        }
+
+        // Check if Hugging Face API key is configured
+        if (!process.env.HUGGINGFACE_API_KEY) {
+            console.warn('HUGGINGFACE_API_KEY not configured, using placeholder');
+            const placeholderUrl = `https://via.placeholder.com/800x600.png?text=${encodeURIComponent(prompt)}`;
+            return res.json({
+                success: true,
+                url: placeholderUrl,
+                prompt: prompt,
+                message: 'Add HUGGINGFACE_API_KEY to .env for AI generation'
             });
         }
 
         console.log('Generating image with prompt:', prompt);
 
-        // Call Hugging Face API - Using Stable Diffusion 2.1
+        // Call Hugging Face API
         const response = await fetch(
             "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1",
             {
                 headers: {
                     Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
-                    'Content-Type': 'application/json',
                 },
                 method: "POST",
-                body: JSON.stringify({
-                    inputs: prompt,
-                    parameters: {
-                        negative_prompt: "blurry, bad quality, distorted, ugly, bad anatomy",
-                        width: 768,
-                        height: 512,
-                        num_inference_steps: 50,
-                        guidance_scale: 7.5,
-                    }
-                }),
+                body: JSON.stringify({ inputs: prompt }),
             }
         );
 
@@ -112,11 +113,10 @@ router.post('/generate', async (req, res) => {
             const errorText = await response.text();
             console.error('Hugging Face API error:', errorText);
 
-            // If model is loading, inform the user
             if (response.status === 503) {
                 return res.json({
                     success: false,
-                    error: 'Model is loading, please try again in a few seconds',
+                    error: 'Model is loading, please try again in 20 seconds',
                     url: `https://via.placeholder.com/800x600.png?text=Model+Loading...+Try+Again`,
                 });
             }
@@ -124,7 +124,7 @@ router.post('/generate', async (req, res) => {
             throw new Error(`API Error: ${errorText}`);
         }
 
-        // Get the image blob
+        // Get the image buffer
         const imageBuffer = await response.buffer();
 
         // Save the generated image
@@ -151,34 +151,6 @@ router.post('/generate', async (req, res) => {
             error: error.message
         });
     }
-});
-
-// Alternative free AI models you can use
-router.get('/ai-models', (req, res) => {
-    res.json({
-        models: [
-            {
-                name: 'Stable Diffusion 2.1',
-                id: 'stabilityai/stable-diffusion-2-1',
-                description: 'High quality image generation'
-            },
-            {
-                name: 'Stable Diffusion XL',
-                id: 'stabilityai/stable-diffusion-xl-base-1.0',
-                description: 'Latest and highest quality (requires more credits)'
-            },
-            {
-                name: 'OpenJourney',
-                id: 'prompthero/openjourney',
-                description: 'Midjourney style images'
-            },
-            {
-                name: 'Dreamlike Diffusion',
-                id: 'dreamlike-art/dreamlike-diffusion-1.0',
-                description: 'Artistic style generation'
-            }
-        ]
-    });
 });
 
 module.exports = router;

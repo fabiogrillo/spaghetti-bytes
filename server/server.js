@@ -21,6 +21,7 @@ const analyticsRoutes = require("./routes/analyticsRoute");
 const rssRoute = require("./routes/rssRoute");
 const imageUploadRoutes = require("./routes/imageUploadRoute");
 
+
 dotenv.config();
 
 const app = express();
@@ -83,8 +84,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.use(session(sessionConfig));
-
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Passport middleware
 app.use(passport.initialize());
@@ -135,6 +136,14 @@ mongoose
     console.error("Error connecting to MongoDB", err);
   });
 
+app.get('/api/test', (req, res) => {
+  res.json({
+    message: 'API is working',
+    env: process.env.NODE_ENV,
+    mongoConnected: mongoose.connection.readyState === 1
+  });
+});
+
 // API Routes
 app.use("/api/stories", storyRoutes);
 app.use("/api/goals", goalRoutes);
@@ -143,6 +152,7 @@ app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/newsletter", analyticsRoutes);
 app.use("/", rssRoute); // RSS at root level
 app.use("/api/upload", imageUploadRoutes);
+
 
 // Auth routes
 app.post("/api/register", async (req, res) => {
@@ -232,4 +242,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
