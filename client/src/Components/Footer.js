@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FaGithub, FaLinkedin, FaMedium } from "react-icons/fa";
 import { BiHeart } from "react-icons/bi";
 import { Link } from "react-router-dom";
+import RSSFeedButton from "./RSSFeedButton";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -46,12 +47,12 @@ const Footer = () => {
             </p>
           </motion.div>
 
-          {/* Social Links */}
+          {/* Social Links + RSS */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="flex gap-6"
+            className="flex gap-6 items-center"
           >
             {socialLinks.map((social, index) => {
               const Icon = social.icon;
@@ -77,6 +78,16 @@ const Footer = () => {
                 </motion.a>
               );
             })}
+
+            {/* RSS Feed Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="ml-4 border-l border-gray-400 pl-4"
+            >
+              <RSSFeedButton />
+            </motion.div>
           </motion.div>
 
           {/* Divider */}

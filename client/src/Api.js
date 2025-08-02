@@ -38,40 +38,24 @@ api.interceptors.response.use(
   }
 );
 
+// Login function
 export const doLogin = async (email, password) => {
   try {
-    const response = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-      credentials: "include", // Importante per inviare i cookie di sessione
-    });
-
-    if (response.ok) {
-      return await response.json();
-    } else {
-      const errorData = await response.json();
-      throw new Error(errorData.message);
-    }
+    const response = await api.post("/login", { email, password });
+    return response.data;
   } catch (error) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
     throw error;
   }
 };
 
+// Logout function
 export const doLogout = async () => {
   try {
-    const response = await fetch("/api/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-
-    if (response.ok) {
-      return await response.json();
-    } else {
-      throw new Error("Logout failed");
-    }
+    const response = await api.post("/logout");
+    return response.data;
   } catch (error) {
     throw error;
   }
