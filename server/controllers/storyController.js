@@ -93,7 +93,7 @@ const publishOnMedium = async (story) => {
 
   try {
     const response = await axios.post(url, data, { headers });
-    //console.log("Story published on Medium:", response.data);
+    console.log("Story published on Medium:", response.data);
   } catch (error) {
     console.error(
       "Error publishing story on Medium:",
@@ -102,47 +102,79 @@ const publishOnMedium = async (story) => {
   }
 };
 
+// Add a reaction to a story
 const addReaction = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { reaction } = req.body;
-        
-        const validReactions = ['love', 'spaghetti', 'fire', 'mind_blown', 'clap'];
-        if (!validReactions.includes(reaction)) {
-            return res.status(400).json({ error: 'Invalid reaction type' });
-        }
-        
-        const story = await Story.findByIdAndUpdate(
-            id,
-            { $inc: { [`reactions.${reaction}`]: 1 } },
-            { new: true }
-        );
-        
-        if (!story) {
-            return res.status(404).json({ error: 'Story not found' });
-        }
-        
-        res.json({ reactions: story.reactions });
-    } catch (error) {
-        console.error('Add reaction error:', error);
-        res.status(500).json({ error: 'Failed to add reaction' });
+  try {
+    const { id } = req.params;
+    const { reaction } = req.body;
+
+    const validReactions = ['love', 'spaghetti', 'fire', 'mind_blown', 'clap'];
+    if (!validReactions.includes(reaction)) {
+      return res.status(400).json({ error: 'Invalid reaction type' });
     }
+
+    const story = await Story.findByIdAndUpdate(
+      id,
+      { $inc: { [`reactions.${reaction}`]: 1 } },
+      { new: true }
+    );
+
+    if (!story) {
+      return res.status(404).json({ error: 'Story not found' });
+    }
+
+    res.json({ reactions: story.reactions });
+  } catch (error) {
+    console.error('Add reaction error:', error);
+    res.status(500).json({ error: 'Failed to add reaction' });
+  }
 };
 
-const getReactions = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const story = await Story.findById(id).select('reactions');
-        
-        if (!story) {
-            return res.status(404).json({ error: 'Story not found' });
-        }
-        
-        res.json({ reactions: story.reactions });
-    } catch (error) {
-        console.error('Get reactions error:', error);
-        res.status(500).json({ error: 'Failed to get reactions' });
+// Remove a reaction from a story
+const removeReaction = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reaction } = req.body;
+
+    const validReactions = ['love', 'spaghetti', 'fire', 'mind_blown', 'clap'];
+    if (!validReactions.includes(reaction)) {
+      return res.status(400).json({ error: 'Invalid reaction type' });
     }
+
+    // First get the story to check current reaction count
+    const story = await Story.findById(id);
+    if (!story) {
+      return res.status(404).json({ error: 'Story not found' });
+    }
+
+    // Only decrement if count is greater than 0
+    if (story.reactions[reaction] > 0) {
+      story.reactions[reaction] -= 1;
+      await story.save();
+    }
+
+    res.json({ reactions: story.reactions });
+  } catch (error) {
+    console.error('Remove reaction error:', error);
+    res.status(500).json({ error: 'Failed to remove reaction' });
+  }
+};
+
+// Get reactions for a story
+const getReactions = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const story = await Story.findById(id).select('reactions');
+
+    if (!story) {
+      return res.status(404).json({ error: 'Story not found' });
+    }
+
+    res.json({ reactions: story.reactions });
+  } catch (error) {
+    console.error('Get reactions error:', error);
+    res.status(500).json({ error: 'Failed to get reactions' });
+  }
 };
 
 module.exports = {
@@ -153,4 +185,5 @@ module.exports = {
   deleteStory,
   getReactions,
   addReaction,
+  removeReaction,
 };

@@ -188,3 +188,247 @@ html {
   color: #d1d5db;
   /* text-gray-300 */
 }
+
+.dark {
+  /* Primary text should be light in dark mode */
+  --tw-text-opacity: 1;
+}
+
+/* Fix for all components with dark backgrounds */
+.dark .bg-blue-900,
+.dark .bg-blue-800,
+.dark .bg-blue-700,
+.dark .bg-indigo-900,
+.dark .bg-indigo-800,
+.dark .bg-purple-900,
+.dark .bg-purple-800,
+.dark .bg-gray-900,
+.dark .bg-gray-800 {
+  /* Ensure text inside these backgrounds is always light */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+/* Specific fixes for common components */
+
+/* Cards and containers */
+.dark .card,
+.dark .shadow-cartoon,
+.dark .shadow-cartoon-sm,
+.dark .shadow-cartoon-hover {
+  background-color: rgb(31 41 55);
+  /* gray-800 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+  border-color: rgb(75 85 99);
+  /* gray-600 */
+}
+
+/* Buttons in dark mode */
+.dark .btn {
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+.dark .btn-primary {
+  background-color: rgb(59 130 246);
+  /* blue-500 */
+  color: rgb(255 255 255);
+  /* white */
+}
+
+.dark .btn-secondary {
+  background-color: rgb(107 114 128);
+  /* gray-500 */
+  color: rgb(255 255 255);
+  /* white */
+}
+
+/* Headers and titles */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: rgb(243 244 246);
+  /* gray-100 */
+}
+
+/* Paragraphs and body text */
+.dark p,
+.dark span:not(.emoji),
+.dark div:not(.has-custom-color) {
+  color: rgb(209 213 219);
+  /* gray-300 */
+}
+
+/* Links */
+.dark a {
+  color: rgb(96 165 250);
+  /* blue-400 */
+}
+
+.dark a:hover {
+  color: rgb(147 197 253);
+  /* blue-300 */
+}
+
+/* Input fields and forms */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: rgb(55 65 81);
+  /* gray-700 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+  border-color: rgb(75 85 99);
+  /* gray-600 */
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: rgb(156 163 175);
+  /* gray-400 */
+}
+
+/* Tables */
+.dark table {
+  background-color: rgb(31 41 55);
+  /* gray-800 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+.dark th {
+  background-color: rgb(17 24 39);
+  /* gray-900 */
+  color: rgb(243 244 246);
+  /* gray-100 */
+}
+
+.dark td {
+  border-color: rgb(75 85 99);
+  /* gray-600 */
+}
+
+/* Modals and overlays */
+.dark .modal-box {
+  background-color: rgb(31 41 55);
+  /* gray-800 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+/* Tooltips */
+.dark .tooltip {
+  background-color: rgb(17 24 39);
+  /* gray-900 */
+  color: rgb(243 244 246);
+  /* gray-100 */
+}
+
+/* Badges and tags */
+.dark .badge,
+.dark .tag {
+  background-color: rgb(55 65 81);
+  /* gray-700 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+/* Navigation */
+.dark .navbar {
+  background-color: rgb(17 24 39);
+  /* gray-900 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+.dark .navbar a {
+  color: rgb(209 213 219);
+  /* gray-300 */
+}
+
+.dark .navbar a:hover {
+  color: rgb(243 244 246);
+  /* gray-100 */
+}
+
+/* Footer */
+.dark footer {
+  background-color: rgb(17 24 39);
+  /* gray-900 */
+  color: rgb(209 213 219);
+  /* gray-300 */
+}
+
+/* Special case for reaction components */
+.dark .reaction-counter {
+  background: linear-gradient(to right, rgb(31 41 55), rgb(55 65 81));
+  /* gray-800 to gray-700 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+/* Chat bot in dark mode */
+.dark .chat-bubble {
+  background-color: rgb(55 65 81);
+  /* gray-700 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+/* Story cards */
+.dark .story-card {
+  background-color: rgb(31 41 55);
+  /* gray-800 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+/* Code blocks */
+.dark pre,
+.dark code {
+  background-color: rgb(17 24 39);
+  /* gray-900 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+/* Alerts and notifications */
+.dark .alert {
+  background-color: rgb(55 65 81);
+  /* gray-700 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+/* Dropdown menus */
+.dark .dropdown-content {
+  background-color: rgb(31 41 55);
+  /* gray-800 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+  border-color: rgb(75 85 99);
+  /* gray-600 */
+}
+
+/* Progress bars */
+.dark .progress {
+  background-color: rgb(55 65 81);
+  /* gray-700 */
+}
+
+/* Pagination */
+.dark .pagination button {
+  background-color: rgb(55 65 81);
+  /* gray-700 */
+  color: rgb(229 231 235);
+  /* gray-200 */
+}
+
+.dark .pagination button:hover {
+  background-color: rgb(75 85 99);
+  /* gray-600 */
+}
