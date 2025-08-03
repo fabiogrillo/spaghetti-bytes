@@ -3,12 +3,10 @@
   "builds": [
     {
       "src": "server/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     }
   ],
   "routes": [
@@ -17,12 +15,15 @@
       "dest": "/server/server.js"
     },
     {
-      "src": "^/static/(.*)",
-      "dest": "/client/static/$1"
+      "src": "/rss",
+      "dest": "/server/server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/client/index.html"
+      "dest": "/server/server.js"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
