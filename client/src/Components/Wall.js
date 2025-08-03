@@ -4,7 +4,6 @@ import ImprovedStoryCard from "./ImprovedStoryCard";
 import { FaRegBookmark, FaSearch } from "react-icons/fa";
 import { LuTags } from "react-icons/lu";
 import { BsStars } from "react-icons/bs";
-import { api } from "../utils/fetchWrapper"; // Use the new fetch wrapper
 
 const Wall = () => {
   const [stories, setStories] = useState([]);
@@ -14,7 +13,6 @@ const Wall = () => {
   const [lastMonthStories, setLastMonthStories] = useState(0);
   const [distinctTags, setDistinctTags] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -23,42 +21,29 @@ const Wall = () => {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
-        // Use the new api wrapper
-        const data = await api.get("/api/stories");
-
-        console.log("Fetched stories:", data);
-
-        // Ensure data is an array
-        const storiesArray = Array.isArray(data) ? data : [];
-
-        setStories(storiesArray);
-        setFilteredStories(storiesArray);
+        const response = await fetch("/api/stories");
+        const data = await response.json();
+        setStories(data);
+        setFilteredStories(data);
 
         // Calculate stories written in the last month
         const lastMonth = new Date();
         lastMonth.setMonth(lastMonth.getMonth() - 1);
-        const storiesLastMonth = storiesArray.filter(
+        const storiesLastMonth = data.filter(
           (story) => new Date(story.createdAt) >= lastMonth
         );
         setLastMonthStories(storiesLastMonth.length);
 
         // Calculate distinct tags
-        const allTags = storiesArray.flatMap((story) => story.tags || []);
+        const allTags = data.flatMap((story) => story.tags);
         const uniqueTags = new Set(allTags);
         setDistinctTags(uniqueTags.size);
       } catch (error) {
         console.error("Error fetching stories:", error);
-        setError(error.message || "Failed to load stories. Please try again later.");
-        setStories([]);
-        setFilteredStories([]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchStories();
   }, []);
 
@@ -69,7 +54,7 @@ const Wall = () => {
       // Filter by search tag
       if (searchTag) {
         sortedStories = sortedStories.filter((story) =>
-          (story.tags || []).some((tag) =>
+          story.tags.some((tag) =>
             tag.toLowerCase().includes(searchTag.toLowerCase())
           )
         );
@@ -92,30 +77,6 @@ const Wall = () => {
     sortAndFilterStories();
   }, [sortOption, searchTag, stories]);
 
-  // Error display
-  if (error) {
-    return (
-      <div className="container mx-auto p-8">
-        <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 border-2 border-red-400 rounded-cartoon p-6 inline-block"
-          >
-            <p className="text-xl text-red-600 mb-2">😔 Oops! Something went wrong</p>
-            <p className="text-gray-600">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-cartoon-blue text-white rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon transition-all"
-            >
-              Try Again
-            </button>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto p-8">
       <motion.div
@@ -133,67 +94,160 @@ const Wall = () => {
           </span>
         </motion.div>
 
-        <h1 className="text-3xl md:text-5xl font-extrabold mb-2 md:mb-4">
-          Explore My <span className="text-cartoon-pink">Stories</span>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          The <span className="gradient-text-fixed">Reading</span> Corner
         </h1>
-        <p className="text-base md:text-lg text-gray-600 mb-8 md:mb-10 max-w-2xl">
-          Dive into a collection of articles about tech, creativity, and everything in between.
+
+        <p className="text-lg md:text-xl max-w-3xl dark:text-grey leading-relaxed">
+          Welcome, dear reader! 📚 Dive into my collection of
+          <strong> carefully crafted stories</strong> where code meets creativity.
+          Each article is a byte-sized adventure waiting to be discovered.
+          Let the stats guide you through my storytelling journey! 🚀
         </p>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 w-full max-w-4xl">
-          <motion.div
-            className="bg-cartoon-yellow p-4 rounded-cartoon shadow-cartoon-sm border-2 border-black"
-            whileHover={{ translateY: -2 }}
-          >
-            <FaRegBookmark className="text-2xl mb-2" />
-            <p className="font-bold text-lg">{stories.length}</p>
-            <p className="text-sm">Total Stories</p>
-          </motion.div>
+        {/* Animated Emoji */}
+        <motion.div
+          className="relative flex justify-center items-center my-8"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="relative">
+            <motion.div
+              className="text-[100px] md:text-[150px] select-none"
+              animate={{
+                y: [0, -30, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              📖
+            </motion.div>
 
-          <motion.div
-            className="bg-cartoon-pink p-4 rounded-cartoon shadow-cartoon-sm border-2 border-black text-white"
-            whileHover={{ translateY: -2 }}
-          >
-            <LuTags className="text-2xl mb-2" />
-            <p className="font-bold text-lg">{distinctTags}</p>
-            <p className="text-sm">Unique Tags</p>
-          </motion.div>
+            {/* Floating elements */}
+            <motion.div
+              className="absolute -top-5 -right-10 text-4xl"
+              animate={{
+                rotate: [0, 360],
+                scale: [1, 1.0, 1]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity
+              }}
+            >
+              ✨
+            </motion.div>
 
-          <motion.div
-            className="bg-cartoon-purple p-4 rounded-cartoon shadow-cartoon-sm border-2 border-black text-white"
-            whileHover={{ translateY: -2 }}
-          >
-            <BsStars className="text-2xl mb-2" />
-            <p className="font-bold text-lg">{lastMonthStories}</p>
-            <p className="text-sm">Recent Stories</p>
-          </motion.div>
-        </div>
+            <motion.div
+              className="absolute bottom-0 -left-10 text-4xl"
+              animate={{
+                y: [0, -10, 0],
+                x: [-5, 5, -5]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                delay: 0.5
+              }}
+            >
+              🔖
+            </motion.div>
 
-        {/* Search and Filter Controls */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8 w-full max-w-2xl">
-          <div className="relative flex-1">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by tag..."
-              value={searchTag}
-              onChange={(e) => setSearchTag(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border-2 border-black rounded-cartoon focus:outline-none focus:ring-2 focus:ring-cartoon-blue"
-            />
+            <motion.div
+              className="absolute top-10 left-20 text-3xl"
+              animate={{
+                scale: [0.8, 1.1, 0.8],
+                opacity: [0.6, 1, 0.6]
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                delay: 1
+              }}
+            >
+              💡
+            </motion.div>
           </div>
+        </motion.div>
+      </motion.div>
 
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="px-4 py-2 border-2 border-black rounded-cartoon focus:outline-none focus:ring-2 focus:ring-cartoon-blue bg-white"
+      {/* Stats Section with Pop-Cartoon Style */}
+      <motion.div
+        className="flex justify-center mx-auto mb-12"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon border-2 border-black hover:shadow-cartoon-hover transform transition-all hover:translate-x-1 hover:translate-y-1"
           >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-          </select>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-4xl font-bold text-cartoon-pink mb-2">{stories.length}</div>
+                <div className="text-lg font-semibold">Total Stories</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {lastMonthStories} new this month!
+                </div>
+              </div>
+              <FaRegBookmark className="text-5xl text-cartoon-pink opacity-20" />
+            </div>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon border-2 border-black hover:shadow-cartoon-hover transform transition-all hover:translate-x-1 hover:translate-y-1"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-4xl font-bold text-cartoon-yellow mb-2">{distinctTags}</div>
+                <div className="text-lg font-semibold">Topics Covered</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Diverse content awaits!
+                </div>
+              </div>
+              <LuTags className="text-5xl text-cartoon-yellow opacity-20" />
+            </div>
+          </motion.div>
         </div>
       </motion.div>
 
+      {/* Filter Controls */}
+      <motion.div
+        className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          className="select select-bordered rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon transition-all"
+        >
+          <option value="newest">📅 Newest First</option>
+          <option value="oldest">📅 Oldest First</option>
+        </select>
+
+        <div className="relative">
+          <input
+            type="text"
+            value={searchTag}
+            onChange={(e) => setSearchTag(e.target.value)}
+            placeholder="Search by tag..."
+            className="input input-bordered w-full pr-10 rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon transition-all"
+          />
+          <div className="absolute top-3.5 right-3 text-cartoon-purple">
+            <FaSearch />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Stories Grid */}
       {loading ? (
         <div className="flex flex-col items-center mt-20">
           <span className="loading loading-spinner loading-lg text-cartoon-pink"></span>
@@ -219,10 +273,10 @@ const Wall = () => {
               >
                 <p className="text-2xl mb-4">😢</p>
                 <p className="text-xl text-gray-500">
-                  {searchTag ? `No stories found with tag "${searchTag}"` : "No stories available"}
+                  No stories found with tag "{searchTag}"
                 </p>
                 <p className="text-md text-gray-400 mt-2">
-                  {searchTag ? "Try searching for something else!" : "Check back later for new content!"}
+                  Try searching for something else!
                 </p>
               </motion.div>
             </div>

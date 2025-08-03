@@ -2,12 +2,10 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BiTargetLock, BiTime, BiCheckCircle, BiCircle } from "react-icons/bi";
 import { FaFire } from "react-icons/fa";
-import { api } from "../utils/fetchWrapper"; // Use the new fetch wrapper
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -16,26 +14,15 @@ const Goals = () => {
   useEffect(() => {
     const fetchGoals = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
-        // Use the new api wrapper
-        const data = await api.get("/api/goals");
-
-        console.log("Fetched goals:", data);
-
-        // Ensure data is an array
-        const goalsArray = Array.isArray(data) ? data : [];
-        setGoals(goalsArray);
+        const response = await fetch("/api/goals");
+        const data = await response.json();
+        setGoals(data);
       } catch (error) {
         console.error("Error fetching goals:", error);
-        setError(error.message || "Failed to load goals. Please try again later.");
-        setGoals([]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchGoals();
   }, []);
 
@@ -47,138 +34,245 @@ const Goals = () => {
   };
 
   const GoalCard = ({ goal, index }) => {
-    const completedSteps = goal.steps ? goal.steps.filter(step => step.completed).length : 0;
-    const totalSteps = goal.steps ? goal.steps.length : 0;
+    const completedSteps = goal.steps.filter(step => step.completed).length;
+    const totalSteps = goal.steps.length;
     const percentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+    const progressColor = getProgressColor(percentage);
+
+    // Rotate colors for variety
+    const cardColors = ['cartoon-pink', 'cartoon-blue', 'cartoon-yellow', 'cartoon-purple', 'cartoon-orange'];
+    const cardColor = cardColors[index % cardColors.length];
 
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.1 }}
-        className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6 hover:shadow-cartoon-hover transition-all duration-300 hover:-translate-y-1"
+        whileHover={{ y: -5 }}
+        className="h-full"
       >
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center">
-            <BiTargetLock className="text-3xl text-cartoon-blue mr-3" />
-            <h3 className="text-xl font-bold">{goal.title}</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black hover:shadow-cartoon-hover transform transition-all h-full flex flex-col">
+          {/* Header */}
+          <div className={`bg-${cardColor} text-white p-6 rounded-t-cartoon`}>
+            <div className="flex items-start justify-between mb-2">
+              <BiTargetLock className="text-3xl" />
+              <motion.div
+                className="badge badge-lg bg-white/20 backdrop-blur text-black"
+                whileHover={{ scale: 1.1 }}
+              >
+                {percentage}%
+              </motion.div>
+            </div>
+            <h3 className="text-xl font-bold mb-2">{goal.title}</h3>
+            <p className="text-sm opacity-90">{goal.description}</p>
           </div>
-          {percentage === 100 && (
-            <FaFire className="text-2xl text-orange-500 animate-pulse" />
-          )}
-        </div>
 
-        <p className="text-gray-600 mb-4">{goal.description}</p>
+          {/* Progress Section */}
+          <div className="p-6 flex-1 flex flex-col">
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-white">Progress</span>
+                <span className="text-sm dark:text-white">
+                  {completedSteps}/{totalSteps} steps
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+                <motion.div
+                  className={`h-full bg-gradient-to-r ${progressColor} rounded-full`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${percentage}%` }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+              </div>
+            </div>
 
-        {/* Progress Bar */}
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium">Progress</span>
-            <span className="text-sm font-bold">{percentage}%</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-            <div
-              className={`h-full bg-gradient-to-r ${getProgressColor(percentage)} transition-all duration-500`}
-              style={{ width: `${percentage}%` }}
-            />
-          </div>
-        </div>
+            {/* Steps */}
+            <div className="space-y-3 flex-1">
+              <h4 className="font-semibold text-sm uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                Milestones:
+              </h4>
+              <div className="space-y-2">
+                {goal.steps.map((step, stepIndex) => (
+                  <motion.div
+                    key={stepIndex}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 + stepIndex * 0.05 }}
+                    className={`
+                      flex items-center gap-3 p-3 rounded-lg transition-all
+                      ${step.completed
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                      }
+                    `}
+                  >
+                    {step.completed ? (
+                      <BiCheckCircle className="text-xl flex-shrink-0" />
+                    ) : (
+                      <BiCircle className="text-xl flex-shrink-0" />
+                    )}
+                    <span className={`text-sm ${step.completed ? 'line-through' : ''}`}>
+                      {step.description}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
 
-        {/* Steps */}
-        {goal.steps && goal.steps.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-700 mb-2">
-              Steps ({completedSteps}/{totalSteps})
-            </p>
-            <div className="max-h-40 overflow-y-auto space-y-1">
-              {goal.steps.map((step, stepIndex) => (
-                <div key={stepIndex} className="flex items-center text-sm">
-                  {step.completed ? (
-                    <BiCheckCircle className="text-green-500 mr-2 flex-shrink-0" />
-                  ) : (
-                    <BiCircle className="text-gray-400 mr-2 flex-shrink-0" />
-                  )}
-                  <span className={step.completed ? "line-through text-gray-400" : ""}>
-                    {step.description}
-                  </span>
-                </div>
-              ))}
+            {/* Footer */}
+            <div className="pt-4 mt-auto border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                <BiTime />
+                <span>Started {new Date(goal.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}</span>
+              </div>
             </div>
           </div>
-        )}
-
-        <div className="mt-4 flex items-center text-sm text-gray-500">
-          <BiTime className="mr-1" />
-          <span>Created {new Date(goal.createdAt).toLocaleDateString()}</span>
         </div>
       </motion.div>
     );
   };
 
-  // Error display
-  if (error) {
-    return (
-      <div className="container mx-auto p-8">
-        <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 border-2 border-red-400 rounded-cartoon p-6 inline-block"
-          >
-            <p className="text-xl text-red-600 mb-2">😔 Oops! Something went wrong</p>
-            <p className="text-gray-600">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-cartoon-blue text-white rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon transition-all"
-            >
-              Try Again
-            </button>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto p-8">
+      {/* Header Section */}
       <motion.div
+        className="flex flex-col items-center text-center mb-12"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-10"
       >
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
-          My <span className="text-cartoon-purple">Goals</span>
+        <motion.div
+          className="inline-block mb-6"
+          whileHover={{ scale: 1.05 }}
+        >
+          <span className="badge badge-lg bg-cartoon-yellow text-black shadow-cartoon-sm px-6 py-3">
+            <FaFire className="mr-2" /> My Journey Tracker
+          </span>
+        </motion.div>
+
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          Personal <span className="gradient-text">Goals</span> & Milestones
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Track my progress and stay motivated on the journey to achieving these milestones.
+
+        <p className="text-lg md:text-xl max-w-3xl text-gray dark:text-gray">
+          Transparency is key! Here's where I'm headed, what I'm learning,
+          and how I'm progressing. No smoke and mirrors, just real goals
+          with real progress tracking.
         </p>
+
+        {/* Animated Emoji */}
+        <motion.div
+          className="relative flex justify-center items-center mt-12"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="relative">
+            <motion.div
+              className="text-[100px] md:text-[150px] select-none"
+              animate={{
+                rotate: [-5, 5, -5],
+                y: [0, -10, 0]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              🎯
+            </motion.div>
+
+            {/* Progress indicators */}
+            <motion.div
+              className="absolute -top-3 -right-5 text-5xl"
+              animate={{
+                scale: [1, 1.0, 1],
+                rotate: [0, 180, 360]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity
+              }}
+            >
+              📈
+            </motion.div>
+
+            <motion.div
+              className="absolute bottom-5 -left-10 text-4xl"
+              animate={{
+                y: [0, -15, 0]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                delay: 0.5
+              }}
+            >
+              🏆
+            </motion.div>
+          </div>
+        </motion.div>
       </motion.div>
 
+      {/* Goals Grid */}
       {loading ? (
         <div className="flex flex-col items-center mt-20">
-          <span className="loading loading-spinner loading-lg text-cartoon-purple"></span>
+          <span className="loading loading-spinner loading-lg text-cartoon-yellow"></span>
           <p className="mt-4 text-lg">Loading goals...</p>
         </div>
-      ) : goals.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      ) : goals.length === 0 ? (
+        <motion.div
+          className="text-center py-20"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <p className="text-2xl text-gray-500">No goals yet!</p>
+          <p className="mt-4">Time to set some ambitious targets! 🎯</p>
+        </motion.div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {goals.map((goal, index) => (
             <GoalCard key={goal._id} goal={goal} index={index} />
           ))}
         </div>
-      ) : (
-        <div className="text-center mt-20">
-          <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            className="inline-block"
-          >
-            <p className="text-2xl mb-4">🎯</p>
-            <p className="text-xl text-gray-500">No goals set yet</p>
-            <p className="text-md text-gray-400 mt-2">
-              Check back later for new goals!
-            </p>
-          </motion.div>
-        </div>
+      )}
+
+      {/* Summary Stats */}
+      {goals.length > 0 && (
+        <motion.div
+          className="mt-12 p-8 bg-gradient-to-br from-cartoon-pink to-cartoon-purple text-white rounded-cartoon shadow-cartoon"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <div className="text-center">
+            <h3 className="text-2xl font-bold mb-4">Overall Progress</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <p className="text-4xl font-bold">{goals.length}</p>
+                <p className="text-sm opacity-90">Active Goals</p>
+              </div>
+              <div>
+                <p className="text-4xl font-bold">
+                  {goals.reduce((acc, goal) =>
+                    acc + goal.steps.filter(s => s.completed).length, 0
+                  )}
+                </p>
+                <p className="text-sm opacity-90">Completed Steps</p>
+              </div>
+              <div>
+                <p className="text-4xl font-bold">
+                  {goals.reduce((acc, goal) => acc + goal.steps.length, 0)}
+                </p>
+                <p className="text-sm opacity-90">Total Steps</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       )}
     </div>
   );
