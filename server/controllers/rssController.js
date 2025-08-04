@@ -1,16 +1,19 @@
-const { Story } = require("../models/Story");
+const Story = require("../models/Story");
 const RSS = require("rss");
 
 // Generate RSS feed
 const generateRSSFeed = async (req, res) => {
     try {
+        // Get site URL from environment or request
+        const siteUrl = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+
         // Create feed instance
         const feed = new RSS({
             title: "Spaghetti Bytes",
             description: "Untangling code, one byte at a time - A technical blog with a cartoon twist",
-            feed_url: `${process.env.SITE_URL}/feed.xml`,
-            site_url: process.env.SITE_URL,
-            image_url: `${process.env.SITE_URL}/logo.png`,
+            feed_url: `${siteUrl}/rss.xml`,
+            site_url: siteUrl,
+            image_url: `${siteUrl}/logo.png`,
             author: "Spaghetti Bytes",
             copyright: `${new Date().getFullYear()} Spaghetti Bytes`,
             language: "en",
@@ -22,31 +25,28 @@ const generateRSSFeed = async (req, res) => {
             }
         });
 
-        // Get latest stories
-        const stories = await Story.find({ published: true })
+        // Get latest stories - removed 'published' field check
+        const stories = await Story.find({})
             .sort({ createdAt: -1 })
             .limit(20); // Last 20 articles
 
         // Add each story to feed
         stories.forEach(story => {
-            // Extract plain text summary from content
-            const summary = extractSummary(story.content);
-
             feed.item({
                 title: story.title,
-                description: story.summary || summary,
-                url: `${process.env.SITE_URL}/story/${story._id}`,
+                description: story.summary || "Read more on Spaghetti Bytes",
+                url: `${siteUrl}/visualizer/${story._id}`,
                 guid: story._id.toString(),
-                categories: story.tags,
+                categories: story.tags || [],
                 date: story.createdAt,
                 custom_elements: [
-                    { 'content:encoded': generateHTMLContent(story) }
+                    { 'content:encoded': generateHTMLContent(story, siteUrl) }
                 ]
             });
         });
 
         // Set content type and send
-        res.set('Content-Type', 'application/rss+xml');
+        res.set('Content-Type', 'application/rss+xml; charset=utf-8');
         res.send(feed.xml());
 
     } catch (error) {
@@ -55,43 +55,46 @@ const generateRSSFeed = async (req, res) => {
     }
 };
 
-// Extract summary from TipTap content
-const extractSummary = (content) => {
-    if (!content || !content.content) return "";
-
-    let text = "";
-    const extractText = (node) => {
-        if (node.text) {
-            text += node.text + " ";
-        }
-        if (node.content) {
-            node.content.forEach(extractText);
-        }
-    };
-
-    extractText(content);
-    return text.trim().substring(0, 200) + "...";
-};
-
 // Generate full HTML content for RSS
-const generateHTMLContent = (story) => {
-    // Convert TipTap JSON to HTML
+const generateHTMLContent = (story, siteUrl) => {
     let html = `<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">`;
 
-    // Add featured image if exists
+    // Add featured image if exists (you might have this in your Story model)
     if (story.featuredImage) {
         html += `<img src="${story.featuredImage}" alt="${story.title}" style="width: 100%; height: auto; margin-bottom: 20px; border-radius: 8px;">`;
     }
 
-    // Add content
-    html += convertTipTapToHTML(story.content);
+    // Add summary
+    if (story.summary) {
+        html += `<p style="font-size: 18px; line-height: 1.6; color: #333; margin-bottom: 20px;">
+                    ${escapeHtml(story.summary)}
+                 </p>`;
+    }
+
+    // Add content - simplified for now since TipTap content is complex
+    if (story.content) {
+        html += `<div style="line-height: 1.8; color: #444;">`;
+
+        // If content is a string
+        if (typeof story.content === 'string') {
+            html += story.content;
+        } else {
+            // If content is TipTap JSON, provide a link to full article
+            html += `<p>This article contains rich media content. 
+                     <a href="${siteUrl}/visualizer/${story._id}" style="color: #FF6B9D;">
+                        Read the full article on Spaghetti Bytes →
+                     </a></p>`;
+        }
+
+        html += `</div>`;
+    }
 
     // Add footer
     html += `
         <hr style="margin: 40px 0; border: 1px solid #eee;">
         <p style="color: #666; font-size: 14px;">
             Originally published at 
-            <a href="${process.env.SITE_URL}/story/${story._id}" style="color: #FF6B9D;">
+            <a href="${siteUrl}/visualizer/${story._id}" style="color: #FF6B9D;">
                 Spaghetti Bytes
             </a>
         </p>
@@ -101,108 +104,9 @@ const generateHTMLContent = (story) => {
     return html;
 };
 
-// Convert TipTap JSON to HTML
-const convertTipTapToHTML = (doc) => {
-    if (!doc || !doc.content) return "";
-
-    let html = "";
-
-    const processNode = (node) => {
-        switch (node.type) {
-            case 'paragraph':
-                html += `<p>${processContent(node.content)}</p>`;
-                break;
-
-            case 'heading':
-                const level = node.attrs?.level || 2;
-                html += `<h${level}>${processContent(node.content)}</h${level}>`;
-                break;
-
-            case 'codeBlock':
-                const lang = node.attrs?.language || 'text';
-                html += `<pre><code class="language-${lang}">${escapeHtml(node.content?.[0]?.text || '')}</code></pre>`;
-                break;
-
-            case 'blockquote':
-                html += `<blockquote>${processContent(node.content)}</blockquote>`;
-                break;
-
-            case 'bulletList':
-                html += `<ul>${processContent(node.content)}</ul>`;
-                break;
-
-            case 'orderedList':
-                html += `<ol>${processContent(node.content)}</ol>`;
-                break;
-
-            case 'listItem':
-                html += `<li>${processContent(node.content)}</li>`;
-                break;
-
-            case 'image':
-                html += `<img src="${node.attrs.src}" alt="${node.attrs.alt || ''}" style="max-width: 100%; height: auto;">`;
-                break;
-
-            case 'horizontalRule':
-                html += '<hr>';
-                break;
-
-            default:
-                if (node.content) {
-                    html += processContent(node.content);
-                }
-        }
-    };
-
-    const processContent = (content) => {
-        if (!content) return "";
-
-        return content.map(item => {
-            if (item.type === 'text') {
-                let text = escapeHtml(item.text);
-
-                // Apply marks
-                if (item.marks) {
-                    item.marks.forEach(mark => {
-                        switch (mark.type) {
-                            case 'bold':
-                                text = `<strong>${text}</strong>`;
-                                break;
-                            case 'italic':
-                                text = `<em>${text}</em>`;
-                                break;
-                            case 'code':
-                                text = `<code>${text}</code>`;
-                                break;
-                            case 'link':
-                                text = `<a href="${mark.attrs.href}" target="_blank">${text}</a>`;
-                                break;
-                        }
-                    });
-                }
-
-                return text;
-            } else {
-                let nodeHtml = "";
-                const tempHtml = html;
-                html = "";
-                processNode(item);
-                nodeHtml = html;
-                html = tempHtml;
-                return nodeHtml;
-            }
-        }).join('');
-    };
-
-    if (doc.content) {
-        doc.content.forEach(processNode);
-    }
-
-    return html;
-};
-
 // Escape HTML special characters
 const escapeHtml = (text) => {
+    if (!text) return '';
     const map = {
         '&': '&amp;',
         '<': '&lt;',
@@ -210,46 +114,48 @@ const escapeHtml = (text) => {
         '"': '&quot;',
         "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, m => map[m]);
+    return text.toString().replace(/[&<>"']/g, m => map[m]);
 };
 
 // Generate Atom feed (alternative to RSS)
 const generateAtomFeed = async (req, res) => {
     try {
-        const stories = await Story.find({ published: true })
+        // Get site URL from environment or request
+        const siteUrl = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+
+        const stories = await Story.find({})
             .sort({ createdAt: -1 })
             .limit(20);
 
         let atom = `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>Spaghetti Bytes</title>
-    <link href="${process.env.SITE_URL}/atom.xml" rel="self"/>
-    <link href="${process.env.SITE_URL}/"/>
+    <link href="${siteUrl}/atom.xml" rel="self"/>
+    <link href="${siteUrl}/"/>
     <updated>${new Date().toISOString()}</updated>
-    <id>${process.env.SITE_URL}/</id>
+    <id>${siteUrl}/</id>
     <author>
         <name>Spaghetti Bytes</name>
     </author>
     <subtitle>Untangling code, one byte at a time</subtitle>`;
 
         stories.forEach(story => {
-            const summary = story.summary || extractSummary(story.content);
             atom += `
     <entry>
         <title>${escapeHtml(story.title)}</title>
-        <link href="${process.env.SITE_URL}/story/${story._id}"/>
-        <id>${process.env.SITE_URL}/story/${story._id}</id>
+        <link href="${siteUrl}/visualizer/${story._id}"/>
+        <id>${siteUrl}/visualizer/${story._id}</id>
         <updated>${story.createdAt.toISOString()}</updated>
-        <summary>${escapeHtml(summary)}</summary>
-        <content type="html">${escapeHtml(generateHTMLContent(story))}</content>
-        ${story.tags.map(tag => `<category term="${escapeHtml(tag)}"/>`).join('')}
+        <summary>${escapeHtml(story.summary || 'Read more on Spaghetti Bytes')}</summary>
+        <content type="html">${escapeHtml(generateHTMLContent(story, siteUrl))}</content>
+        ${story.tags ? story.tags.map(tag => `<category term="${escapeHtml(tag)}"/>`).join('') : ''}
     </entry>`;
         });
 
         atom += `
 </feed>`;
 
-        res.set('Content-Type', 'application/atom+xml');
+        res.set('Content-Type', 'application/atom+xml; charset=utf-8');
         res.send(atom);
 
     } catch (error) {
@@ -258,7 +164,49 @@ const generateAtomFeed = async (req, res) => {
     }
 };
 
+// Generate JSON Feed (modern alternative)
+const generateJSONFeed = async (req, res) => {
+    try {
+        const siteUrl = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+
+        const stories = await Story.find({})
+            .sort({ createdAt: -1 })
+            .limit(20);
+
+        const jsonFeed = {
+            version: "https://jsonfeed.org/version/1.1",
+            title: "Spaghetti Bytes",
+            home_page_url: siteUrl,
+            feed_url: `${siteUrl}/feed.json`,
+            description: "Untangling code, one byte at a time",
+            icon: `${siteUrl}/logo.png`,
+            favicon: `${siteUrl}/favicon.ico`,
+            authors: [{
+                name: "Spaghetti Bytes"
+            }],
+            language: "en",
+            items: stories.map(story => ({
+                id: story._id.toString(),
+                url: `${siteUrl}/visualizer/${story._id}`,
+                title: story.title,
+                summary: story.summary || "Read more on Spaghetti Bytes",
+                content_html: generateHTMLContent(story, siteUrl),
+                date_published: story.createdAt.toISOString(),
+                tags: story.tags || []
+            }))
+        };
+
+        res.set('Content-Type', 'application/json; charset=utf-8');
+        res.json(jsonFeed);
+
+    } catch (error) {
+        console.error("JSON feed error:", error);
+        res.status(500).json({ error: "Error generating JSON feed" });
+    }
+};
+
 module.exports = {
     generateRSSFeed,
-    generateAtomFeed
+    generateAtomFeed,
+    generateJSONFeed
 };
