@@ -29,7 +29,7 @@ const DonationModal = ({
                 className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6 max-w-md w-full"
                 onClick={(e) => e.stopPropagation()}
             >
-                <h2 className="text-2xl font-bold mb-2 text-center">
+                <h2 className="text-2xl text-black font-bold mb-2 text-center">
                     Support Spaghetti Bytes! 🍝
                 </h2>
                 <p className="text-gray-600 mb-6 text-center">
@@ -63,7 +63,7 @@ const DonationModal = ({
                         <span className="label-text">Or enter custom amount:</span>
                     </label>
                     <div className="input-group">
-                        <span className="bg-cartoon-pink text-white">€</span>
+                        <span className="text-cartoon-orange">€</span>
                         <input
                             type="number"
                             value={customAmount}

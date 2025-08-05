@@ -4,6 +4,7 @@ import { FaGithub, FaLinkedin, FaMedium, FaRss } from "react-icons/fa";
 import { BiHeart } from "react-icons/bi";
 import { BsCheckCircle } from "react-icons/bs";
 import { Link } from "react-router-dom";
+import NewsletterWidget from "./NewsletterWidget";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -127,28 +128,14 @@ const Footer = () => {
             </motion.div>
 
             {/* Newsletter Signup */}
+            {/* Newsletter Signup */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="w-full max-w-sm sm:max-w-md"
             >
-              <div className="bg-gradient-to-r from-cartoon-pink/10 to-cartoon-purple/10 
-                            rounded-2xl p-3 sm:p-4 border-2 border-gray-200 dark:border-gray-700">
-                <p className="text-xs sm:text-sm text-center text-gray-700 dark:text-gray-300 mb-3">
-                  📬 Get notified about new posts
-                </p>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="email"
-                    placeholder="your@email.com"
-                    className="input input-bordered input-sm sm:input-md flex-1"
-                  />
-                  <button className="btn btn-primary btn-sm sm:btn-md">
-                    Subscribe
-                  </button>
-                </div>
-              </div>
+              <NewsletterWidget source="footer" variant="compact" />
             </motion.div>
 
             {/* Divider */}

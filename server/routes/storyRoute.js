@@ -10,6 +10,7 @@ const {
   addReaction,
   removeReaction,
 } = require("../controllers/storyController");
+const { generateImage } = require("../controllers/imageController");
 
 // Route to get all stories
 router.get("/", getStories);
@@ -30,5 +31,8 @@ router.delete("/:id", deleteStory);
 router.get("/:id/reactions", getReactions);
 router.post("/:id/reactions", addReaction);
 router.delete("/:id/reactions", removeReaction);
+
+// Route for AI image generation
+router.post("/generate-image", generateImage);
 
 module.exports = router;

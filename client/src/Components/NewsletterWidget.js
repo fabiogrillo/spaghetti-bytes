@@ -2,18 +2,31 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BiEnvelope, BiCheck } from 'react-icons/bi';
 import { HiSparkles } from "react-icons/hi2";
+import { useToast } from './ToastProvider';
 
 const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState('idle'); // idle, loading, success, error
     const [message, setMessage] = useState('');
+    const toast = useToast();
+
+    // Email validation regex
+    const validateEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!email || !email.includes('@')) {
-            setStatus('error');
-            setMessage('Please enter a valid email');
+        // Validate email
+        if (!email) {
+            toast.error('Please enter your email address');
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            toast.error('Please enter a valid email address');
             return;
         }
 
@@ -35,14 +48,33 @@ const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
             if (response.ok) {
                 setStatus('success');
                 setMessage(data.message || 'Successfully subscribed! Check your email to confirm.');
+                toast.success('🎉 Successfully subscribed! Check your email to confirm.');
                 setEmail('');
+
+                // Reset status after 3 seconds
+                setTimeout(() => {
+                    setStatus('idle');
+                    setMessage('');
+                }, 3000);
             } else {
                 setStatus('error');
                 setMessage(data.error || 'Something went wrong. Please try again.');
+                toast.error(data.error || 'Failed to subscribe. Please try again.');
+
+                // Reset status after 3 seconds
+                setTimeout(() => {
+                    setStatus('idle');
+                }, 3000);
             }
         } catch (error) {
             setStatus('error');
             setMessage('Network error. Please try again later.');
+            toast.error('Network error. Please check your connection and try again.');
+
+            // Reset status after 3 seconds
+            setTimeout(() => {
+                setStatus('idle');
+            }, 3000);
         }
     };
 

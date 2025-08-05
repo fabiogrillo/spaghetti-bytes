@@ -17,7 +17,8 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "redis": "^5.6.1",
-    "rss": "^1.2.2"
+    "rss": "^1.2.2",
+    "sharp": "^0.34.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

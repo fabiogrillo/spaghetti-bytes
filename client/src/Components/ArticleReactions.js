@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../Api';
+import { useToast } from './ToastProvider';
 
 const ArticleReactions = ({ articleId, compact = false }) => {
     const [reactions, setReactions] = useState({
@@ -14,6 +15,7 @@ const ArticleReactions = ({ articleId, compact = false }) => {
     const [animatingEmojis, setAnimatingEmojis] = useState([]);
     const [hoveredReaction, setHoveredReaction] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
+    const toast = useToast();
 
     const reactionEmojis = [
         { key: 'love', emoji: '❤️', label: 'Love it!', color: 'bg-red-500' },
@@ -101,13 +103,16 @@ const ArticleReactions = ({ articleId, compact = false }) => {
                 await api.delete(`/stories/${articleId}/reactions`, {
                     data: { reaction: reactionKey }
                 });
+                toast.info(`Removed ${emoji} reaction`);
             } else {
                 await api.post(`/stories/${articleId}/reactions`, {
                     reaction: reactionKey
                 });
+                toast.success(`Added ${emoji} reaction!`);
             }
         } catch (error) {
             console.error('Error updating reaction:', error);
+            toast.error('Failed to update reaction. Please try again.');
             // Rollback on error
             setReactions(prev => ({
                 ...prev,

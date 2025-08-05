@@ -27,6 +27,7 @@ import CampaignManager from "./Pages/CampaignManager";
 import NewsletterAnalytics from "./Components/NewsletterAnalytics";
 import DonationButton from "./Components/DonationButton";
 import api from "./Api";
+import ToastProvider from "./Components/ToastProvider";
 
 // Crea un componente wrapper per le routes
 const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, checkingAuth }) => {
@@ -182,15 +183,17 @@ const App = () => {
   }, []);
 
   return (
-    <Router>
-      <AppContent
-        isAuthenticated={isAuthenticated}
-        setAuthenticated={setAuthenticated}
-        username={username}
-        setUsername={setUsername}
-        checkingAuth={checkingAuth}
-      />
-    </Router>
+    <ToastProvider>
+      <Router>
+        <AppContent
+          isAuthenticated={isAuthenticated}
+          setAuthenticated={setAuthenticated}
+          username={username}
+          setUsername={setUsername}
+          checkingAuth={checkingAuth}
+        />
+      </Router>
+    </ToastProvider>
   );
 };
 
