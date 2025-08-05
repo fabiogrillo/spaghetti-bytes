@@ -258,7 +258,7 @@ const CampaignManager = () => {
                                 className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6 cursor-pointer hover:shadow-cartoon-hover transition-all"
                             >
                                 <div className="text-4xl mb-3">{template.thumbnail}</div>
-                                <h3 className="text-lg font-bold mb-1">{template.name}</h3>
+                                <h3 className="text-lg text-white font-bold mb-1">{template.name}</h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">{template.description}</p>
                             </motion.div>
                         ))}

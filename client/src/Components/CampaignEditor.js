@@ -58,7 +58,7 @@ const CampaignEditor = ({ campaign, templateData, onSave, onClose }) => {
             >
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-2xl font-bold">
+                    <h2 className="text-2xl font-bold text-white">
                         {campaign ? 'Edit Campaign' : 'Create New Campaign'}
                     </h2>
                     <button
@@ -74,7 +74,7 @@ const CampaignEditor = ({ campaign, templateData, onSave, onClose }) => {
                     {/* Subject */}
                     <div className="form-control mb-4">
                         <label className="label">
-                            <span className="label-text font-bold">Subject Line *</span>
+                            <span className="label-text font-bold text-white">Subject Line *</span>
                         </label>
                         <input
                             type="text"
@@ -89,7 +89,7 @@ const CampaignEditor = ({ campaign, templateData, onSave, onClose }) => {
                     {/* Preheader */}
                     <div className="form-control mb-4">
                         <label className="label">
-                            <span className="label-text font-bold">Preheader Text</span>
+                            <span className="label-text font-bold text-white">Preheader Text</span>
                             <span className="label-text-alt text-xs">Preview text shown in inbox</span>
                         </label>
                         <input
@@ -104,7 +104,7 @@ const CampaignEditor = ({ campaign, templateData, onSave, onClose }) => {
                     {/* Schedule */}
                     <div className="form-control mb-6">
                         <label className="label">
-                            <span className="label-text font-bold">Schedule For (Optional)</span>
+                            <span className="label-text font-bold text-white">Schedule For (Optional)</span>
                             <span className="label-text-alt text-xs">Leave empty to save as draft</span>
                         </label>
                         <input
@@ -119,7 +119,7 @@ const CampaignEditor = ({ campaign, templateData, onSave, onClose }) => {
                     {/* Content */}
                     <div className="form-control mb-6">
                         <label className="label">
-                            <span className="label-text font-bold">Email Content *</span>
+                            <span className="label-text font-bold text-white">Email Content *</span>
                         </label>
                         <div className="border-2 border-gray-300 dark:border-gray-600 rounded-cartoon p-4 min-h-[300px]">
                             <TipTapEditor

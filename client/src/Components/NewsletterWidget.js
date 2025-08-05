@@ -152,7 +152,7 @@ const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
                     📬
                 </motion.div>
 
-                <h2 className="text-3xl font-bold mb-2">
+                <h2 className="text-3xl font-bold mb-2 dark:text-white">
                     Join the <span className="gradient-text">Spaghetti Club</span>!
                 </h2>
 

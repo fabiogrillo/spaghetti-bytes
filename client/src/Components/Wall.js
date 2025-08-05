@@ -190,7 +190,7 @@ const Wall = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-4xl font-bold text-cartoon-pink mb-2">{stories.length}</div>
-                <div className="text-lg font-semibold">Total Stories</div>
+                <div className="text-lg font-semibold dark:text-white">Total Stories</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {lastMonthStories} new this month!
                 </div>
@@ -206,7 +206,7 @@ const Wall = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-4xl font-bold text-cartoon-yellow mb-2">{distinctTags}</div>
-                <div className="text-lg font-semibold">Topics Covered</div>
+                <div className="text-lg font-semibold dark:text-white">Topics Covered</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Diverse content awaits!
                 </div>
