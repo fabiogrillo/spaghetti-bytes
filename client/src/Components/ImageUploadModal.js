@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaUpload, FaCamera, FaMagic, FaTimes, FaSpinner } from 'react-icons/fa';
 import { useToast } from './ToastProvider';
@@ -8,8 +8,11 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [aiPrompt, setAiPrompt] = useState('');
     const [previewUrl, setPreviewUrl] = useState('');
+    const [isCameraActive, setIsCameraActive] = useState(false);
     const fileInputRef = useRef(null);
-    const cameraInputRef = useRef(null);
+    const videoRef = useRef(null);
+    const canvasRef = useRef(null);
+    const streamRef = useRef(null);
     const toast = useToast();
 
     // Compress image using canvas
@@ -62,6 +65,62 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         });
     };
 
+    // Start camera
+    const startCamera = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user' },
+                audio: false
+            });
+
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                streamRef.current = stream;
+                setIsCameraActive(true);
+            }
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            toast.error('Unable to access camera. Please check permissions.');
+        }
+    };
+
+    // Take photo from camera
+    const takePhoto = () => {
+        if (!videoRef.current || !canvasRef.current) return;
+
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+
+        // Set canvas dimensions to match video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Draw video frame to canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert to blob and then base64
+        canvas.toBlob(async (blob) => {
+            try {
+                const compressedBlob = await compressImage(blob);
+                const base64 = await blobToBase64(compressedBlob);
+                setPreviewUrl(base64);
+
+                // Stop camera after taking photo
+                if (streamRef.current) {
+                    streamRef.current.getTracks().forEach(track => track.stop());
+                    setIsCameraActive(false);
+                }
+
+                toast.success('Photo captured successfully!');
+            } catch (error) {
+                console.error('Error processing photo:', error);
+                toast.error('Failed to process photo');
+            }
+        }, 'image/jpeg', 0.9);
+    };
+
+
     // Handle file upload
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
@@ -107,6 +166,23 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
             setIsLoading(false);
         }
     };
+
+    // Cleanup camera on unmount or tab change
+    useEffect(() => {
+        return () => {
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, []);
+
+    // Stop camera when changing tabs
+    useEffect(() => {
+        if (activeTab !== 'camera' && streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            setIsCameraActive(false);
+        }
+    }, [activeTab]);
 
     // Handle AI generation
     const handleAIGeneration = async () => {
@@ -157,8 +233,14 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         setPreviewUrl('');
         setAiPrompt('');
         setIsLoading(false);
-    };
+        setIsCameraActive(false);
 
+        // Stop camera if active
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+        }
+    };
+    
     if (!isOpen) return null;
 
     return (
@@ -195,8 +277,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                         <button
                             onClick={() => setActiveTab('upload')}
                             className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'upload'
-                                    ? 'bg-cartoon-pink text-white'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'bg-cartoon-pink text-white'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <FaUpload className="inline mr-2" />
@@ -205,8 +287,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                         <button
                             onClick={() => setActiveTab('camera')}
                             className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'camera'
-                                    ? 'bg-cartoon-purple text-white'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'bg-cartoon-purple text-white'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <FaCamera className="inline mr-2" />
@@ -215,8 +297,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                         <button
                             onClick={() => setActiveTab('ai')}
                             className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'ai'
-                                    ? 'bg-cartoon-orange text-white'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'bg-cartoon-orange text-white'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <FaMagic className="inline mr-2" />
@@ -263,28 +345,45 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                                 {/* Camera Tab */}
                                 {activeTab === 'camera' && (
                                     <div className="space-y-4">
-                                        <div
-                                            onClick={() => cameraInputRef.current?.click()}
-                                            className="border-2 border-dashed border-gray-300 dark:border-gray-600 
-                                                     rounded-cartoon p-8 text-center cursor-pointer
-                                                     hover:border-cartoon-purple transition-colors"
-                                        >
-                                            <FaCamera className="text-4xl text-gray-400 mx-auto mb-4" />
-                                            <p className="text-gray-600 dark:text-gray-400">
-                                                Click to take a photo
-                                            </p>
-                                            <p className="text-sm text-gray-500 mt-2">
-                                                Use your device camera
-                                            </p>
-                                        </div>
-                                        <input
-                                            ref={cameraInputRef}
-                                            type="file"
-                                            accept="image/*"
-                                            capture="environment"
-                                            onChange={handleCameraCapture}
-                                            className="hidden"
-                                        />
+                                        {!isCameraActive && !previewUrl && (
+                                            <div
+                                                onClick={startCamera}
+                                                className="border-2 border-dashed border-gray-300 dark:border-gray-600 
+                                                         rounded-cartoon p-8 text-center cursor-pointer
+                                                         hover:border-cartoon-purple transition-colors"
+                                            >
+                                                <FaCamera className="text-4xl text-gray-400 mx-auto mb-4" />
+                                                <p className="text-gray-600 dark:text-gray-400">
+                                                    Click to start camera
+                                                </p>
+                                                <p className="text-sm text-gray-500 mt-2">
+                                                    Make sure to allow camera access
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        {isCameraActive && (
+                                            <div className="space-y-4">
+                                                <div className="relative rounded-cartoon overflow-hidden bg-black">
+                                                    <video
+                                                        ref={videoRef}
+                                                        autoPlay
+                                                        playsInline
+                                                        className="w-full h-auto"
+                                                    />
+                                                </div>
+                                                <button
+                                                    onClick={takePhoto}
+                                                    className="w-full btn btn-primary bg-cartoon-purple hover:bg-cartoon-purple/80 
+                                                             rounded-cartoon shadow-cartoon"
+                                                >
+                                                    <FaCamera className="mr-2" />
+                                                    Take Photo
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        <canvas ref={canvasRef} className="hidden" />
                                     </div>
                                 )}
 

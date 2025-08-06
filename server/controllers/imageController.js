@@ -10,14 +10,21 @@ const generateImage = async (req, res) => {
             return res.status(400).json({ error: 'Prompt is required' });
         }
 
+        // Check if API key exists
+        if (!process.env.HUGGINGFACE_API_KEY) {
+            console.error('HUGGINGFACE_API_KEY not found in environment variables');
+            return res.status(500).json({ error: 'API configuration error' });
+        }
+
         // Hugging Face API configuration
         const API_URL = process.env.HUGGINGFACE_API_URL || "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1";
         const headers = {
-            "Authorization": `Bearer ${process.env.HUGGINGFACE_API_TOKEN}`,
+            "Authorization": `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
             "Content-Type": "application/json"
         };
 
         console.log('Generating image with prompt:', prompt);
+        console.log('Using API URL:', API_URL);
 
         // Call Hugging Face API
         const response = await axios.post(
@@ -59,8 +66,15 @@ const generateImage = async (req, res) => {
             });
         }
 
+        if (error.response?.status === 401) {
+            return res.status(401).json({
+                error: 'Invalid API key. Please check your Hugging Face configuration.'
+            });
+        }
+
         res.status(500).json({
-            error: 'Failed to generate image. Please try again.'
+            error: 'Failed to generate image. Please try again.',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 };
