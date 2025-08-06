@@ -1,40 +1,42 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUpload, FaCamera, FaMagic, FaTimes, FaSpinner } from 'react-icons/fa';
-import { useToast } from './ToastProvider';
+import { FaUpload, FaCamera, FaTimes, FaMagic, FaSpinner } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import api from '../Api'; // Use the api module
 
 const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
     const [activeTab, setActiveTab] = useState('upload');
-    const [isLoading, setIsLoading] = useState(false);
-    const [aiPrompt, setAiPrompt] = useState('');
     const [previewUrl, setPreviewUrl] = useState('');
+    const [aiPrompt, setAiPrompt] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [isCameraActive, setIsCameraActive] = useState(false);
+
     const fileInputRef = useRef(null);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const streamRef = useRef(null);
-    const toast = useToast();
 
-    // Compress image using canvas
-    const compressImage = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) => {
+    // Image compression utility
+    const compressImage = async (file, maxWidth = 1920, maxHeight = 1080, quality = 0.8) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
+            reader.readAsDataURL(file);
             reader.onload = (e) => {
                 const img = new Image();
+                img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
 
-                    // Calculate new dimensions
                     if (width > height) {
                         if (width > maxWidth) {
-                            height *= maxWidth / width;
+                            height = (height * maxWidth) / width;
                             width = maxWidth;
                         }
                     } else {
                         if (height > maxHeight) {
-                            width *= maxHeight / height;
+                            width = (width * maxHeight) / height;
                             height = maxHeight;
                         }
                     }
@@ -45,13 +47,15 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    canvas.toBlob((blob) => {
-                        resolve(blob);
-                    }, 'image/jpeg', quality);
+                    canvas.toBlob(
+                        (blob) => resolve(blob),
+                        'image/jpeg',
+                        quality
+                    );
                 };
-                img.src = e.target.result;
+                img.onerror = reject;
             };
-            reader.readAsDataURL(file);
+            reader.onerror = reject;
         });
     };
 
@@ -59,18 +63,52 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
     const blobToBase64 = (blob) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
             reader.readAsDataURL(blob);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
         });
     };
 
-    // Start camera
+    // Handle file upload
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please select an image file');
+            return;
+        }
+
+        // Validate file size (10MB limit)
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error('File size must be less than 10MB');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const compressedBlob = await compressImage(file);
+            const base64 = await blobToBase64(compressedBlob);
+
+            setPreviewUrl(base64);
+            toast.success('Image uploaded successfully!');
+        } catch (error) {
+            console.error('Error processing image:', error);
+            toast.error('Failed to process image');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Initialize camera
     const startCamera = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user' },
-                audio: false
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
             });
 
             if (videoRef.current) {
@@ -80,7 +118,7 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
             }
         } catch (error) {
             console.error('Error accessing camera:', error);
-            toast.error('Unable to access camera. Please check permissions.');
+            toast.error('Failed to access camera. Please check permissions.');
         }
     };
 
@@ -92,79 +130,26 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
-        // Set canvas dimensions to match video
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
 
-        // Draw video frame to canvas
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Convert to blob and then base64
         canvas.toBlob(async (blob) => {
             try {
-                const compressedBlob = await compressImage(blob);
-                const base64 = await blobToBase64(compressedBlob);
+                const base64 = await blobToBase64(blob);
                 setPreviewUrl(base64);
+                toast.success('Photo captured!');
 
-                // Stop camera after taking photo
+                // Stop camera after capture
                 if (streamRef.current) {
                     streamRef.current.getTracks().forEach(track => track.stop());
                     setIsCameraActive(false);
                 }
-
-                toast.success('Photo captured successfully!');
             } catch (error) {
                 console.error('Error processing photo:', error);
                 toast.error('Failed to process photo');
             }
-        }, 'image/jpeg', 0.9);
-    };
-
-
-    // Handle file upload
-    const handleFileUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (!file.type.startsWith('image/')) {
-            toast.error('Please select an image file');
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            // Compress image
-            const compressedBlob = await compressImage(file);
-            const base64 = await blobToBase64(compressedBlob);
-
-            setPreviewUrl(base64);
-            toast.success('Image loaded successfully!');
-        } catch (error) {
-            console.error('Error processing image:', error);
-            toast.error('Failed to process image');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // Handle camera capture
-    const handleCameraCapture = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        setIsLoading(true);
-        try {
-            const compressedBlob = await compressImage(file);
-            const base64 = await blobToBase64(compressedBlob);
-
-            setPreviewUrl(base64);
-            toast.success('Photo captured successfully!');
-        } catch (error) {
-            console.error('Error processing photo:', error);
-            toast.error('Failed to process photo');
-        } finally {
-            setIsLoading(false);
-        }
+        }, 'image/jpeg', 0.8);
     };
 
     // Cleanup camera on unmount or tab change
@@ -184,7 +169,7 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         }
     }, [activeTab]);
 
-    // Handle AI generation
+    // Handle AI generation - Fixed to use api module
     const handleAIGeneration = async () => {
         if (!aiPrompt.trim()) {
             toast.error('Please enter a description for the image');
@@ -193,23 +178,30 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
 
         setIsLoading(true);
         try {
-            // Call AI generation endpoint
-            const response = await fetch('/api/stories/generate-image', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: aiPrompt })
+            // Use the api module which handles the proxy correctly
+            const response = await api.post('/stories/generate-image', {
+                prompt: aiPrompt
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to generate image');
+            if (response.data && response.data.imageUrl) {
+                setPreviewUrl(response.data.imageUrl);
+                toast.success('Image generated successfully!');
+            } else {
+                throw new Error('No image URL in response');
             }
-
-            const data = await response.json();
-            setPreviewUrl(data.imageUrl);
-            toast.success('Image generated successfully!');
         } catch (error) {
             console.error('Error generating image:', error);
-            toast.error('Failed to generate image. Please try again.');
+
+            // More specific error messages
+            if (error.response?.status === 503) {
+                toast.error('AI model is loading. Please try again in a moment.');
+            } else if (error.response?.status === 401) {
+                toast.error('API key error. Please contact support.');
+            } else if (error.response?.data?.error) {
+                toast.error(error.response.data.error);
+            } else {
+                toast.error('Failed to generate image. Please try again.');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -240,7 +232,7 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
             streamRef.current.getTracks().forEach(track => track.stop());
         }
     };
-    
+
     if (!isOpen) return null;
 
     return (
@@ -277,8 +269,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                         <button
                             onClick={() => setActiveTab('upload')}
                             className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'upload'
-                                ? 'bg-cartoon-pink text-white'
-                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                    ? 'bg-cartoon-pink text-white'
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <FaUpload className="inline mr-2" />
@@ -287,8 +279,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                         <button
                             onClick={() => setActiveTab('camera')}
                             className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'camera'
-                                ? 'bg-cartoon-purple text-white'
-                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                    ? 'bg-cartoon-purple text-white'
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <FaCamera className="inline mr-2" />
@@ -297,8 +289,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                         <button
                             onClick={() => setActiveTab('ai')}
                             className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'ai'
-                                ? 'bg-cartoon-orange text-white'
-                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                    ? 'bg-cartoon-orange text-white'
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <FaMagic className="inline mr-2" />
@@ -345,24 +337,16 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                                 {/* Camera Tab */}
                                 {activeTab === 'camera' && (
                                     <div className="space-y-4">
-                                        {!isCameraActive && !previewUrl && (
-                                            <div
+                                        {!isCameraActive ? (
+                                            <button
                                                 onClick={startCamera}
-                                                className="border-2 border-dashed border-gray-300 dark:border-gray-600 
-                                                         rounded-cartoon p-8 text-center cursor-pointer
-                                                         hover:border-cartoon-purple transition-colors"
+                                                className="w-full btn btn-primary bg-cartoon-purple hover:bg-cartoon-purple/80 
+                                                         rounded-cartoon shadow-cartoon"
                                             >
-                                                <FaCamera className="text-4xl text-gray-400 mx-auto mb-4" />
-                                                <p className="text-gray-600 dark:text-gray-400">
-                                                    Click to start camera
-                                                </p>
-                                                <p className="text-sm text-gray-500 mt-2">
-                                                    Make sure to allow camera access
-                                                </p>
-                                            </div>
-                                        )}
-
-                                        {isCameraActive && (
+                                                <FaCamera className="mr-2" />
+                                                Start Camera
+                                            </button>
+                                        ) : (
                                             <div className="space-y-4">
                                                 <div className="relative rounded-cartoon overflow-hidden bg-black">
                                                     <video
@@ -421,13 +405,11 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-3">
                                             Preview
                                         </h3>
-                                        <div className="relative rounded-cartoon overflow-hidden shadow-cartoon">
-                                            <img
-                                                src={previewUrl}
-                                                alt="Preview"
-                                                className="w-full h-auto max-h-64 object-contain bg-gray-100 dark:bg-gray-700"
-                                            />
-                                        </div>
+                                        <img
+                                            src={previewUrl}
+                                            alt="Preview"
+                                            className="w-full rounded-cartoon shadow-cartoon border-2 border-black"
+                                        />
                                     </div>
                                 )}
                             </>
@@ -435,25 +417,24 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                     </div>
 
                     {/* Footer */}
-                    <div className="flex items-center justify-end gap-4 p-6 border-t border-gray-200 dark:border-gray-700">
-                        <button
-                            onClick={() => {
-                                resetModal();
-                                onClose();
-                            }}
-                            className="btn btn-ghost rounded-cartoon"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleImageSelect}
-                            disabled={!previewUrl || isLoading}
-                            className="btn btn-primary rounded-cartoon shadow-cartoon 
-                                     disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Insert Image
-                        </button>
-                    </div>
+                    {!isLoading && (
+                        <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+                            <button
+                                onClick={onClose}
+                                className="btn btn-ghost rounded-cartoon"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleImageSelect}
+                                disabled={!previewUrl}
+                                className="btn btn-primary bg-cartoon-green hover:bg-cartoon-green/80 
+                                         rounded-cartoon shadow-cartoon disabled:opacity-50"
+                            >
+                                Use This Image
+                            </button>
+                        </div>
+                    )}
                 </motion.div>
             </motion.div>
         </AnimatePresence>
