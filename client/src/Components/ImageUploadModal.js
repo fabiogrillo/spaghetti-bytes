@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaUpload, FaCamera, FaTimes, FaMagic, FaSpinner } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-import api from '../Api'; // Use the api module
+import api from '../Api';
 
 const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
     const [activeTab, setActiveTab] = useState('upload');
@@ -10,6 +10,7 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
     const [aiPrompt, setAiPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isCameraActive, setIsCameraActive] = useState(false);
+    const [cameraError, setCameraError] = useState('');
 
     const fileInputRef = useRef(null);
     const videoRef = useRef(null);
@@ -29,6 +30,7 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                     let width = img.width;
                     let height = img.height;
 
+                    // Calculate new dimensions
                     if (width > height) {
                         if (width > maxWidth) {
                             height = (height * maxWidth) / width;
@@ -90,7 +92,6 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         try {
             const compressedBlob = await compressImage(file);
             const base64 = await blobToBase64(compressedBlob);
-
             setPreviewUrl(base64);
             toast.success('Image uploaded successfully!');
         } catch (error) {
@@ -101,24 +102,73 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         }
     };
 
-    // Initialize camera
+    // Initialize camera with better error handling
     const startCamera = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
+            setCameraError('');
+
+            // Check if getUserMedia is available
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Camera API not supported in this browser');
+            }
+
+            // Request camera permission with fallback constraints
+            const constraints = {
                 video: {
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            });
+                    width: { ideal: 1280, min: 640 },
+                    height: { ideal: 720, min: 480 },
+                    facingMode: 'user'
+                },
+                audio: false
+            };
+
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
                 streamRef.current = stream;
                 setIsCameraActive(true);
+
+                // Wait for video to be ready
+                videoRef.current.onloadedmetadata = () => {
+                    videoRef.current.play().catch(err => {
+                        console.error('Error playing video:', err);
+                    });
+                };
             }
         } catch (error) {
             console.error('Error accessing camera:', error);
-            toast.error('Failed to access camera. Please check permissions.');
+
+            // Provide specific error messages
+            let errorMessage = 'Failed to access camera. ';
+
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                errorMessage += 'Please allow camera permissions in your browser settings.';
+            } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                errorMessage += 'No camera found on this device.';
+            } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+                errorMessage += 'Camera is already in use by another application.';
+            } else if (error.name === 'OverconstrainedError' || error.name === 'ConstraintNotSatisfiedError') {
+                errorMessage += 'Camera does not support the required resolution.';
+            } else if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+                errorMessage += 'Camera access requires HTTPS connection.';
+            } else {
+                errorMessage += error.message || 'Please check your camera settings.';
+            }
+
+            setCameraError(errorMessage);
+            toast.error(errorMessage);
+        }
+    };
+
+    // Stop camera
+    const stopCamera = () => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => {
+                track.stop();
+            });
+            streamRef.current = null;
+            setIsCameraActive(false);
         }
     };
 
@@ -130,10 +180,14 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
+        // Set canvas dimensions to video dimensions
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
+
+        // Draw video frame to canvas
         context.drawImage(video, 0, 0);
 
+        // Convert to blob and then to base64
         canvas.toBlob(async (blob) => {
             try {
                 const base64 = await blobToBase64(blob);
@@ -141,10 +195,7 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                 toast.success('Photo captured!');
 
                 // Stop camera after capture
-                if (streamRef.current) {
-                    streamRef.current.getTracks().forEach(track => track.stop());
-                    setIsCameraActive(false);
-                }
+                stopCamera();
             } catch (error) {
                 console.error('Error processing photo:', error);
                 toast.error('Failed to process photo');
@@ -152,24 +203,21 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         }, 'image/jpeg', 0.8);
     };
 
-    // Cleanup camera on unmount or tab change
+    // Cleanup camera on unmount or modal close
     useEffect(() => {
         return () => {
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach(track => track.stop());
-            }
+            stopCamera();
         };
     }, []);
 
-    // Stop camera when changing tabs
+    // Stop camera when changing tabs or closing modal
     useEffect(() => {
-        if (activeTab !== 'camera' && streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-            setIsCameraActive(false);
+        if (activeTab !== 'camera' || !isOpen) {
+            stopCamera();
         }
-    }, [activeTab]);
+    }, [activeTab, isOpen]);
 
-    // Handle AI generation - Fixed to use api module
+    // Handle AI generation with proper error handling
     const handleAIGeneration = async () => {
         if (!aiPrompt.trim()) {
             toast.error('Please enter a description for the image');
@@ -178,9 +226,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
 
         setIsLoading(true);
         try {
-            // Use the api module which handles the proxy correctly
             const response = await api.post('/stories/generate-image', {
-                prompt: aiPrompt
+                prompt: aiPrompt.trim()
             });
 
             if (response.data && response.data.imageUrl) {
@@ -192,13 +239,17 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         } catch (error) {
             console.error('Error generating image:', error);
 
-            // More specific error messages
+            // Detailed error messages
             if (error.response?.status === 503) {
-                toast.error('AI model is loading. Please try again in a moment.');
+                toast.error('AI model is loading. Please wait a moment and try again.');
             } else if (error.response?.status === 401) {
-                toast.error('API key error. Please contact support.');
+                toast.error('API key error. Please check server configuration.');
+            } else if (error.response?.status === 400) {
+                toast.error(error.response.data.error || 'Invalid request');
             } else if (error.response?.data?.error) {
                 toast.error(error.response.data.error);
+            } else if (error.message === 'Network Error') {
+                toast.error('Cannot connect to server. Please check if the server is running.');
             } else {
                 toast.error('Failed to generate image. Please try again.');
             }
@@ -226,11 +277,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
         setAiPrompt('');
         setIsLoading(false);
         setIsCameraActive(false);
-
-        // Stop camera if active
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-        }
+        setCameraError('');
+        stopCamera();
     };
 
     if (!isOpen) return null;
@@ -257,7 +305,10 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                             Add Image
                         </h2>
                         <button
-                            onClick={onClose}
+                            onClick={() => {
+                                resetModal();
+                                onClose();
+                            }}
                             className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                         >
                             <FaTimes size={24} />
@@ -269,8 +320,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                         <button
                             onClick={() => setActiveTab('upload')}
                             className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'upload'
-                                    ? 'bg-cartoon-pink text-white'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'bg-cartoon-pink text-white'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <FaUpload className="inline mr-2" />
@@ -279,8 +330,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                         <button
                             onClick={() => setActiveTab('camera')}
                             className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'camera'
-                                    ? 'bg-cartoon-purple text-white'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'bg-cartoon-purple text-white'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <FaCamera className="inline mr-2" />
@@ -289,8 +340,8 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                         <button
                             onClick={() => setActiveTab('ai')}
                             className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'ai'
-                                    ? 'bg-cartoon-orange text-white'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'bg-cartoon-orange text-white'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <FaMagic className="inline mr-2" />
@@ -337,7 +388,11 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                                 {/* Camera Tab */}
                                 {activeTab === 'camera' && (
                                     <div className="space-y-4">
-                                        {!isCameraActive ? (
+                                        {cameraError ? (
+                                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-cartoon">
+                                                {cameraError}
+                                            </div>
+                                        ) : !isCameraActive ? (
                                             <button
                                                 onClick={startCamera}
                                                 className="w-full btn btn-primary bg-cartoon-purple hover:bg-cartoon-purple/80 
@@ -353,56 +408,64 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                                                         ref={videoRef}
                                                         autoPlay
                                                         playsInline
+                                                        muted
                                                         className="w-full h-auto"
                                                     />
+                                                    <canvas
+                                                        ref={canvasRef}
+                                                        className="hidden"
+                                                    />
                                                 </div>
-                                                <button
-                                                    onClick={takePhoto}
-                                                    className="w-full btn btn-primary bg-cartoon-purple hover:bg-cartoon-purple/80 
-                                                             rounded-cartoon shadow-cartoon"
-                                                >
-                                                    <FaCamera className="mr-2" />
-                                                    Take Photo
-                                                </button>
+                                                <div className="flex gap-3">
+                                                    <button
+                                                        onClick={takePhoto}
+                                                        className="flex-1 btn btn-primary bg-cartoon-purple hover:bg-cartoon-purple/80 
+                                                                 rounded-cartoon shadow-cartoon"
+                                                    >
+                                                        Take Photo
+                                                    </button>
+                                                    <button
+                                                        onClick={stopCamera}
+                                                        className="btn btn-ghost rounded-cartoon"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
                                             </div>
                                         )}
-
-                                        <canvas ref={canvasRef} className="hidden" />
                                     </div>
                                 )}
 
                                 {/* AI Tab */}
                                 {activeTab === 'ai' && (
                                     <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                Describe the image you want to generate
-                                            </label>
-                                            <textarea
-                                                value={aiPrompt}
-                                                onChange={(e) => setAiPrompt(e.target.value)}
-                                                placeholder="A beautiful sunset over mountains with vibrant colors..."
-                                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 
-                                                         rounded-cartoon focus:ring-2 focus:ring-cartoon-orange 
-                                                         dark:bg-gray-700 dark:text-gray-200"
-                                                rows={4}
-                                            />
-                                        </div>
+                                        <textarea
+                                            value={aiPrompt}
+                                            onChange={(e) => setAiPrompt(e.target.value)}
+                                            placeholder="Describe the image you want to generate... (e.g., 'A cartoon robot coding on a laptop with spaghetti in the background')"
+                                            className="w-full h-32 p-4 border-2 border-gray-300 dark:border-gray-600 
+                                                     rounded-cartoon focus:border-cartoon-orange transition-colors
+                                                     dark:bg-gray-700 dark:text-gray-200"
+                                        />
                                         <button
                                             onClick={handleAIGeneration}
+                                            disabled={!aiPrompt.trim()}
                                             className="w-full btn btn-primary bg-cartoon-orange hover:bg-cartoon-orange/80 
-                                                     rounded-cartoon shadow-cartoon"
+                                                     rounded-cartoon shadow-cartoon disabled:opacity-50"
                                         >
                                             <FaMagic className="mr-2" />
                                             Generate Image
                                         </button>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                            AI generation may take 10-30 seconds
+                                        </p>
                                     </div>
                                 )}
 
                                 {/* Preview */}
                                 {previewUrl && (
                                     <div className="mt-6">
-                                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">
                                             Preview
                                         </h3>
                                         <img
@@ -420,7 +483,10 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                     {!isLoading && (
                         <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
                             <button
-                                onClick={onClose}
+                                onClick={() => {
+                                    resetModal();
+                                    onClose();
+                                }}
                                 className="btn btn-ghost rounded-cartoon"
                             >
                                 Cancel
