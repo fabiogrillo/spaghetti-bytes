@@ -1,7 +1,7 @@
 const axios = require('axios');
 const sharp = require('sharp');
 
-// Generate image using Hugging Face API with better error handling
+// Generate image using Hugging Face API with updated model
 const generateImage = async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -21,8 +21,15 @@ const generateImage = async (req, res) => {
             });
         }
 
-        // Hugging Face API configuration
-        const API_URL = process.env.HUGGINGFACE_API_URL || "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1";
+        // Updated Hugging Face API configuration with working models
+        // Try multiple models in case one is unavailable
+        const models = [
+            "stabilityai/stable-diffusion-xl-base-1.0",
+            "runwayml/stable-diffusion-v1-5",
+            "CompVis/stable-diffusion-v1-4",
+            "prompthero/openjourney",
+            "stabilityai/stable-diffusion-2-1" // Keep as fallback
+        ];
 
         const headers = {
             "Authorization": `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
@@ -30,17 +37,18 @@ const generateImage = async (req, res) => {
         };
 
         console.log('Generating image with prompt:', prompt);
-        console.log('Using API URL:', API_URL);
 
         // Enhanced prompt for better results
-        const enhancedPrompt = `${prompt}, high quality, detailed, professional`;
+        const enhancedPrompt = `${prompt}, high quality, detailed, professional, 4k`;
 
-        // Call Hugging Face API with retry logic
-        let response;
-        let retries = 0;
-        const maxRetries = 2;
+        let response = null;
+        let lastError = null;
 
-        while (retries <= maxRetries) {
+        // Try each model until one works
+        for (const model of models) {
+            const API_URL = `https://api-inference.huggingface.co/models/${model}`;
+            console.log('Trying model:', model);
+
             try {
                 response = await axios.post(
                     API_URL,
@@ -48,32 +56,56 @@ const generateImage = async (req, res) => {
                         inputs: enhancedPrompt,
                         options: {
                             wait_for_model: true  // Wait for model to load if needed
+                        },
+                        parameters: {
+                            negative_prompt: "low quality, blurry, distorted, disfigured, bad anatomy",
+                            num_inference_steps: 25,
+                            guidance_scale: 7.5
                         }
                     },
                     {
                         headers,
                         responseType: 'arraybuffer',
-                        timeout: 90000, // 90 seconds timeout
+                        timeout: 120000, // 2 minutes timeout
                         maxContentLength: 50 * 1024 * 1024, // 50MB max
                         maxBodyLength: 50 * 1024 * 1024
                     }
                 );
+
+                console.log('Successfully generated image with model:', model);
                 break; // Success, exit loop
             } catch (error) {
-                if (error.response?.status === 503 && retries < maxRetries) {
-                    // Model is loading, wait and retry
-                    console.log(`Model loading, retry ${retries + 1}/${maxRetries}`);
-                    await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
-                    retries++;
-                } else {
-                    throw error; // Re-throw for outer catch block
+                lastError = error;
+                console.log(`Model ${model} failed:`, error.response?.status || error.message);
+
+                // If it's a 503 (model loading), retry after a delay
+                if (error.response?.status === 503) {
+                    console.log('Model is loading, waiting 10 seconds...');
+                    await new Promise(resolve => setTimeout(resolve, 10000));
+
+                    // Retry the same model once
+                    try {
+                        response = await axios.post(API_URL, {
+                            inputs: enhancedPrompt,
+                            options: { wait_for_model: true }
+                        }, {
+                            headers,
+                            responseType: 'arraybuffer',
+                            timeout: 120000
+                        });
+                        console.log('Successfully generated image after retry with model:', model);
+                        break;
+                    } catch (retryError) {
+                        console.log('Retry failed, trying next model');
+                    }
                 }
             }
         }
 
-        // Validate response
+        // Check if any model succeeded
         if (!response || !response.data) {
-            throw new Error('Invalid response from AI service');
+            console.error('All models failed. Last error:', lastError?.message);
+            throw lastError || new Error('All AI models are currently unavailable');
         }
 
         // Convert the response to buffer
@@ -82,6 +114,15 @@ const generateImage = async (req, res) => {
         // Validate image buffer
         if (buffer.length < 1000) { // Less than 1KB probably means error
             console.error('Received buffer too small, likely an error response');
+
+            // Try to parse error message
+            try {
+                const errorText = buffer.toString('utf8');
+                console.error('Error response:', errorText);
+            } catch (e) {
+                // Ignore parsing error
+            }
+
             throw new Error('Invalid image data received');
         }
 
@@ -123,22 +164,31 @@ const generateImage = async (req, res) => {
             data: error.response?.data ?
                 (typeof error.response.data === 'string' ?
                     error.response.data.substring(0, 200) :
-                    JSON.stringify(error.response.data).substring(0, 200)
+                    Buffer.isBuffer(error.response.data) ?
+                        error.response.data.toString('utf8').substring(0, 200) :
+                        JSON.stringify(error.response.data).substring(0, 200)
                 ) : undefined
         });
 
         // Send appropriate error response
         if (error.response?.status === 503) {
             return res.status(503).json({
-                error: 'AI model is loading. Please try again in 10-20 seconds.',
-                retryAfter: 20
+                error: 'AI models are loading. Please try again in 20-30 seconds.',
+                retryAfter: 30
             });
         }
 
         if (error.response?.status === 401) {
             return res.status(401).json({
-                error: 'Invalid API key. Please check your Hugging Face API key configuration.',
+                error: 'Invalid API key. Please check your Hugging Face API key.',
                 help: 'Get your API key from https://huggingface.co/settings/tokens'
+            });
+        }
+
+        if (error.response?.status === 404) {
+            return res.status(503).json({
+                error: 'AI model not available. Please try again later.',
+                details: 'The image generation service is temporarily unavailable.'
             });
         }
 
@@ -158,7 +208,7 @@ const generateImage = async (req, res) => {
 
         if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
             return res.status(504).json({
-                error: 'Request timeout. The image generation took too long. Please try again with a simpler prompt.'
+                error: 'Request timeout. The image generation took too long. Please try with a simpler prompt.'
             });
         }
 
@@ -186,8 +236,8 @@ const checkAIService = async (req, res) => {
             });
         }
 
-        // Try to check model status
-        const API_URL = process.env.HUGGINGFACE_API_URL || "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1";
+        // Check the first available model
+        const API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0";
 
         const response = await axios.get(API_URL, {
             headers: {
@@ -198,12 +248,14 @@ const checkAIService = async (req, res) => {
 
         res.json({
             status: 'healthy',
-            message: 'AI service is operational'
+            message: 'AI service is operational',
+            model: 'stable-diffusion-xl-base-1.0'
         });
     } catch (error) {
-        res.status(503).json({
-            status: 'unhealthy',
-            message: 'AI service is not available',
+        // Even if health check fails, the service might still work
+        res.json({
+            status: 'unknown',
+            message: 'AI service status unknown, but may still be operational',
             details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }

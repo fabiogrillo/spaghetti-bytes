@@ -112,29 +112,71 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                 throw new Error('Camera API not supported in this browser');
             }
 
-            // Request camera permission with fallback constraints
-            const constraints = {
-                video: {
-                    width: { ideal: 1280, min: 640 },
-                    height: { ideal: 720, min: 480 },
-                    facingMode: 'user'
+            // Try different constraint configurations for better compatibility
+            const constraints = [
+                {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    },
+                    audio: false
                 },
-                audio: false
-            };
+                {
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    },
+                    audio: false
+                },
+                {
+                    video: true,
+                    audio: false
+                }
+            ];
 
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            let stream = null;
+            let lastError = null;
+
+            // Try each constraint configuration
+            for (const constraint of constraints) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia(constraint);
+                    break; // Success, exit loop
+                } catch (err) {
+                    lastError = err;
+                    console.log('Constraint failed, trying next:', err.message);
+                }
+            }
+
+            if (!stream) {
+                throw lastError || new Error('Could not access camera');
+            }
 
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
                 streamRef.current = stream;
-                setIsCameraActive(true);
 
-                // Wait for video to be ready
-                videoRef.current.onloadedmetadata = () => {
-                    videoRef.current.play().catch(err => {
-                        console.error('Error playing video:', err);
-                    });
-                };
+                const video = videoRef.current;
+
+                // Usa `loadeddata` invece di `loadedmetadata` per assicurarci che il video abbia pixel visibili
+                await new Promise((resolve) => {
+                    const handler = () => {
+                        video.play()
+                            .then(() => {
+                                setIsCameraActive(true);
+                                resolve();
+                            })
+                            .catch(err => {
+                                console.error('Error playing video:', err);
+                                setCameraError('Camera stream started but cannot display. Please try again.');
+                                stopCamera();
+                                resolve();
+                            });
+                        video.removeEventListener('loadeddata', handler);
+                    };
+                    video.addEventListener('loadeddata', handler);
+                });
             }
         } catch (error) {
             console.error('Error accessing camera:', error);
@@ -385,7 +427,6 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                                     </div>
                                 )}
 
-                                {/* Camera Tab */}
                                 {activeTab === 'camera' && (
                                     <div className="space-y-4">
                                         {cameraError ? (
@@ -396,32 +437,53 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                                             <button
                                                 onClick={startCamera}
                                                 className="w-full btn btn-primary bg-cartoon-purple hover:bg-cartoon-purple/80 
-                                                         rounded-cartoon shadow-cartoon"
+                         rounded-cartoon shadow-cartoon"
                                             >
                                                 <FaCamera className="mr-2" />
                                                 Start Camera
                                             </button>
                                         ) : (
                                             <div className="space-y-4">
-                                                <div className="relative rounded-cartoon overflow-hidden bg-black">
+                                                <div className="relative rounded-cartoon overflow-hidden bg-black"
+                                                    style={{ minHeight: '400px' }}>
                                                     <video
                                                         ref={videoRef}
                                                         autoPlay
                                                         playsInline
                                                         muted
-                                                        className="w-full h-auto"
+                                                        style={{
+                                                            width: '100%',
+                                                            height: 'auto',
+                                                            display: 'block',
+                                                            objectFit: 'cover'
+                                                        }}
                                                     />
                                                     <canvas
                                                         ref={canvasRef}
-                                                        className="hidden"
+                                                        style={{ display: 'none' }}
                                                     />
+                                                    {/* Camera overlay for better UX */}
+                                                    <div className="absolute inset-0 pointer-events-none">
+                                                        <div className="absolute top-4 left-4 right-4 flex justify-between">
+                                                            <div className="bg-red-500 rounded-full w-3 h-3 animate-pulse" />
+                                                            <span className="text-white text-sm bg-black/50 px-2 py-1 rounded">
+                                                                LIVE
+                                                            </span>
+                                                        </div>
+                                                        {/* Viewfinder corners */}
+                                                        <div className="absolute top-8 left-8 w-8 h-8 border-t-2 border-l-2 border-white" />
+                                                        <div className="absolute top-8 right-8 w-8 h-8 border-t-2 border-r-2 border-white" />
+                                                        <div className="absolute bottom-8 left-8 w-8 h-8 border-b-2 border-l-2 border-white" />
+                                                        <div className="absolute bottom-8 right-8 w-8 h-8 border-b-2 border-r-2 border-white" />
+                                                    </div>
                                                 </div>
                                                 <div className="flex gap-3">
                                                     <button
                                                         onClick={takePhoto}
                                                         className="flex-1 btn btn-primary bg-cartoon-purple hover:bg-cartoon-purple/80 
-                                                                 rounded-cartoon shadow-cartoon"
+                                 rounded-cartoon shadow-cartoon"
                                                     >
+                                                        <FaCamera className="mr-2" />
                                                         Take Photo
                                                     </button>
                                                     <button
@@ -431,6 +493,9 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                                                         Cancel
                                                     </button>
                                                 </div>
+                                                <p className="text-sm text-gray-500 text-center">
+                                                    Make sure your camera is not being used by another application
+                                                </p>
                                             </div>
                                         )}
                                     </div>

@@ -8,6 +8,8 @@ import { BsArrowLeft } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../Api';
+import { FaClock, FaCalendarAlt } from 'react-icons/fa';
+
 
 const CampaignManager = () => {
     const navigate = useNavigate();
@@ -48,6 +50,22 @@ const CampaignManager = () => {
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
         }
     });
+
+    const getCurrentDateTime = () => {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        return now.toISOString().slice(0, 16);
+    };
+
+    const formatScheduleInfo = (datetime) => {
+        if (!datetime) return '';
+        const date = new Date(datetime);
+        return `Scheduled for: ${date.toLocaleString('en-US', {
+            timeZone: 'Europe/Rome',
+            dateStyle: 'medium',
+            timeStyle: 'short'
+        })} (Rome Time)`;
+    };
 
     // Fetch data function - NOT using useCallback to avoid dependency issues
     const fetchData = async () => {
@@ -299,8 +317,8 @@ const CampaignManager = () => {
                     <button
                         onClick={() => setActiveTab('campaigns')}
                         className={`px-6 py-3 rounded-cartoon font-medium transition-all ${activeTab === 'campaigns'
-                                ? 'bg-cartoon-purple text-white shadow-cartoon'
-                                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                            ? 'bg-cartoon-purple text-white shadow-cartoon'
+                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                             }`}
                     >
                         <FaEnvelope className="inline mr-2" />
@@ -309,8 +327,8 @@ const CampaignManager = () => {
                     <button
                         onClick={() => setActiveTab('subscribers')}
                         className={`px-6 py-3 rounded-cartoon font-medium transition-all ${activeTab === 'subscribers'
-                                ? 'bg-cartoon-purple text-white shadow-cartoon'
-                                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                            ? 'bg-cartoon-purple text-white shadow-cartoon'
+                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                             }`}
                     >
                         <FaUsers className="inline mr-2" />
@@ -562,19 +580,121 @@ const CampaignManager = () => {
                                     <div>
                                         <label className="block text-sm font-medium mb-2">
                                             Schedule Send (Optional)
+                                            <span className="ml-2 text-xs text-gray-500">
+                                                Leave empty to send immediately
+                                            </span>
                                         </label>
-                                        <input
-                                            type="datetime-local"
-                                            value={campaignForm.schedule.sendAt}
-                                            onChange={(e) => setCampaignForm({
-                                                ...campaignForm,
-                                                schedule: {
-                                                    ...campaignForm.schedule,
-                                                    sendAt: e.target.value
-                                                }
-                                            })}
-                                            className="w-full p-3 border rounded-cartoon dark:bg-gray-700 dark:border-gray-600"
-                                        />
+
+                                        <div className="space-y-2">
+                                            <div className="relative">
+                                                <input
+                                                    type="datetime-local"
+                                                    value={campaignForm.schedule.sendAt}
+                                                    onChange={(e) => setCampaignForm({
+                                                        ...campaignForm,
+                                                        schedule: {
+                                                            ...campaignForm.schedule,
+                                                            sendAt: e.target.value,
+                                                            timezone: 'Europe/Rome'
+                                                        }
+                                                    })}
+                                                    min={getCurrentDateTime()}
+                                                    className="w-full p-3 pl-10 border rounded-cartoon dark:bg-gray-700 dark:border-gray-600"
+                                                />
+                                                <FaCalendarAlt className="absolute left-3 top-4 text-gray-400" />
+                                            </div>
+
+                                            {campaignForm.schedule.sendAt && (
+                                                <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                                                    <FaClock className="inline mr-2" />
+                                                    {formatScheduleInfo(campaignForm.schedule.sendAt)}
+                                                </div>
+                                            )}
+
+                                            <div className="flex gap-2 mt-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const now = new Date();
+                                                        now.setMinutes(now.getMinutes() + 5);
+                                                        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                                                        setCampaignForm({
+                                                            ...campaignForm,
+                                                            schedule: {
+                                                                ...campaignForm.schedule,
+                                                                sendAt: now.toISOString().slice(0, 16)
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="text-xs btn btn-sm btn-ghost"
+                                                >
+                                                    +5 min
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const now = new Date();
+                                                        now.setHours(now.getHours() + 1);
+                                                        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                                                        setCampaignForm({
+                                                            ...campaignForm,
+                                                            schedule: {
+                                                                ...campaignForm.schedule,
+                                                                sendAt: now.toISOString().slice(0, 16)
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="text-xs btn btn-sm btn-ghost"
+                                                >
+                                                    +1 hour
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const tomorrow = new Date();
+                                                        tomorrow.setDate(tomorrow.getDate() + 1);
+                                                        tomorrow.setHours(9, 0, 0, 0);
+                                                        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
+                                                        setCampaignForm({
+                                                            ...campaignForm,
+                                                            schedule: {
+                                                                ...campaignForm.schedule,
+                                                                sendAt: tomorrow.toISOString().slice(0, 16)
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="text-xs btn btn-sm btn-ghost"
+                                                >
+                                                    Tomorrow 9AM
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setCampaignForm({
+                                                        ...campaignForm,
+                                                        schedule: {
+                                                            ...campaignForm.schedule,
+                                                            sendAt: ''
+                                                        }
+                                                    })}
+                                                    className="text-xs btn btn-sm btn-ghost text-red-500"
+                                                >
+                                                    Clear
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="alert alert-info text-sm mt-4">
+                                        <FaClock className="inline mr-2" />
+                                        <div>
+                                            <p><strong>How scheduling works:</strong></p>
+                                            <ul className="list-disc list-inside mt-1">
+                                                <li>Leave empty to send immediately to all active subscribers</li>
+                                                <li>Set a future date/time to schedule the campaign</li>
+                                                <li>All times are in Rome timezone (UTC+1/+2)</li>
+                                                <li>Campaigns will be sent at the exact time specified</li>
+                                            </ul>
+                                        </div>
                                     </div>
 
                                     <div className="flex justify-end gap-3 pt-4">
