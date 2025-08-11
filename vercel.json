@@ -24,7 +24,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/client/public/index.html"
+      "dest": "/index.html"
     }
   ],
   "env": {
