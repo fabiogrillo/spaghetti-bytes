@@ -9,7 +9,6 @@
     "client": "cd client && npm start",
     "install-all": "npm install && cd client && npm install && cd ../server && npm install",
     "build": "cd client && npm run build",
-    "vercel-build": "cd client && npm install && npm run build",
     "start": "cd server && npm start",
     "heroku-postbuild": "cd client && npm install && npm run build"
   },
