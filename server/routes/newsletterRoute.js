@@ -1,5 +1,8 @@
+// server/routes/newsletterRoute.js
 const express = require("express");
 const router = express.Router();
+
+// Import controllers
 const {
     subscribe,
     confirmSubscription,
@@ -13,27 +16,122 @@ const {
     getSubscriberStats
 } = require("../controllers/newsletterController");
 
-// Authentication middleware (optional - add if you want to protect admin routes)
-const requireAuth = (req, res, next) => {
-    // Add your authentication logic here
-    // For now, we'll pass through
-    next();
-};
+// Import middleware
+const { requireAuth, requireAdmin } = require("../middleware/auth");
+const {
+    newsletterLimiter,
+    apiLimiter,
+    contentLimiter
+} = require("../middleware/rateLimiter");
+const {
+    newsletterValidation,
+    campaignValidation,
+    queryValidation,
+    sanitizeMongo
+} = require("../middleware/validation");
 
-// Public routes - no authentication required
-router.post("/subscribe", subscribe);
-router.get("/confirm/:token", confirmSubscription);
-router.get("/unsubscribe/:token", unsubscribe);
+// Apply MongoDB sanitization to all routes
+router.use(sanitizeMongo);
 
-// Admin routes - authentication recommended
-router.get("/subscribers", requireAuth, getSubscribers);
-router.delete("/subscribers/:id", requireAuth, deleteSubscriber);
+// ====================================
+// PUBLIC ROUTES - No authentication required
+// ====================================
 
-router.post("/campaigns", requireAuth, createCampaign);
-router.get("/campaigns", requireAuth, getCampaigns);
-router.post("/campaigns/:campaignId/send", requireAuth, sendCampaign);
-router.delete("/campaigns/:campaignId", requireAuth, deleteCampaign);
+// Subscribe to newsletter - with rate limiting and validation
+router.post(
+    "/subscribe",
+    newsletterLimiter, // Prevent spam subscriptions
+    newsletterValidation.subscribe, // Validate email format
+    subscribe
+);
 
-router.get("/stats", requireAuth, getSubscriberStats);
+// Confirm subscription via email token
+router.get(
+    "/confirm/:token",
+    apiLimiter, // Basic rate limiting
+    newsletterValidation.confirmSubscription, // Validate token
+    confirmSubscription
+);
+
+// Unsubscribe via email token
+router.get(
+    "/unsubscribe/:token",
+    apiLimiter, // Basic rate limiting
+    newsletterValidation.unsubscribe, // Validate token
+    unsubscribe
+);
+
+// ====================================
+// ADMIN ROUTES - Authentication required
+// ====================================
+
+// Get all subscribers - Admin only
+router.get(
+    "/subscribers",
+    requireAuth, // Check authentication
+    requireAdmin, // Check admin role
+    queryValidation.pagination, // Validate pagination params
+    getSubscribers
+);
+
+// Delete a specific subscriber - Admin only
+router.delete(
+    "/subscribers/:id",
+    requireAuth, // Check authentication
+    requireAdmin, // Check admin role
+    deleteSubscriber
+);
+
+// ====================================
+// CAMPAIGN MANAGEMENT - Admin only
+// ====================================
+
+// Create new campaign
+router.post(
+    "/campaigns",
+    requireAuth, // Check authentication
+    requireAdmin, // Check admin role
+    contentLimiter, // Rate limit content creation
+    campaignValidation.create, // Validate campaign data
+    createCampaign
+);
+
+// Get all campaigns
+router.get(
+    "/campaigns",
+    requireAuth, // Check authentication
+    requireAdmin, // Check admin role
+    queryValidation.pagination, // Validate pagination
+    getCampaigns
+);
+
+// Send a campaign
+router.post(
+    "/campaigns/:campaignId/send",
+    requireAuth, // Check authentication
+    requireAdmin, // Check admin role
+    campaignValidation.send, // Validate campaign ID
+    sendCampaign
+);
+
+// Delete a campaign
+router.delete(
+    "/campaigns/:campaignId",
+    requireAuth, // Check authentication
+    requireAdmin, // Check admin role
+    deleteCampaign
+);
+
+// ====================================
+// STATISTICS ROUTES - Admin only
+// ====================================
+
+// Get subscriber statistics
+router.get(
+    "/stats",
+    requireAuth, // Check authentication
+    requireAdmin, // Check admin role
+    getSubscriberStats
+);
 
 module.exports = router;
