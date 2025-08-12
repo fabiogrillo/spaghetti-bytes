@@ -1,15 +1,24 @@
-import { useState, useEffect } from "react";
+// client/src/App.js - Updated with optional lazy loading
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
+
+// Core components (always loaded)
 import ImprovedNavbar from "./Components/ImprovedNavbar";
+import Footer from "./Components/Footer";
+import LoadingSpinner from "./Components/LoadingSpinner";
+import ChatBot from "./Components/ChatBot";
+import ToastProvider from "./Components/ToastProvider";
+import api from "./Api";
+
+// Regular imports (no lazy loading for simplicity on Vercel)
 import Home from "./Pages/Home";
 import Blog from "./Pages/Blog";
 import Goals from "./Pages/Goals";
-import Footer from "./Components/Footer";
 import Login from "./Pages/Login";
 import StoryManager from "./Pages/StoryManager";
 import StoryPublisher from "./Pages/StoryPublisher";
@@ -17,33 +26,53 @@ import TableManager from "./Pages/TableManager";
 import StoryVisualizer from "./Pages/StoryVisualizer";
 import GoalPublisher from "./Pages/GoalPublisher";
 import TableGoals from "./Pages/TableGoals";
-import ChatBot from "./Components/ChatBot";
 import ConversationDashboard from "./Pages/ConversationDashboard";
-import CookieBanner from "./Components/CookieBanner";
-import CookieSettings from "./Components/CookieSettings";
-import Privacy from "./Pages/Privacy";
-import { useAnalytics } from "./hooks/useAnalytics";
 import CampaignManager from "./Pages/CampaignManager";
 import NewsletterAnalytics from "./Components/NewsletterAnalytics";
 import DonationButton from "./Components/DonationButton";
-import api from "./Api";
-import ToastProvider from "./Components/ToastProvider";
+import CookieBanner from "./Components/CookieBanner";
+import CookieSettings from "./Components/CookieSettings";
+import Privacy from "./Pages/Privacy";
+import Contacts from "./Pages/Contacts";
 
-// Crea un componente wrapper per le routes
+// Import analytics hook
+import { useAnalytics } from "./hooks/useAnalytics";
+
+// Performance Monitor - only load in development
+const PerformanceMonitor = lazy(() =>
+  import('./Components/PerformanceMonitor').catch(() => {
+    // Return a fallback component if the module doesn't exist
+    return { default: () => null };
+  })
+);
+
+// Protected Route Component
+const ProtectedRoute = ({ children, isAuthenticated, checkingAuth }) => {
+  if (checkingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner size="lg" message="Checking authentication..." />
+      </div>
+    );
+  }
+  return isAuthenticated ? children : <Navigate to="/login" />;
+};
+
+// App Content Component
 const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, checkingAuth }) => {
-  // Qui useAnalytics funziona perché siamo dentro il Router
   useAnalytics();
+  const [showPerformance, setShowPerformance] = useState(false);
 
-  const ProtectedRoute = ({ children }) => {
-    if (checkingAuth) {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          <span className="loading loading-spinner loading-lg text-cartoon-pink"></span>
-        </div>
-      );
+  useEffect(() => {
+    // Only show performance monitor for admin users in development
+    const urlParams = new URLSearchParams(window.location.search);
+    if (
+      process.env.NODE_ENV === 'development' ||
+      (isAuthenticated && urlParams.get('debug') === 'true')
+    ) {
+      setShowPerformance(true);
     }
-    return isAuthenticated ? children : <Navigate to="/login" />;
-  };
+  }, [isAuthenticated]);
 
   return (
     <>
@@ -53,111 +82,143 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
         setAuthenticated={setAuthenticated}
         setUsername={setUsername}
       />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/goals" element={<Goals />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route
-          path="/editor"
-          element={
-            <ProtectedRoute>
-              <StoryPublisher />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/storyTable"
-          element={
-            <ProtectedRoute>
-              <TableManager />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/manager"
-          element={
-            <ProtectedRoute>
-              <StoryManager username={username} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/story-publisher/:id?"
-          element={
-            <ProtectedRoute>
-              <StoryPublisher />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/visualizer/:storyId" element={<StoryVisualizer />} />
-        <Route
-          path="/login"
-          element={
-            <Login
-              setAuthenticated={setAuthenticated}
-              setUsername={setUsername}
-            />
-          }
-        />
-        <Route
-          path="/create-goal"
-          element={
-            <ProtectedRoute>
-              <GoalPublisher />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/goalsTable"
-          element={
-            <ProtectedRoute>
-              <TableGoals />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/create-goal/:id"
-          element={
-            <ProtectedRoute>
-              <GoalPublisher />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/conversations"
-          element={
-            <ProtectedRoute>
-              <ConversationDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/newsletter/campaigns"
-          element={
-            <ProtectedRoute>
-              <CampaignManager />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/newsletter/analytics"
-          element={
-            <ProtectedRoute>
-              <NewsletterAnalytics />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/privacy" element={<Privacy />} />
-      </Routes>
+
+      <main className="flex-grow">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/goals" element={<Goals />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/contacts" element={<Contacts />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/visualizer/:storyId" element={<StoryVisualizer />} />
+          <Route
+            path="/login"
+            element={
+              <Login
+                setAuthenticated={setAuthenticated}
+                setUsername={setUsername}
+              />
+            }
+          />
+
+          {/* Protected Routes - Admin Only */}
+          <Route
+            path="/editor"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <StoryPublisher />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/story-publisher/:id?"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <StoryPublisher />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/storyTable"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <TableManager />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <StoryManager username={username} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create-goal"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <GoalPublisher />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create-goal/:id"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <GoalPublisher />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/goalsTable"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <TableGoals />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/conversations"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <ConversationDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/newsletter/campaigns"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <CampaignManager />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/newsletter/analytics"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <NewsletterAnalytics />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 404 Page */}
+          <Route
+            path="*"
+            element={
+              <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                  <h1 className="text-6xl font-bold text-cartoon-pink">404</h1>
+                  <p className="text-xl mt-4">Page not found</p>
+                  <a href="/" className="btn bg-cartoon-purple text-white mt-8 shadow-cartoon">
+                    Go Home
+                  </a>
+                </div>
+              </div>
+            }
+          />
+        </Routes>
+      </main>
+
       <Footer />
       <ChatBot />
       <CookieBanner />
       <CookieSettings />
       <DonationButton variant="floating" />
+
+      {/* Performance Monitor - Only for authenticated admins */}
+      {showPerformance && isAuthenticated && (
+        <Suspense fallback={null}>
+          <PerformanceMonitor show={true} position="bottom-left" />
+        </Suspense>
+      )}
     </>
   );
 };
 
+// Main App Component
 const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
@@ -170,7 +231,7 @@ const App = () => {
         const response = await api.get('/auth/check');
         if (response.data.authenticated) {
           setAuthenticated(true);
-          setUsername(response.data.username);
+          setUsername(response.data.user?.username || response.data.username);
         }
       } catch (error) {
         console.log('Auth check failed:', error);
@@ -185,13 +246,15 @@ const App = () => {
   return (
     <ToastProvider>
       <Router>
-        <AppContent
-          isAuthenticated={isAuthenticated}
-          setAuthenticated={setAuthenticated}
-          username={username}
-          setUsername={setUsername}
-          checkingAuth={checkingAuth}
-        />
+        <div className="App min-h-screen flex flex-col">
+          <AppContent
+            isAuthenticated={isAuthenticated}
+            setAuthenticated={setAuthenticated}
+            username={username}
+            setUsername={setUsername}
+            checkingAuth={checkingAuth}
+          />
+        </div>
       </Router>
     </ToastProvider>
   );

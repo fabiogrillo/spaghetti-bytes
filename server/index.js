@@ -10,10 +10,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 // Connettiti a MongoDB
 mongoose
-  .connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(MONGODB_URI) // ✅ senza opzioni deprecate
   .then(() => {
     console.log("Connected to MongoDB");
   })

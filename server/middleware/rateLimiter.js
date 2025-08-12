@@ -53,11 +53,7 @@ const newsletterLimiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req) => {
-        // Use IP for key generation (fixed for IPv6)
-        // The library handles IPv6 addresses automatically when we don't override
-        return req.ip;
-    }
+    keyGenerator: (req) => rateLimit.ipKeyGenerator(req) // ✅ compatibile IPv6
 });
 
 /**

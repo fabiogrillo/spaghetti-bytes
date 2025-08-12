@@ -51,7 +51,6 @@ const subscriberSchema = new mongoose.Schema({
 });
 
 // Indexes
-subscriberSchema.index({ email: 1 });
 subscriberSchema.index({ status: 1 });
 subscriberSchema.index({ 'tokens.unsubscribeToken': 1 });
 
