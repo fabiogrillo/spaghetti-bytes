@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import ShareButtons from "../Components/ShareButtons";
 import NewsletterWidget from "../Components/NewsletterWidget";
 import ArticleReactions from '../Components/ArticleReactions';
+import CommentSection from "../Components/CommentSection";
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();
@@ -231,6 +232,20 @@ const StoryVisualizer = () => {
           className="relative mt-8 mb-8"
         >
           <ArticleReactions articleId={storyId} compact={true} />
+        </motion.div>
+
+        {/* Divider before Comments */}
+        <div className="divider mt-16 mb-8">
+          <span className="text-gray-400">💬</span>
+        </div>
+
+        {/* Comments Section - NEW */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <CommentSection storyId={story._id} />
         </motion.div>
 
         {/* Newsletter Widget */}

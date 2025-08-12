@@ -20,6 +20,7 @@
     "helmet": "^8.1.0",
     "image-size": "^2.0.2",
     "ioredis": "^5.7.0",
+    "isomorphic-dompurify": "^2.26.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.4",
     "multer": "^2.0.2",

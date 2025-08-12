@@ -19,6 +19,7 @@ dotenv.config();
 
 // Models
 const User = require("./models/User");
+const Comment = require("./models/Comment");
 
 // Routes
 const storyRoutes = require("./routes/storyRoute");
@@ -27,6 +28,7 @@ const conversationRoutes = require("./routes/conversationRoute");
 const newsletterRoutes = require("./routes/newsletterRoute");
 const analyticsRoutes = require("./routes/analyticsRoute");
 const rssRoute = require("./routes/rssRoute");
+const commentRoutes = require("./routes/commentRoute");
 
 // Middleware
 const { apiLimiter, authLimiter } = require("./middleware/rateLimiter");
@@ -132,6 +134,23 @@ const sessionConfig = {
 };
 
 app.use(session(sessionConfig));
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key-here',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    collectionName: 'sessions',
+    ttl: 24 * 60 * 60 // 1 day
+  }),
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    sameSite: 'strict'
+  }
+}));
 
 // ====================================
 // PASSPORT CONFIGURATION
@@ -268,6 +287,9 @@ app.use("/api/analytics", analyticsRoutes);
 
 // RSS feed routes
 app.use("/", rssRoute);
+
+// Comment routes
+app.use("/api/comments", commentRoutes);
 
 // ====================================
 // STATIC FILES (for production)
