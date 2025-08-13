@@ -4,6 +4,7 @@ const router = express.Router();
 const commentController = require("../controllers/commentController");
 const { body, param, validationResult } = require("express-validator");
 
+
 // Validation middleware
 const validate = (req, res, next) => {
     const errors = validationResult(req);
@@ -11,7 +12,71 @@ const validate = (req, res, next) => {
         return res.status(400).json({ errors: errors.array() });
     }
     next();
+}; 
+
+// Middleware per autenticazione admin
+const isAdmin = (req, res, next) => {
+    if (req.isAuthenticated && req.isAuthenticated() && req.user && req.user.role === 'admin') {
+        return next();
+    }
+    return res.status(403).json({ error: 'Admin authentication required' });
 };
+
+// GET /api/comments/moderate - Elenco commenti da moderare (pending/spam)
+router.get(
+    '/moderate',
+    isAdmin,
+    async (req, res) => {
+        const Comment = require('../models/Comment');
+        try {
+            const comments = await Comment.find({ status: { $in: ['pending', 'spam'] } })
+                .sort({ createdAt: -1 })
+                .limit(100);
+            res.json({ comments });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to fetch comments for moderation' });
+        }
+    }
+);
+
+// POST /api/comments/:commentId/approve - Approva commento
+router.post(
+    '/:commentId/approve',
+    isAdmin,
+    [param('commentId').isMongoId().withMessage('Invalid comment ID')],
+    validate,
+    async (req, res) => {
+        const Comment = require('../models/Comment');
+        try {
+            const comment = await Comment.findById(req.params.commentId);
+            if (!comment) return res.status(404).json({ error: 'Comment not found' });
+            comment.status = 'approved';
+            await comment.save();
+            res.json({ message: 'Comment approved', comment });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to approve comment' });
+        }
+    }
+);
+
+// DELETE /api/comments/:commentId/admin - Elimina commento (admin)
+router.delete(
+    '/:commentId/admin',
+    isAdmin,
+    [param('commentId').isMongoId().withMessage('Invalid comment ID')],
+    validate,
+    async (req, res) => {
+        const Comment = require('../models/Comment');
+        try {
+            const comment = await Comment.findById(req.params.commentId);
+            if (!comment) return res.status(404).json({ error: 'Comment not found' });
+            await comment.softDelete('admin');
+            res.json({ message: 'Comment deleted by admin' });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to delete comment' });
+        }
+    }
+);
 
 // Validation rules - FIXED parentId validation
 const commentValidation = [

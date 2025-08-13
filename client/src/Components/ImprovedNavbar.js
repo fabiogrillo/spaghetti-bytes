@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { BiShield } from "react-icons/bi";
+import { BiShield, BiCommentCheck } from "react-icons/bi";
 import {
   IoIosLogIn,
   IoIosLogOut,
@@ -162,13 +162,27 @@ const ImprovedNavbar = ({
                 className="dropdown-content menu p-2 shadow-cartoon bg-base-100 rounded-cartoon w-52 mt-3 border-2 border-black"
               >
                 <li>
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.05, rotate: 2 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => navigate("/manager")}
-                    className="rounded-cartoon hover:bg-cartoon-purple hover:text-white"
+                    className="rounded-cartoon hover:bg-cartoon-purple hover:text-white flex items-center gap-2"
                   >
                     <IoMdSettings /> Manager
-                  </button>
+                  </motion.button>
                 </li>
+                {authenticated && (
+                  <li>
+                    <motion.button
+                      whileHover={{ scale: 1.05, rotate: 2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => navigate("/moderate-comments")}
+                      className="rounded-cartoon bg-cartoon-purple text-white flex items-center gap-2 shadow-cartoon"
+                    >
+                      <BiCommentCheck size={20} /> Comments
+                    </motion.button>
+                  </li>
+                )}
                 <li>
                   <button
                     onClick={() => navigate("/conversations")}

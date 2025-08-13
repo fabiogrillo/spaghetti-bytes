@@ -20,7 +20,7 @@ import Home from "./Pages/Home";
 import Blog from "./Pages/Blog";
 import Goals from "./Pages/Goals";
 import Login from "./Pages/Login";
-import StoryManager from "./Pages/StoryManager";
+import Manager from "./Pages/Manager";
 import StoryPublisher from "./Pages/StoryPublisher";
 import TableManager from "./Pages/TableManager";
 import StoryVisualizer from "./Pages/StoryVisualizer";
@@ -34,6 +34,7 @@ import CookieBanner from "./Components/CookieBanner";
 import CookieSettings from "./Components/CookieSettings";
 import Privacy from "./Pages/Privacy";
 import Contacts from "./Pages/Contacts";
+import CommentReaction from "./Pages/CommentReaction";
 
 // Import analytics hook
 import { useAnalytics } from "./hooks/useAnalytics";
@@ -64,15 +65,16 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
   const [showPerformance, setShowPerformance] = useState(false);
 
   useEffect(() => {
-    // Only show performance monitor for admin users in development
+    // Mostra il performance monitor se admin o debug=true
     const urlParams = new URLSearchParams(window.location.search);
     if (
       process.env.NODE_ENV === 'development' ||
-      (isAuthenticated && urlParams.get('debug') === 'true')
+      (isAuthenticated && urlParams.get('debug') === 'true') ||
+      (isAuthenticated && username === 'admin')
     ) {
       setShowPerformance(true);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, username]);
 
   return (
     <>
@@ -131,7 +133,7 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
             path="/manager"
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
-                <StoryManager username={username} />
+                <Manager username={username} isAuthenticated={isAuthenticated} />
               </ProtectedRoute>
             }
           />
@@ -180,6 +182,14 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
                 <NewsletterAnalytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/moderate-comments"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
+                <CommentReaction />
               </ProtectedRoute>
             }
           />

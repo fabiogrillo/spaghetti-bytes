@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BiBookAdd, BiTargetLock, BiEnvelope, BiBarChart, BiBook, BiTrophy, BiMessageSquareDetail } from "react-icons/bi";
 
-const StoryManager = ({ username }) => {
+const Manager = ({ username, isAuthenticated }) => {
   const navigate = useNavigate();
 
   const sections = [
@@ -181,7 +181,7 @@ const StoryManager = ({ username }) => {
           </motion.div>
         ))}
 
-          {isAuthenticated && (
+          {isAuthenticated && username === 'admin' && (
             <a href="/moderate-comments" className="btn btn-sm bg-cartoon-purple text-white ml-2">Moderazione Commenti</a>
           )}
         {/* Quick Stats Card */}
@@ -218,4 +218,4 @@ const StoryManager = ({ username }) => {
   );
 };
 
-export default StoryManager;
+export default Manager;
