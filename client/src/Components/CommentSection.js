@@ -1,625 +1,352 @@
 // client/src/Components/CommentSection.js
+// Fixed version without AuthContext dependency
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    FiMessageCircle,
-    FiSend,
-    FiHeart,
-    FiThumbsUp,
-    FiThumbsDown,
-    FiSmile,
-    FiAward,
-    FiFlag,
-    FiEdit2,
-    FiTrash2,
-    FiCornerDownRight
+    FiMessageCircle, FiSend, FiHeart, FiThumbsUp,
+    FiX
 } from 'react-icons/fi';
-import TimeAgo from 'react-timeago';
-import { useInView } from 'react-intersection-observer';
-import clsx from 'clsx';
-
-// Comment Form Component
-const CommentForm = ({ onSubmit, parentId = null, onCancel = null, initialData = null }) => {
-    const [formData, setFormData] = useState({
-        name: initialData?.name || localStorage.getItem('commentAuthorName') || '',
-        email: initialData?.email || localStorage.getItem('commentAuthorEmail') || '',
-        website: initialData?.website || localStorage.getItem('commentAuthorWebsite') || '',
-        content: initialData?.content || ''
-    });
-
-    const [errors, setErrors] = useState({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error for this field
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
-        }
-    };
-
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!formData.name.trim() || formData.name.length < 2) {
-            newErrors.name = 'Name must be at least 2 characters';
-        }
-
-        if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = 'Please enter a valid email address';
-        }
-
-        if (formData.website && !/^https?:\/\/.+\..+/.test(formData.website)) {
-            newErrors.website = 'Please enter a valid URL (including http:// or https://)';
-        }
-
-        if (!formData.content.trim()) {
-            newErrors.content = 'Comment cannot be empty';
-        } else if (formData.content.length > 5000) {
-            newErrors.content = 'Comment must be less than 5000 characters';
-        }
-
-        return newErrors;
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        const newErrors = validateForm();
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            return;
-        }
-
-        setIsSubmitting(true);
-
-        try {
-            // Save user info to localStorage for next time
-            localStorage.setItem('commentAuthorName', formData.name);
-            localStorage.setItem('commentAuthorEmail', formData.email);
-            localStorage.setItem('commentAuthorWebsite', formData.website);
-
-            await onSubmit({
-                author: {
-                    name: formData.name,
-                    email: formData.email,
-                    website: formData.website
-                },
-                content: formData.content,
-                parentId
-            });
-
-            // Clear content after successful submission
-            setFormData(prev => ({ ...prev, content: '' }));
-
-            if (onCancel) {
-                onCancel();
-            }
-        } catch (error) {
-            setErrors({ submit: 'Failed to post comment. Please try again.' });
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    return (
-        <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4 p-4 bg-white rounded-cartoon border-2 border-black shadow-cartoon"
-            onSubmit={handleSubmit}
-        >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Your Name *"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className={clsx(
-                            "w-full px-3 py-2 border-2 rounded-lg focus:outline-none focus:border-cartoon-blue",
-                            errors.name ? "border-red-500" : "border-gray-300"
-                        )}
-                    />
-                    {errors.name && (
-                        <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-                    )}
-                </div>
-
-                <div>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email (optional)"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className={clsx(
-                            "w-full px-3 py-2 border-2 rounded-lg focus:outline-none focus:border-cartoon-blue",
-                            errors.email ? "border-red-500" : "border-gray-300"
-                        )}
-                    />
-                    {errors.email && (
-                        <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                    )}
-                </div>
-
-                <div>
-                    <input
-                        type="url"
-                        name="website"
-                        placeholder="Website (optional)"
-                        value={formData.website}
-                        onChange={handleChange}
-                        className={clsx(
-                            "w-full px-3 py-2 border-2 rounded-lg focus:outline-none focus:border-cartoon-blue",
-                            errors.website ? "border-red-500" : "border-gray-300"
-                        )}
-                    />
-                    {errors.website && (
-                        <p className="text-red-500 text-sm mt-1">{errors.website}</p>
-                    )}
-                </div>
-            </div>
-
-            <div>
-                <textarea
-                    name="content"
-                    placeholder={parentId ? "Write your reply..." : "Share your thoughts..."}
-                    value={formData.content}
-                    onChange={handleChange}
-                    rows={4}
-                    className={clsx(
-                        "w-full px-3 py-2 border-2 rounded-lg resize-none focus:outline-none focus:border-cartoon-blue",
-                        errors.content ? "border-red-500" : "border-gray-300"
-                    )}
-                />
-                {errors.content && (
-                    <p className="text-red-500 text-sm mt-1">{errors.content}</p>
-                )}
-                <p className="text-gray-500 text-sm mt-1">
-                    {formData.content.length}/5000 characters
-                </p>
-            </div>
-
-            {errors.submit && (
-                <div className="bg-red-100 border-2 border-red-500 text-red-700 px-4 py-2 rounded-lg">
-                    {errors.submit}
-                </div>
-            )}
-
-            <div className="flex justify-end gap-2">
-                {onCancel && (
-                    <button
-                        type="button"
-                        onClick={onCancel}
-                        className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                )}
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={clsx(
-                        "px-6 py-2 bg-cartoon-blue text-white rounded-full font-bold",
-                        "hover:bg-blue-600 transition-colors flex items-center gap-2",
-                        "disabled:opacity-50 disabled:cursor-not-allowed"
-                    )}
-                >
-                    <FiSend />
-                    {isSubmitting ? 'Posting...' : (parentId ? 'Reply' : 'Post Comment')}
-                </button>
-            </div>
-        </motion.form>
-    );
-};
+import { BiReply } from 'react-icons/bi';
+import api from '../Api';
+import { formatDistanceToNow } from 'date-fns';
+import toast from 'react-hot-toast';
 
 // Single Comment Component
-const Comment = ({ comment, onReply, onReaction, onEdit, onDelete, onFlag, sessionId, depth = 0 }) => {
+const Comment = ({ comment, onReply, onDelete, onReaction, depth = 0, isAdmin = false }) => {
     const [showReplyForm, setShowReplyForm] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const maxDepth = 1; // Only allow 1 level of nesting
+    const [replyContent, setReplyContent] = useState('');
 
-    const canReply = depth < maxDepth;
-    const isOwn = comment.metadata?.sessionId === sessionId;
-    const canEdit = isOwn && comment.canEdit;
+    const handleReaction = async (type) => {
+        try {
+            const sessionId = localStorage.getItem('sessionId') || Date.now().toString();
+            localStorage.setItem('sessionId', sessionId);
 
-    const getAvatarUrl = () => {
-        if (comment.author.avatarUrl) return comment.author.avatarUrl;
-        if (comment.author.gravatarUrl) return comment.author.gravatarUrl;
+            await api.post(`/comments/${comment._id}/reaction`, {
+                type,
+                sessionId
+            });
 
-        return `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author.name)}&background=random`;
+            onReaction(comment._id, type);
+        } catch (error) {
+            toast.error('Failed to add reaction');
+        }
     };
 
-    const handleReaction = (reaction) => {
-        onReaction(comment._id, reaction);
+    const handleDelete = async () => {
+        if (window.confirm('Are you sure you want to delete this comment?')) {
+            try {
+                const endpoint = isAdmin
+                    ? `/comments/${comment._id}/admin`
+                    : `/comments/${comment._id}`;
+
+                await api.delete(endpoint);
+                onDelete(comment._id);
+                toast.success('Comment deleted successfully');
+            } catch (error) {
+                toast.error('Failed to delete comment');
+            }
+        }
     };
 
-    const reactions = [
-        { key: 'love', icon: FiHeart, color: 'text-red-500' },
-        { key: 'thumbsUp', icon: FiThumbsUp, color: 'text-blue-500' },
-        { key: 'thumbsDown', icon: FiThumbsDown, color: 'text-gray-500' },
-        { key: 'laugh', icon: FiSmile, color: 'text-yellow-500' },
-        { key: 'wow', icon: FiAward, color: 'text-purple-500' }
-    ];
+    const handleReply = async (e) => {
+        e.preventDefault();
+        if (!replyContent.trim()) return;
 
-    if (comment.status === 'deleted') {
-        return (
-            <div className="opacity-50 italic p-4 bg-gray-100 rounded-lg">
-                This comment has been deleted
-            </div>
-        );
-    }
+        await onReply(replyContent, comment._id);
+        setReplyContent('');
+        setShowReplyForm(false);
+    };
+
+    const getStatusBadge = () => {
+        if (comment.status === 'pending') {
+            return (
+                <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                    Pending Approval
+                </span>
+            );
+        }
+        if (comment.status === 'rejected') {
+            return (
+                <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                    Rejected
+                </span>
+            );
+        }
+        return null;
+    };
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className={clsx(
-                "flex gap-3",
-                depth > 0 && "ml-12 mt-4"
-            )}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`${depth > 0 ? 'ml-8 border-l-2 border-gray-200 pl-4' : ''}`}
         >
-            {/* Avatar */}
-            <img
-                src={getAvatarUrl()}
-                alt={comment.author.name}
-                className="w-10 h-10 rounded-full border-2 border-black flex-shrink-0"
-            />
-
-            {/* Comment Content */}
-            <div className="flex-1">
-                <div className="bg-white rounded-2xl px-4 py-3 border-2 border-black shadow-sm">
-                    {/* Author Info */}
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="font-bold text-gray-900">
-                            {comment.author.website ? (
-                                <a
-                                    href={comment.author.website}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-cartoon-blue transition-colors"
-                                >
+            <div className={`
+                bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon-sm 
+                p-4 mb-4 transition-all hover:shadow-cartoon
+                ${comment.status === 'pending' ? 'opacity-75' : ''}
+            `}>
+                {/* Header */}
+                <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-cartoon-pink to-cartoon-purple rounded-full flex items-center justify-center text-white font-bold">
+                            {comment.author.name[0].toUpperCase()}
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <span className="font-semibold">
                                     {comment.author.name}
-                                </a>
-                            ) : (
-                                comment.author.name
-                            )}
-                        </span>
-                        <span className="text-gray-500 text-sm">
-                            <TimeAgo date={comment.createdAt} />
-                        </span>
-                        {comment.metadata?.editHistory?.length > 0 && (
-                            <span className="text-gray-400 text-sm">(edited)</span>
-                        )}
+                                </span>
+                                {isAdmin && getStatusBadge()}
+                            </div>
+                            <span className="text-xs text-gray-500">
+                                {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                            </span>
+                        </div>
                     </div>
 
-                    {/* Comment Text */}
-                    {isEditing ? (
-                        <CommentForm
-                            onSubmit={async (data) => {
-                                await onEdit(comment._id, data.content);
-                                setIsEditing(false);
-                            }}
-                            onCancel={() => setIsEditing(false)}
-                            initialData={{
-                                name: comment.author.name,
-                                email: comment.author.email,
-                                website: comment.author.website,
-                                content: comment.content
-                            }}
-                        />
-                    ) : (
-                        <div
-                            className="text-gray-700 prose prose-sm max-w-none"
-                            dangerouslySetInnerHTML={{ __html: comment.content }}
-                        />
+                    {/* Admin Delete Button */}
+                    {isAdmin && (
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={handleDelete}
+                            className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50"
+                            title="Delete comment"
+                        >
+                            <FiX size={20} />
+                        </motion.button>
                     )}
                 </div>
 
+                {/* Content */}
+                <div className="text-gray-700 dark:text-gray-300 mb-4">
+                    {comment.content}
+                </div>
+
                 {/* Actions */}
-                <div className="flex items-center gap-1 mt-2 flex-wrap">
+                <div className="flex items-center gap-4">
                     {/* Reactions */}
-                    {reactions.map(({ key, icon: Icon, color }) => (
-                        <button
-                            key={key}
-                            onClick={() => handleReaction(key)}
-                            className={clsx(
-                                "flex items-center gap-1 px-2 py-1 rounded-full text-sm",
-                                "hover:bg-gray-100 transition-colors",
-                                comment.hasVoted && comment.reactions[key] > 0 && color
-                            )}
+                    <div className="flex items-center gap-2">
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleReaction('like')}
+                            className={`
+                                flex items-center gap-1 px-3 py-1 rounded-full
+                                ${comment.reactions.likes.length > 0
+                                    ? 'bg-blue-100 text-blue-600'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-blue-50'}
+                            `}
                         >
-                            <Icon size={16} />
-                            {comment.reactions[key] > 0 && (
-                                <span>{comment.reactions[key]}</span>
+                            <FiThumbsUp size={16} />
+                            {comment.reactions.likes.length > 0 && (
+                                <span className="text-sm">{comment.reactions.likes.length}</span>
                             )}
-                        </button>
-                    ))}
+                        </motion.button>
 
-                    <div className="flex-1" />
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleReaction('heart')}
+                            className={`
+                                flex items-center gap-1 px-3 py-1 rounded-full
+                                ${comment.reactions.hearts.length > 0
+                                    ? 'bg-red-100 text-red-600'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-red-50'}
+                            `}
+                        >
+                            <FiHeart size={16} />
+                            {comment.reactions.hearts.length > 0 && (
+                                <span className="text-sm">{comment.reactions.hearts.length}</span>
+                            )}
+                        </motion.button>
+                    </div>
 
-                    {/* Action Buttons */}
-                    {canReply && (
+                    {/* Reply Button */}
+                    {depth < 2 && comment.status === 'approved' && (
                         <button
                             onClick={() => setShowReplyForm(!showReplyForm)}
-                            className="flex items-center gap-1 px-2 py-1 text-sm text-gray-600 hover:text-cartoon-blue transition-colors"
+                            className="flex items-center gap-1 text-gray-600 hover:text-cartoon-blue text-sm"
                         >
-                            <FiCornerDownRight size={16} />
+                            <BiReply />
                             Reply
-                        </button>
-                    )}
-
-                    {canEdit && (
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="flex items-center gap-1 px-2 py-1 text-sm text-gray-600 hover:text-cartoon-blue transition-colors"
-                        >
-                            <FiEdit2 size={16} />
-                            Edit
-                        </button>
-                    )}
-
-                    {isOwn && (
-                        <button
-                            onClick={() => onDelete(comment._id)}
-                            className="flex items-center gap-1 px-2 py-1 text-sm text-gray-600 hover:text-red-500 transition-colors"
-                        >
-                            <FiTrash2 size={16} />
-                            Delete
-                        </button>
-                    )}
-
-                    {!isOwn && (
-                        <button
-                            onClick={() => onFlag(comment._id)}
-                            className="flex items-center gap-1 px-2 py-1 text-sm text-gray-600 hover:text-orange-500 transition-colors"
-                        >
-                            <FiFlag size={16} />
-                            Report
                         </button>
                     )}
                 </div>
 
                 {/* Reply Form */}
                 {showReplyForm && (
-                    <div className="mt-4">
-                        <CommentForm
-                            onSubmit={async (data) => {
-                                await onReply(data);
-                                setShowReplyForm(false);
-                            }}
-                            parentId={comment._id}
-                            onCancel={() => setShowReplyForm(false)}
+                    <motion.form
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        onSubmit={handleReply}
+                        className="mt-4"
+                    >
+                        <textarea
+                            value={replyContent}
+                            onChange={(e) => setReplyContent(e.target.value)}
+                            placeholder="Write your reply..."
+                            className="w-full p-3 border-2 border-gray-200 rounded-cartoon focus:border-cartoon-blue outline-none resize-none"
+                            rows="3"
                         />
-                    </div>
-                )}
-
-                {/* Replies */}
-                {comment.replies && comment.replies.length > 0 && (
-                    <div className="mt-4 space-y-4">
-                        {comment.replies.map(reply => (
-                            <Comment
-                                key={reply._id}
-                                comment={reply}
-                                onReply={onReply}
-                                onReaction={onReaction}
-                                onEdit={onEdit}
-                                onDelete={onDelete}
-                                onFlag={onFlag}
-                                sessionId={sessionId}
-                                depth={depth + 1}
-                            />
-                        ))}
-                    </div>
+                        <div className="flex justify-end gap-2 mt-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowReplyForm(false)}
+                                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="px-4 py-2 bg-cartoon-blue text-white rounded-cartoon hover:shadow-cartoon"
+                            >
+                                Reply
+                            </button>
+                        </div>
+                    </motion.form>
                 )}
             </div>
+
+            {/* Replies */}
+            {comment.replies && comment.replies.length > 0 && (
+                <div className="mt-2">
+                    {comment.replies.map(reply => (
+                        <Comment
+                            key={reply._id}
+                            comment={reply}
+                            onReply={onReply}
+                            onDelete={onDelete}
+                            onReaction={onReaction}
+                            depth={depth + 1}
+                            isAdmin={isAdmin}
+                        />
+                    ))}
+                </div>
+            )}
         </motion.div>
     );
 };
 
 // Main Comment Section Component
-const CommentSection = ({ storyId }) => {
+const CommentSection = ({ storyId, username = '', isAuthenticated = false }) => {
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        limit: 20,
-        total: 0,
-        pages: 0
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        content: ''
     });
+    const [submitting, setSubmitting] = useState(false);
     const [sortBy, setSortBy] = useState('newest');
-    const [sessionId, setSessionId] = useState(null);
-    const [stats, setStats] = useState(null);
+    const isAdmin = isAuthenticated && username === 'admin';
 
-    const { ref, inView } = useInView({
-        threshold: 0,
-        triggerOnce: false
-    });
-
-    // Fetch comments
-    const fetchComments = useCallback(async (page = 1) => {
+    const fetchComments = useCallback(async () => {
         try {
-            const response = await fetch(
-                `/api/comments/story/${storyId}?page=${page}&limit=20&sort=${sortBy}`
-            );
-            const data = await response.json();
+            setLoading(true);
+            const response = await api.get(`/comments/story/${storyId}?sort=${sortBy}`);
 
-            if (page === 1) {
-                setComments(data.comments);
-            } else {
-                setComments(prev => [...prev, ...data.comments]);
-            }
+            // Organize comments into tree structure
+            const organizeComments = (comments) => {
+                const commentMap = {};
+                const rootComments = [];
 
-            setPagination(data.pagination);
+                comments.forEach(comment => {
+                    commentMap[comment._id] = { ...comment, replies: [] };
+                });
 
-            // Get session ID from response headers or generate one
-            const newSessionId = response.headers.get('X-Session-Id') ||
-                localStorage.getItem('commentSessionId') ||
-                Math.random().toString(36).substring(7);
-            setSessionId(newSessionId);
-            localStorage.setItem('commentSessionId', newSessionId);
+                comments.forEach(comment => {
+                    if (comment.parentComment) {
+                        if (commentMap[comment.parentComment]) {
+                            commentMap[comment.parentComment].replies.push(commentMap[comment._id]);
+                        }
+                    } else {
+                        rootComments.push(commentMap[comment._id]);
+                    }
+                });
 
+                return rootComments;
+            };
+
+            setComments(organizeComments(response.data.comments));
         } catch (error) {
-            console.error('Error fetching comments:', error);
+            toast.error('Failed to load comments');
         } finally {
             setLoading(false);
         }
     }, [storyId, sortBy]);
 
-    // Fetch comment stats
-    const fetchStats = useCallback(async () => {
+    useEffect(() => {
+        fetchComments();
+    }, [fetchComments]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!formData.content.trim()) return;
+
         try {
-            const response = await fetch(`/api/comments/story/${storyId}/stats`);
-            const data = await response.json();
-            setStats(data);
-        } catch (error) {
-            console.error('Error fetching stats:', error);
-        }
-    }, [storyId]);
+            setSubmitting(true);
+            const sessionId = localStorage.getItem('sessionId') || Date.now().toString();
+            localStorage.setItem('sessionId', sessionId);
 
-    useEffect(() => {
-        fetchComments(1);
-        fetchStats();
-    }, [fetchComments, fetchStats]);
-
-    // Load more when scrolling
-    useEffect(() => {
-        if (inView && pagination.page < pagination.pages) {
-            fetchComments(pagination.page + 1);
-        }
-    }, [inView, pagination, fetchComments]);
-
-    // Handle new comment
-    const handleSubmitComment = async (commentData) => {
-        const response = await fetch(`/api/comments/story/${storyId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(commentData)
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to post comment');
-        }
-
-        const { comment } = await response.json();
-
-        if (commentData.parentId) {
-            // Add reply to parent comment
-            setComments(prev => prev.map(c => {
-                if (c._id === commentData.parentId) {
-                    return {
-                        ...c,
-                        replies: [...(c.replies || []), comment]
-                    };
+            await api.post(`/comments/story/${storyId}`, {
+                content: formData.content,
+                author: {
+                    name: formData.name || 'Anonymous',
+                    email: formData.email,
+                    sessionId
                 }
-                return c;
-            }));
-        } else {
-            // Add new top-level comment
-            setComments(prev => [comment, ...prev]);
-        }
+            });
 
-        // Update stats
-        fetchStats();
+            toast.success('Comment submitted for moderation');
+            setFormData({ name: '', email: '', content: '' });
+
+            // Refresh comments if admin
+            if (isAdmin) {
+                fetchComments();
+            }
+        } catch (error) {
+            toast.error('Failed to submit comment');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
-    // Handle reactions
-    const handleReaction = async (commentId, reaction) => {
+    const handleReply = async (content, parentId) => {
         try {
-            await fetch(`/api/comments/${commentId}/reaction`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            const sessionId = localStorage.getItem('sessionId') || Date.now().toString();
+
+            await api.post(`/comments/story/${storyId}`, {
+                content,
+                author: {
+                    name: isAuthenticated ? username : 'Anonymous',
+                    sessionId
                 },
-                body: JSON.stringify({ reaction })
+                parentId
             });
 
-            // Update local state
-            const updateReactions = (comments) => {
-                return comments.map(c => {
-                    if (c._id === commentId) {
-                        return {
-                            ...c,
-                            reactions: {
-                                ...c.reactions,
-                                [reaction]: c.reactions[reaction] + 1
-                            },
-                            hasVoted: true
-                        };
-                    }
-                    if (c.replies) {
-                        c.replies = updateReactions(c.replies);
-                    }
-                    return c;
-                });
-            };
+            toast.success('Reply submitted for moderation');
 
-            setComments(prev => updateReactions(prev));
+            if (isAdmin) {
+                fetchComments();
+            }
         } catch (error) {
-            console.error('Error adding reaction:', error);
+            toast.error('Failed to submit reply');
         }
     };
 
-    // Handle edit
-    const handleEdit = async (commentId, content) => {
-        const response = await fetch(`/api/comments/${commentId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ content })
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to edit comment');
-        }
-
-        // Refresh comments
-        fetchComments(1);
+    const handleDelete = (commentId) => {
+        setComments(prevComments =>
+            prevComments.filter(comment => comment._id !== commentId)
+        );
     };
 
-    // Handle delete
-    const handleDelete = async (commentId) => {
-        if (!window.confirm('Are you sure you want to delete this comment?')) {
-            return;
-        }
-
-        try {
-            await fetch(`/api/comments/${commentId}`, {
-                method: 'DELETE'
-            });
-
-            // Refresh comments
-            fetchComments(1);
-            fetchStats();
-        } catch (error) {
-            console.error('Error deleting comment:', error);
-        }
-    };
-
-    // Handle flag
-    const handleFlag = async (commentId) => {
-        const reason = window.prompt('Please provide a reason for reporting this comment (optional):');
-
-        try {
-            await fetch(`/api/comments/${commentId}/flag`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ reason })
-            });
-
-            alert('Thank you for your report. We will review this comment.');
-        } catch (error) {
-            console.error('Error flagging comment:', error);
-        }
+    const handleReaction = () => {
+        // Refresh comments to show updated reactions
+        fetchComments();
     };
 
     return (
@@ -628,13 +355,13 @@ const CommentSection = ({ storyId }) => {
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
                     <FiMessageCircle className="text-cartoon-blue" />
-                    Comments {stats && `(${stats.totalComments})`}
+                    Comments
                 </h2>
 
                 <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="px-3 py-1 border-2 border-black rounded-lg focus:outline-none focus:border-cartoon-blue"
+                    className="px-3 py-1 border-2 border-black rounded-cartoon focus:outline-none focus:border-cartoon-blue"
                 >
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
@@ -643,9 +370,56 @@ const CommentSection = ({ storyId }) => {
             </div>
 
             {/* Comment Form */}
-            <div className="mb-8">
-                <CommentForm onSubmit={handleSubmitComment} />
-            </div>
+            <motion.form
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onSubmit={handleSubmit}
+                className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-6 mb-8"
+            >
+                <h3 className="text-lg font-semibold mb-4">Leave a Comment</h3>
+
+                {!isAuthenticated && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <input
+                            type="text"
+                            placeholder="Your Name (optional)"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="px-4 py-2 border-2 border-gray-200 rounded-cartoon focus:border-cartoon-blue outline-none"
+                        />
+                        <input
+                            type="email"
+                            placeholder="Your Email (optional)"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="px-4 py-2 border-2 border-gray-200 rounded-cartoon focus:border-cartoon-blue outline-none"
+                        />
+                    </div>
+                )}
+
+                <textarea
+                    placeholder="Share your thoughts..."
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-cartoon focus:border-cartoon-blue outline-none resize-none"
+                    rows="4"
+                    required
+                />
+
+                <div className="flex justify-between items-center mt-4">
+                    <p className="text-sm text-gray-500">
+                        Comments are moderated before appearing
+                    </p>
+                    <button
+                        type="submit"
+                        disabled={submitting}
+                        className="px-6 py-2 bg-cartoon-blue text-white rounded-cartoon hover:shadow-cartoon disabled:opacity-50 flex items-center gap-2"
+                    >
+                        <FiSend />
+                        {submitting ? 'Submitting...' : 'Submit'}
+                    </button>
+                </div>
+            </motion.form>
 
             {/* Comments List */}
             {loading ? (
@@ -653,33 +427,24 @@ const CommentSection = ({ storyId }) => {
                     <div className="loading loading-spinner loading-lg text-cartoon-blue"></div>
                 </div>
             ) : comments.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
+                <div className="text-center py-12 bg-gray-50 rounded-cartoon">
                     <FiMessageCircle className="mx-auto text-4xl text-gray-400 mb-4" />
                     <p className="text-gray-600">No comments yet. Be the first to share your thoughts!</p>
                 </div>
             ) : (
-                <AnimatePresence>
-                    <div className="space-y-6">
+                <div className="space-y-4">
+                    <AnimatePresence>
                         {comments.map(comment => (
                             <Comment
                                 key={comment._id}
                                 comment={comment}
-                                onReply={handleSubmitComment}
-                                onReaction={handleReaction}
-                                onEdit={handleEdit}
+                                onReply={handleReply}
                                 onDelete={handleDelete}
-                                onFlag={handleFlag}
-                                sessionId={sessionId}
+                                onReaction={handleReaction}
+                                isAdmin={isAdmin}
                             />
                         ))}
-                    </div>
-                </AnimatePresence>
-            )}
-
-            {/* Load More Indicator */}
-            {pagination.page < pagination.pages && (
-                <div ref={ref} className="flex justify-center py-8">
-                    <div className="loading loading-spinner loading-md text-cartoon-blue"></div>
+                    </AnimatePresence>
                 </div>
             )}
         </div>

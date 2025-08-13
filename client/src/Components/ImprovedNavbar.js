@@ -171,18 +171,16 @@ const ImprovedNavbar = ({
                     <IoMdSettings /> Manager
                   </motion.button>
                 </li>
-                {authenticated && (
-                  <li>
-                    <motion.button
-                      whileHover={{ scale: 1.05, rotate: 2 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => navigate("/moderate-comments")}
-                      className="rounded-cartoon bg-cartoon-purple text-white flex items-center gap-2 shadow-cartoon"
-                    >
-                      <BiCommentCheck size={20} /> Comments
-                    </motion.button>
-                  </li>
-                )}
+                <li>
+                  <motion.button
+                    whileHover={{ scale: 1.05, rotate: 2 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate("/moderate-comments")}
+                    className="rounded-cartoon hover:bg-cartoon-orange hover:text-white flex items-center gap-2"
+                  >
+                    <BiCommentCheck size={20} /> Comments
+                  </motion.button>
+                </li>
                 <li>
                   <button
                     onClick={() => navigate("/conversations")}
@@ -294,7 +292,7 @@ const ImprovedNavbar = ({
                           className={
                             isActive(item.path)
                               ? `w-full btn justify-start rounded-cartoon shadow-cartoon bg-${color} text-white`
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-pink"
                           }
                         >
                           <Icon className="text-xl" />
@@ -313,11 +311,25 @@ const ImprovedNavbar = ({
                           className={
                             isActive("/conversations")
                               ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-blue text-white"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-yellow"
                           }
                         >
                           <IoMdBook className="text-xl" />
                           <span className="ml-3">Conversations</span>
+                        </motion.button>
+                      </Link>
+                      <Link to="/moderate-comments" onClick={() => setIsSidebarOpen(false)}>
+                        <motion.button
+                          whileHover={{ x: 10 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={
+                            isActive("/moderate-comments")
+                              ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-blue text-white"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-purple"
+                          }
+                        >
+                          <BiCommentCheck className="text-xl" />
+                          <span className="ml-3">Comments</span>
                         </motion.button>
                       </Link>
                       <Link to="/newsletter/campaigns" onClick={() => setIsSidebarOpen(false)}>
@@ -327,7 +339,7 @@ const ImprovedNavbar = ({
                           className={
                             isActive("/newsletter/campaigns")
                               ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-pink text-white"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-orange"
                           }
                         >
                           <BiEnvelope className="text-xl" />
@@ -342,7 +354,7 @@ const ImprovedNavbar = ({
                           className={
                             isActive("/newsletter/analytics")
                               ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-yellow text-black"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-pink"
                           }
                         >
                           <BiBarChart className="text-xl" />
@@ -353,7 +365,7 @@ const ImprovedNavbar = ({
                         <motion.button
                           whileHover={{ x: 10 }}
                           whileTap={{ scale: 0.95 }}
-                          className="w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-gray-100"
+                          className="w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-blue"
                         >
                           <BiShield className="text-xl" />
                           <span className="ml-3">Privacy Policy</span>

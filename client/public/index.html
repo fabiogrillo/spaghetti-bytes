@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DQTSBB55KE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag() { dataLayer.push(arguments); }
-  gtag('js', new Date());
-
-  gtag('config', 'G-DQTSBB55KE');
-</script>
-
-
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DQTSBB55KE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-DQTSBB55KE');
+  </script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Spaghetti Bytes - Where Code Meets Creativity</title>
-  <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
-  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+
+  <!-- Favicon Support - Multiple formats for better compatibility -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Fallback for SVG support -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
   <meta name="description"
     content="A cartoon-themed technical blog where code meets creativity. Untangling spaghetti code, one byte at a time!" />
   <meta name="keywords"
@@ -27,7 +34,7 @@
     content="A cartoon-themed technical blog where code meets creativity. Untangling spaghetti code, one byte at a time!" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://spaghetti-bytes.com" />
-  <meta property="og:image" content="%PUBLIC_URL%/og-image.png" />
+  <meta property="og:image" content="/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Spaghetti Bytes - Where Code Meets Creativity" />
   <meta name="twitter:description"

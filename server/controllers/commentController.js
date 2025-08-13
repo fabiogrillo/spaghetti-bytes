@@ -1,395 +1,425 @@
 // server/controllers/commentController.js
-const Comment = require("../models/Comment");
-const Story = require("../models/Story");
-const crypto = require("crypto");
-const DOMPurify = require("isomorphic-dompurify");
-const mongoose = require("mongoose");
+// Complete comment system with moderation workflow
 
-// Helper function to generate session ID
-const generateSessionId = (req) => {
-    const ip = req.ip || req.connection.remoteAddress;
-    const userAgent = req.headers['user-agent'] || '';
-    const timestamp = Date.now();
-    return crypto.createHash('md5').update(`${ip}-${userAgent}-${timestamp}`).digest('hex');
-};
+const Comment = require('../models/Comment');
+const Story = require('../models/Story');
+const { validationResult } = require('express-validator');
 
-// Helper function to get or create session ID
-const getSessionId = (req) => {
-    // Check if session ID exists in cookies or session
-    if (req.session && req.session.commentSessionId) {
-        return req.session.commentSessionId;
-    }
-
-    // Generate new session ID
-    const sessionId = generateSessionId(req);
-
-    // Store in session if available
-    if (req.session) {
-        req.session.commentSessionId = sessionId;
-    }
-
-    return sessionId;
-};
-
-// Helper function to sanitize comment content
-const sanitizeContent = (content) => {
-    // Remove any HTML tags but keep line breaks
-    const sanitized = DOMPurify.sanitize(content, {
-        ALLOWED_TAGS: [],
-        KEEP_CONTENT: true
-    });
-
-    // Convert URLs to links (simple regex)
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return sanitized.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-};
-
-// Get comments for a story
+// Get comments for a story (only approved for non-admin)
 exports.getComments = async (req, res) => {
     try {
         const { storyId } = req.params;
-        const { page = 1, limit = 20, sort = 'newest' } = req.query;
+        const { page = 1, limit = 10, sort = 'newest' } = req.query;
 
-        // Verify story exists
-        const story = await Story.findById(storyId);
-        if (!story) {
-            return res.status(404).json({ error: "Story not found" });
+        // Build query based on user role
+        let query = { story: storyId };
+
+        // Non-admin users only see approved comments
+        if (!req.user || req.user.role !== 'admin') {
+            query.status = 'approved';
         }
 
-        // Build sort options
-        let sortOptions = {};
+        // Sorting options
+        let sortOption = {};
         switch (sort) {
             case 'oldest':
-                sortOptions = { createdAt: 1 };
+                sortOption = { createdAt: 1 };
                 break;
             case 'popular':
-                sortOptions = { 'reactions.love': -1, 'reactions.thumbsUp': -1 };
+                sortOption = { 'reactions.totalCount': -1, createdAt: -1 };
                 break;
             case 'newest':
             default:
-                sortOptions = { createdAt: -1 };
+                sortOption = { createdAt: -1 };
         }
 
-        // Get comments with pagination
-        const comments = await Comment.getCommentsForStory(storyId, {
-            page: parseInt(page),
-            limit: parseInt(limit),
-            includeReplies: true,
-            status: 'approved'
-        });
+        const comments = await Comment.find(query)
+            .populate('author.userId', 'username avatar')
+            .sort(sortOption)
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .lean();
 
-        // Get total count for pagination
-        const totalCount = await Comment.countDocuments({
-            storyId,
-            status: 'approved',
-            parentId: null
-        });
+        const total = await Comment.countDocuments(query);
 
-        // Add session-specific data (like whether user has voted)
-        const sessionId = getSessionId(req);
-        comments.forEach(comment => {
-            comment.hasVoted = comment.voters &&
-                comment.voters.some(v => v.sessionId === sessionId);
-
-            // Process replies too
-            if (comment.replies) {
-                comment.replies.forEach(reply => {
-                    reply.hasVoted = reply.voters &&
-                        reply.voters.some(v => v.sessionId === sessionId);
-                });
-            }
-        });
+        // Add admin flag to comments if user is admin
+        if (req.user && req.user.role === 'admin') {
+            comments.forEach(comment => {
+                comment.isAdmin = true;
+                comment.canDelete = true;
+            });
+        }
 
         res.json({
             comments,
             pagination: {
                 page: parseInt(page),
                 limit: parseInt(limit),
-                total: totalCount,
-                pages: Math.ceil(totalCount / limit)
+                total,
+                pages: Math.ceil(total / limit)
             }
         });
     } catch (error) {
-        console.error("Error fetching comments:", error);
-        res.status(500).json({ error: "Failed to fetch comments" });
+        console.error('Error fetching comments:', error);
+        res.status(500).json({ error: 'Failed to fetch comments' });
     }
 };
 
-// Create a new comment
+// Create new comment (defaults to pending status)
 exports.createComment = async (req, res) => {
     try {
-        const { storyId } = req.params;
-        const { author, content, parentId } = req.body;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
 
-        // Validate story exists
+        const { storyId } = req.params;
+        const { content, author, parentId } = req.body;
+
+        // Verify story exists
         const story = await Story.findById(storyId);
         if (!story) {
-            return res.status(404).json({ error: "Story not found" });
+            return res.status(404).json({ error: 'Story not found' });
         }
 
-        // Validate parent comment if replying
-        if (parentId) {
-            const parentComment = await Comment.findById(parentId);
-            if (!parentComment) {
-                return res.status(404).json({ error: "Parent comment not found" });
-            }
-
-            // Don't allow nested replies (only 1 level deep)
-            if (parentComment.parentId) {
-                return res.status(400).json({ error: "Cannot reply to a reply. Only one level of nesting is allowed." });
-            }
-        }
-
-        // Get IP and user agent for anti-spam
-        const ipAddress = req.ip || req.connection.remoteAddress;
-        const userAgent = req.headers['user-agent'] || 'Unknown';
-
-        // Check rate limiting (10 comments per hour per IP)
-        const isRateLimited = await Comment.checkRateLimit(ipAddress, 10, 60);
-        if (isRateLimited) {
-            return res.status(429).json({
-                error: "Too many comments. Please wait before posting again."
-            });
-        }
-
-        // Basic spam detection
-        const spamKeywords = ['viagra', 'casino', 'lottery', 'click here', 'buy now'];
-        const contentLower = content.toLowerCase();
-        const isSpam = spamKeywords.some(keyword => contentLower.includes(keyword));
-
-        // Sanitize content
-        const sanitizedContent = sanitizeContent(content);
-
-        // Create comment
-        const comment = new Comment({
-            storyId,
-            parentId: parentId || null,
+        // Create comment with pending status for moderation
+        const newComment = new Comment({
+            story: storyId,
+            content,
             author: {
-                name: author.name.trim(),
-                email: author.email ? author.email.trim().toLowerCase() : null,
-                website: author.website ? author.website.trim() : null
+                name: author.name || 'Anonymous',
+                email: author.email,
+                userId: req.user ? req.user._id : null,
+                sessionId: author.sessionId
             },
-            content: sanitizedContent,
-            status: isSpam ? 'spam' : 'approved', // Auto-moderate spam
-            metadata: {
-                ipAddress,
-                userAgent,
-                sessionId: getSessionId(req)
+            parentComment: parentId || null,
+            status: 'pending', // All new comments start as pending
+            reactions: {
+                likes: [],
+                hearts: [],
+                claps: [],
+                totalCount: 0
             }
         });
 
-        await comment.save();
+        await newComment.save();
 
-        // Update story comment count (denormalized for performance)
-        await Story.findByIdAndUpdate(storyId, {
-            $inc: { commentCount: 1 }
+        // Update story comment count (only approved comments)
+        const approvedCount = await Comment.countDocuments({
+            story: storyId,
+            status: 'approved'
         });
+        story.commentsCount = approvedCount;
+        await story.save();
 
-        // Return the created comment
         res.status(201).json({
-            message: "Comment posted successfully",
-            comment: {
-                ...comment.toObject(),
-                hasVoted: false,
-                canEdit: true
-            }
+            message: 'Comment submitted for moderation',
+            comment: newComment,
+            requiresModeration: true
         });
-
     } catch (error) {
-        console.error("Error creating comment:", error);
-
-        // Handle validation errors
-        if (error.name === 'ValidationError') {
-            const errors = Object.keys(error.errors).reduce((acc, key) => {
-                acc[key] = error.errors[key].message;
-                return acc;
-            }, {});
-            return res.status(400).json({ errors });
-        }
-
-        res.status(500).json({ error: "Failed to create comment" });
+        console.error('Error creating comment:', error);
+        res.status(500).json({ error: 'Failed to create comment' });
     }
 };
 
-// Update a comment (within 5-minute edit window)
-exports.updateComment = async (req, res) => {
+// Get comments pending moderation (admin only)
+exports.getPendingComments = async (req, res) => {
     try {
-        const { commentId } = req.params;
-        const { content } = req.body;
-        const sessionId = getSessionId(req);
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
 
-        // Find comment
+        const comments = await Comment.find({
+            status: { $in: ['pending', 'spam'] }
+        })
+            .populate('story', 'title slug')
+            .populate('author.userId', 'username')
+            .sort({ createdAt: -1 })
+            .limit(100);
+
+        res.json({
+            comments,
+            total: comments.length
+        });
+    } catch (error) {
+        console.error('Error fetching pending comments:', error);
+        res.status(500).json({ error: 'Failed to fetch pending comments' });
+    }
+};
+
+// Approve comment (admin only)
+exports.approveComment = async (req, res) => {
+    try {
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
+
+        const { commentId } = req.params;
+
         const comment = await Comment.findById(commentId);
         if (!comment) {
-            return res.status(404).json({ error: "Comment not found" });
+            return res.status(404).json({ error: 'Comment not found' });
         }
 
-        // Check if comment belongs to this session
-        if (comment.metadata.sessionId !== sessionId) {
-            return res.status(403).json({ error: "You can only edit your own comments" });
+        comment.status = 'approved';
+        comment.moderatedBy = req.user._id;
+        comment.moderatedAt = new Date();
+        await comment.save();
+
+        // Update story comment count
+        const story = await Story.findById(comment.story);
+        if (story) {
+            const approvedCount = await Comment.countDocuments({
+                story: story._id,
+                status: 'approved'
+            });
+            story.commentsCount = approvedCount;
+            await story.save();
         }
 
-        // Check if still within edit window
-        if (!comment.canEdit) {
-            return res.status(403).json({ error: "Edit window has expired (5 minutes)" });
-        }
-
-        // Save old content to edit history
-        if (!comment.metadata.editHistory) {
-            comment.metadata.editHistory = [];
-        }
-        comment.metadata.editHistory.push({
-            content: comment.content,
-            editedAt: new Date()
+        res.json({
+            message: 'Comment approved successfully',
+            comment
         });
+    } catch (error) {
+        console.error('Error approving comment:', error);
+        res.status(500).json({ error: 'Failed to approve comment' });
+    }
+};
 
-        // Update content
-        comment.content = sanitizeContent(content);
+// Reject comment (admin only)
+exports.rejectComment = async (req, res) => {
+    try {
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
+
+        const { commentId } = req.params;
+        const { reason } = req.body;
+
+        const comment = await Comment.findById(commentId);
+        if (!comment) {
+            return res.status(404).json({ error: 'Comment not found' });
+        }
+
+        comment.status = 'rejected';
+        comment.moderationReason = reason || 'Content violates community guidelines';
+        comment.moderatedBy = req.user._id;
+        comment.moderatedAt = new Date();
         await comment.save();
 
         res.json({
-            message: "Comment updated successfully",
+            message: 'Comment rejected successfully',
             comment
         });
-
     } catch (error) {
-        console.error("Error updating comment:", error);
-        res.status(500).json({ error: "Failed to update comment" });
+        console.error('Error rejecting comment:', error);
+        res.status(500).json({ error: 'Failed to reject comment' });
     }
 };
 
-// Delete a comment (soft delete)
+// Delete comment (admin only or comment owner)
 exports.deleteComment = async (req, res) => {
     try {
         const { commentId } = req.params;
-        const sessionId = getSessionId(req);
 
-        // Find comment
         const comment = await Comment.findById(commentId);
         if (!comment) {
-            return res.status(404).json({ error: "Comment not found" });
+            return res.status(404).json({ error: 'Comment not found' });
         }
 
-        // Check if comment belongs to this session
-        if (comment.metadata.sessionId !== sessionId) {
-            return res.status(403).json({ error: "You can only delete your own comments" });
+        // Check permissions
+        const isAdmin = req.user && req.user.role === 'admin';
+        const isOwner = req.user && comment.author.userId &&
+            comment.author.userId.toString() === req.user._id.toString();
+
+        if (!isAdmin && !isOwner) {
+            return res.status(403).json({ error: 'Permission denied' });
         }
 
-        // Soft delete
-        await comment.softDelete('user');
-
-        // Update story comment count
-        await Story.findByIdAndUpdate(comment.storyId, {
-            $inc: { commentCount: -1 }
+        // Delete comment and all replies
+        await Comment.deleteMany({
+            $or: [
+                { _id: commentId },
+                { parentComment: commentId }
+            ]
         });
 
-        res.json({ message: "Comment deleted successfully" });
+        // Update story comment count
+        const story = await Story.findById(comment.story);
+        if (story) {
+            const approvedCount = await Comment.countDocuments({
+                story: story._id,
+                status: 'approved'
+            });
+            story.commentsCount = approvedCount;
+            await story.save();
+        }
 
+        res.json({
+            message: 'Comment deleted successfully',
+            deletedId: commentId
+        });
     } catch (error) {
-        console.error("Error deleting comment:", error);
-        res.status(500).json({ error: "Failed to delete comment" });
+        console.error('Error deleting comment:', error);
+        res.status(500).json({ error: 'Failed to delete comment' });
     }
 };
 
-// Add reaction to a comment
+// Admin delete (force delete regardless of status)
+exports.adminDeleteComment = async (req, res) => {
+    try {
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
+
+        const { commentId } = req.params;
+
+        const comment = await Comment.findById(commentId);
+        if (!comment) {
+            return res.status(404).json({ error: 'Comment not found' });
+        }
+
+        // Delete comment and all its replies
+        const deleteCommentAndReplies = async (id) => {
+            const replies = await Comment.find({ parentComment: id });
+            for (const reply of replies) {
+                await deleteCommentAndReplies(reply._id);
+            }
+            await Comment.findByIdAndDelete(id);
+        };
+
+        await deleteCommentAndReplies(commentId);
+
+        // Update story comment count
+        const story = await Story.findById(comment.story);
+        if (story) {
+            const approvedCount = await Comment.countDocuments({
+                story: story._id,
+                status: 'approved'
+            });
+            story.commentsCount = approvedCount;
+            await story.save();
+        }
+
+        res.json({
+            message: 'Comment and all replies deleted successfully',
+            deletedId: commentId
+        });
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        res.status(500).json({ error: 'Failed to delete comment' });
+    }
+};
+
+// Add reaction to comment
 exports.addReaction = async (req, res) => {
     try {
         const { commentId } = req.params;
-        const { reaction } = req.body;
-        const sessionId = getSessionId(req);
+        const { type, sessionId } = req.body;
 
-        // Validate reaction type
-        const validReactions = ['love', 'thumbsUp', 'thumbsDown', 'laugh', 'wow'];
-        if (!validReactions.includes(reaction)) {
-            return res.status(400).json({ error: "Invalid reaction type" });
+        if (!['like', 'heart', 'clap'].includes(type)) {
+            return res.status(400).json({ error: 'Invalid reaction type' });
         }
 
-        // Find comment
         const comment = await Comment.findById(commentId);
         if (!comment) {
-            return res.status(404).json({ error: "Comment not found" });
+            return res.status(404).json({ error: 'Comment not found' });
         }
 
-        // Add or update reaction
-        await comment.addReaction(reaction, sessionId);
+        // Check if already reacted
+        const reactionField = `reactions.${type}s`;
+        const userId = req.user ? req.user._id.toString() : sessionId;
+
+        const alreadyReacted = comment.reactions[`${type}s`].some(
+            r => r.toString() === userId
+        );
+
+        if (alreadyReacted) {
+            // Remove reaction
+            comment.reactions[`${type}s`] = comment.reactions[`${type}s`].filter(
+                r => r.toString() !== userId
+            );
+            comment.reactions.totalCount--;
+        } else {
+            // Add reaction
+            comment.reactions[`${type}s`].push(userId);
+            comment.reactions.totalCount++;
+        }
+
+        await comment.save();
 
         res.json({
-            message: "Reaction added successfully",
+            message: alreadyReacted ? 'Reaction removed' : 'Reaction added',
             reactions: comment.reactions
         });
-
     } catch (error) {
-        console.error("Error adding reaction:", error);
-        res.status(500).json({ error: "Failed to add reaction" });
+        console.error('Error adding reaction:', error);
+        res.status(500).json({ error: 'Failed to add reaction' });
     }
 };
 
-// Flag comment as spam/inappropriate
+// Flag comment for review
 exports.flagComment = async (req, res) => {
     try {
         const { commentId } = req.params;
         const { reason } = req.body;
 
-        // Find comment
         const comment = await Comment.findById(commentId);
         if (!comment) {
-            return res.status(404).json({ error: "Comment not found" });
+            return res.status(404).json({ error: 'Comment not found' });
         }
 
-        // Flag the comment
-        await comment.flag();
+        comment.status = 'spam';
+        comment.flagReason = reason || 'Flagged by user';
+        comment.flaggedAt = new Date();
+        await comment.save();
 
-        // Log the flag reason (you might want to store this in a separate collection)
-        console.log(`Comment ${commentId} flagged for: ${reason}`);
-
-        res.json({ message: "Comment has been flagged for review" });
-
+        res.json({
+            message: 'Comment flagged for review',
+            commentId
+        });
     } catch (error) {
-        console.error("Error flagging comment:", error);
-        res.status(500).json({ error: "Failed to flag comment" });
+        console.error('Error flagging comment:', error);
+        res.status(500).json({ error: 'Failed to flag comment' });
     }
 };
 
-// Get comment stats for a story
+// Get comment statistics (admin only)
 exports.getCommentStats = async (req, res) => {
     try {
-        const { storyId } = req.params;
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
 
         const stats = await Comment.aggregate([
             {
-                $match: {
-                    storyId: new mongoose.Types.ObjectId(storyId),
-                    status: 'approved'
-                }
-            },
-            {
                 $group: {
-                    _id: null,
-                    totalComments: { $sum: 1 },
-                    totalReactions: {
-                        $sum: {
-                            $add: [
-                                '$reactions.love',
-                                '$reactions.thumbsUp',
-                                '$reactions.thumbsDown',
-                                '$reactions.laugh',
-                                '$reactions.wow'
-                            ]
-                        }
-                    },
-                    uniqueAuthors: { $addToSet: '$author.email' }
+                    _id: '$status',
+                    count: { $sum: 1 }
                 }
             }
         ]);
 
-        res.json({
-            totalComments: stats[0]?.totalComments || 0,
-            totalReactions: stats[0]?.totalReactions || 0,
-            uniqueAuthors: stats[0]?.uniqueAuthors.filter(e => e).length || 0
+        const formattedStats = {
+            total: 0,
+            approved: 0,
+            pending: 0,
+            rejected: 0,
+            spam: 0
+        };
+
+        stats.forEach(stat => {
+            formattedStats[stat._id] = stat.count;
+            formattedStats.total += stat.count;
         });
 
+        res.json(formattedStats);
     } catch (error) {
-        console.error("Error getting comment stats:", error);
-        res.status(500).json({ error: "Failed to get comment statistics" });
+        console.error('Error fetching comment stats:', error);
+        res.status(500).json({ error: 'Failed to fetch comment statistics' });
     }
 };
+
+module.exports = exports;

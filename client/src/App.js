@@ -1,5 +1,4 @@
-// client/src/App.js - Updated with optional lazy loading
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -39,14 +38,6 @@ import CommentReaction from "./Pages/CommentReaction";
 // Import analytics hook
 import { useAnalytics } from "./hooks/useAnalytics";
 
-// Performance Monitor - only load in development
-const PerformanceMonitor = lazy(() =>
-  import('./Components/PerformanceMonitor').catch(() => {
-    // Return a fallback component if the module doesn't exist
-    return { default: () => null };
-  })
-);
-
 // Protected Route Component
 const ProtectedRoute = ({ children, isAuthenticated, checkingAuth }) => {
   if (checkingAuth) {
@@ -62,19 +53,6 @@ const ProtectedRoute = ({ children, isAuthenticated, checkingAuth }) => {
 // App Content Component
 const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, checkingAuth }) => {
   useAnalytics();
-  const [showPerformance, setShowPerformance] = useState(false);
-
-  useEffect(() => {
-    // Mostra il performance monitor se admin o debug=true
-    const urlParams = new URLSearchParams(window.location.search);
-    if (
-      process.env.NODE_ENV === 'development' ||
-      (isAuthenticated && urlParams.get('debug') === 'true') ||
-      (isAuthenticated && username === 'admin')
-    ) {
-      setShowPerformance(true);
-    }
-  }, [isAuthenticated, username]);
 
   return (
     <>
@@ -217,13 +195,6 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
       <CookieBanner />
       <CookieSettings />
       <DonationButton variant="floating" />
-
-      {/* Performance Monitor - Only for authenticated admins */}
-      {showPerformance && isAuthenticated && (
-        <Suspense fallback={null}>
-          <PerformanceMonitor show={true} position="bottom-left" />
-        </Suspense>
-      )}
     </>
   );
 };

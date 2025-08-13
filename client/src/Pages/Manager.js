@@ -1,92 +1,24 @@
-import { useNavigate } from "react-router-dom";
+// client/src/Pages/Manager.js
+// Redesigned with better organization and UI
 import { motion } from "framer-motion";
-import { BiBookAdd, BiTargetLock, BiEnvelope, BiBarChart, BiBook, BiTrophy, BiMessageSquareDetail } from "react-icons/bi";
+import {
+  BiPlus, BiEdit, BiStats, BiTargetLock,
+  BiCommentCheck, BiConversation, BiUser
+} from "react-icons/bi";
+import {
+  FaNewspaper, FaBullseye,
+  FaComments, FaEnvelope,
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-const Manager = ({ username, isAuthenticated }) => {
+const Manager = ({ username = 'admin', isAuthenticated = false }) => {
   const navigate = useNavigate();
 
-  const sections = [
-    {
-      title: "📚 Stories Management",
-      description: "Create and manage your blog content",
-      color: "from-cartoon-pink/20 to-cartoon-purple/20",
-      borderColor: "border-cartoon-pink",
-      buttons: [
-        {
-          label: "Write New Story",
-          icon: <BiBookAdd size={24} />,
-          action: () => navigate("/editor"),
-          description: "Create a new masterpiece",
-          color: "bg-cartoon-pink hover:bg-cartoon-pink/90",
-          emoji: "✍️",
-        },
-        {
-          label: "Manage Stories",
-          icon: <BiBook size={24} />,
-          action: () => navigate("/storyTable"),
-          description: "Edit your existing stories",
-          color: "bg-cartoon-blue hover:bg-cartoon-blue/90",
-          emoji: "📝",
-        },
-      ]
-    },
-    {
-      title: "🎯 Goals Management",
-      description: "Set and track your achievements",
-      color: "from-cartoon-yellow/20 to-cartoon-orange/20",
-      borderColor: "border-cartoon-yellow",
-      buttons: [
-        {
-          label: "Create New Goal",
-          icon: <BiTargetLock size={24} />,
-          action: () => navigate("/create-goal"),
-          description: "Set a new achievement",
-          color: "bg-cartoon-yellow hover:bg-cartoon-yellow/90",
-          emoji: "🎯",
-        },
-        {
-          label: "Manage Goals",
-          icon: <BiTrophy size={24} />,
-          action: () => navigate("/goalsTable"),
-          description: "Track your progress",
-          color: "bg-cartoon-purple hover:bg-cartoon-purple/90",
-          emoji: "📊",
-        },
-      ]
-    },
-    {
-      title: "💌 Communication & Analytics",
-      description: "Engage with your audience",
-      color: "from-cartoon-blue/20 to-cartoon-blue-dark/20",
-      borderColor: "border-cartoon-blue",
-      buttons: [
-        {
-          label: "Conversations",
-          icon: <BiMessageSquareDetail size={24} />,
-          action: () => navigate("/conversations"),
-          description: "Manage inbox & replies",
-          color: "bg-cartoon-blue-dark hover:bg-cartoon-blue-dark/90",
-          emoji: "💬",
-        },
-        {
-          label: "Email Campaigns",
-          icon: <BiEnvelope size={24} />,
-          action: () => navigate("/newsletter/campaigns"),
-          description: "Create newsletters",
-          color: "bg-cartoon-orange hover:bg-cartoon-orange/90",
-          emoji: "📧",
-        },
-        {
-          label: "Analytics",
-          icon: <BiBarChart size={24} />,
-          action: () => navigate("/newsletter/analytics"),
-          description: "View statistics",
-          color: "bg-cartoon-green hover:bg-cartoon-green/90",
-          emoji: "📈",
-        },
-      ]
-    }
-  ];
+  // Redirect if not admin
+  if (!isAuthenticated || username !== 'admin') {
+    navigate('/login');
+    return null;
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -110,39 +42,152 @@ const Manager = ({ username, isAuthenticated }) => {
     }
   };
 
-  return (
-    <div className="min-h-screen py-12 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12"
-      >
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Welcome back, <span className="text-cartoon-pink">{username}</span>! 🍝
-        </h1>
-        <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-600 dark:text-gray-300">
-          Your creative kitchen awaits! What amazing content shall we cook up today?
-        </p>
-      </motion.div>
+  const sections = [
+    {
+      title: "📝 Content Management",
+      description: "Create and manage your blog posts",
+      gridCols: 3,
+      buttons: [
+        {
+          label: "New Story",
+          description: "Write a new blog post",
+          icon: <BiPlus size={24} />,
+          emoji: "✍️",
+          color: "bg-gradient-to-br from-cartoon-pink to-pink-600",
+          action: () => navigate("/editor")
+        },
+        {
+          label: "Edit Stories",
+          description: "Manage existing posts",
+          icon: <BiEdit size={24} />,
+          emoji: "📚",
+          color: "bg-gradient-to-br from-cartoon-blue to-blue-600",
+          action: () => navigate("/storyTable")
+        },
+        {
+          label: "Moderate Comments",
+          description: "Review and approve comments",
+          icon: <BiCommentCheck size={24} />,
+          emoji: "💬",
+          color: "bg-gradient-to-br from-cartoon-purple to-purple-600",
+          action: () => navigate("/moderate-comments")
+        }
+      ]
+    },
+    {
+      title: "🎯 Goals & Planning",
+      description: "Track your progress and achievements",
+      gridCols: 2,
+      buttons: [
+        {
+          label: "Create Goal",
+          description: "Set new objectives",
+          icon: <BiTargetLock size={24} />,
+          emoji: "🎯",
+          color: "bg-gradient-to-br from-cartoon-yellow to-yellow-600",
+          action: () => navigate("/create-goal")
+        },
+        {
+          label: "Manage Goals",
+          description: "Track your progress",
+          icon: <FaBullseye size={24} />,
+          emoji: "📊",
+          color: "bg-gradient-to-br from-cartoon-orange to-orange-600",
+          action: () => navigate("/goalsTable")
+        }
+      ]
+    },
+    {
+      title: "📊 Analytics & Communication",
+      description: "Monitor performance and engage with readers",
+      gridCols: 3,
+      buttons: [
+        {
+          label: "Analytics",
+          description: "View site statistics",
+          icon: <BiStats size={24} />,
+          emoji: "📈",
+          color: "bg-gradient-to-br from-green-500 to-green-700",
+          action: () => navigate("/newsletter/analytics")
+        },
+        {
+          label: "Conversations",
+          description: "Chat messages from visitors",
+          icon: <BiConversation size={24} />,
+          emoji: "💌",
+          color: "bg-gradient-to-br from-indigo-500 to-indigo-700",
+          action: () => navigate("/conversations")
+        },
+        {
+          label: "Newsletter",
+          description: "Subscriber management",
+          icon: <FaEnvelope size={24} />,
+          emoji: "📮",
+          color: "bg-gradient-to-br from-red-500 to-red-700",
+          action: () => navigate("/newsletter/campaigns")
+        }
+      ]
+    }
+  ];
 
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-7xl mx-auto space-y-8"
+        className="max-w-7xl mx-auto"
       >
+        {/* Header */}
+        <motion.div
+          variants={sectionVariants}
+          className="text-center mb-12"
+        >
+          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cartoon-pink via-cartoon-purple to-cartoon-blue bg-clip-text text-transparent">
+            Admin Dashboard
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
+            Welcome back, <span className="font-semibold text-cartoon-purple">{username}</span>!
+            Ready to create something amazing today?
+          </p>
+        </motion.div>
+
+        {/* Quick Stats Bar */}
+        <motion.div
+          variants={sectionVariants}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+        >
+          {[
+            { label: "Total Posts", value: "42", icon: <FaNewspaper />, color: "text-cartoon-pink" },
+            { label: "Comments", value: "128", icon: <FaComments />, color: "text-cartoon-blue" },
+            { label: "Goals", value: "8", icon: <FaBullseye />, color: "text-cartoon-yellow" },
+            { label: "Visitors", value: "1.2k", icon: <BiUser />, color: "text-cartoon-purple" }
+          ].map((stat, index) => (
+            <div key={index} className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-4 text-center">
+              <div className={`text-3xl ${stat.color} mb-2`}>{stat.icon}</div>
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Main Sections */}
         {sections.map((section, sectionIndex) => (
           <motion.div
             key={sectionIndex}
             variants={sectionVariants}
-            className={`bg-gradient-to-br ${section.color} rounded-cartoon border-2 ${section.borderColor} shadow-cartoon p-6 md:p-8`}
+            className="mb-8"
           >
-            <div className="mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">{section.title}</h2>
-              <p className="text-gray-600 dark:text-gray-300">{section.description}</p>
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                {section.title}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                {section.description}
+              </p>
             </div>
 
-            <div className={`grid grid-cols-1 md:grid-cols-${section.buttons.length === 2 ? '2' : '3'} gap-4`}>
+            <div className={`grid grid-cols-1 md:grid-cols-${section.gridCols === 2 ? '2' : '3'} gap-4`}>
               {section.buttons.map((button, buttonIndex) => (
                 <motion.button
                   key={buttonIndex}
@@ -181,9 +226,6 @@ const Manager = ({ username, isAuthenticated }) => {
           </motion.div>
         ))}
 
-          {isAuthenticated && username === 'admin' && (
-            <a href="/moderate-comments" className="btn btn-sm bg-cartoon-purple text-white ml-2">Moderazione Commenti</a>
-          )}
         {/* Quick Stats Card */}
         <motion.div
           variants={sectionVariants}
