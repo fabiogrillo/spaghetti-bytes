@@ -1,4 +1,4 @@
-// server/routes/commentRoute.js
+// server/routes/commentRoute.js - FIXED VERSION
 const express = require("express");
 const router = express.Router();
 const commentController = require("../controllers/commentController");
@@ -13,7 +13,7 @@ const validate = (req, res, next) => {
     next();
 };
 
-// Validation rules
+// Validation rules - FIXED parentId validation
 const commentValidation = [
     body("author.name")
         .trim()
@@ -33,9 +33,18 @@ const commentValidation = [
         .isLength({ min: 1, max: 5000 })
         .withMessage("Comment must be between 1 and 5000 characters"),
     body("parentId")
-        .optional()
-        .isMongoId()
-        .withMessage("Invalid parent comment ID")
+        .optional({ nullable: true })  // ← FIX: Allow null values
+        .custom((value) => {
+            // Only validate if value is not null
+            if (value !== null && value !== undefined && value !== '') {
+                // Check if it's a valid MongoDB ObjectId
+                const ObjectId = require('mongoose').Types.ObjectId;
+                if (!ObjectId.isValid(value)) {
+                    throw new Error("Invalid parent comment ID");
+                }
+            }
+            return true;
+        })
 ];
 
 const reactionValidation = [

@@ -1,34 +1,30 @@
 // scripts/optimizeImages.js
-/**
- * Batch image optimization script
- * Processes all images in uploads folder
- */
-
+const sharp = require('sharp');
 const fs = require('fs').promises;
 const path = require('path');
-const ImageProcessor = require('../server/utils/imageProcessor');
 
-async function optimizeAllImages() {
-    console.log('🖼️  Starting batch image optimization...\n');
+async function optimizeImages() {
+    console.log('🖼️  Starting image optimization...\n');
 
-    const processor = new ImageProcessor({
-        uploadDir: 'uploads/original',
-        processedDir: 'uploads/processed',
-        formats: ['webp', 'jpeg'],
-        quality: {
-            webp: 85,
-            jpeg: 80
-        }
-    });
+    const inputDir = path.join(__dirname, '../uploads/original');
+    const outputDir = path.join(__dirname, '../uploads/optimized');
 
     try {
-        // Get all images from upload directory
-        const uploadDir = path.join(__dirname, '../uploads/original');
-        const files = await fs.readdir(uploadDir);
+        // Create output directory if it doesn't exist
+        await fs.mkdir(outputDir, { recursive: true });
+        await fs.mkdir(path.join(outputDir, 'webp'), { recursive: true });
+        await fs.mkdir(path.join(outputDir, 'jpeg'), { recursive: true });
 
+        // Get all images from input directory
+        const files = await fs.readdir(inputDir).catch(() => []);
         const imageFiles = files.filter(file =>
             /\.(jpg|jpeg|png|gif|webp)$/i.test(file)
         );
+
+        if (imageFiles.length === 0) {
+            console.log('No images found to optimize');
+            return;
+        }
 
         console.log(`Found ${imageFiles.length} images to process\n`);
 
@@ -36,15 +32,31 @@ async function optimizeAllImages() {
         let processedCount = 0;
 
         for (const file of imageFiles) {
-            const filePath = path.join(uploadDir, file);
+            const inputPath = path.join(inputDir, file);
+            const baseName = path.parse(file).name;
+
             console.log(`Processing: ${file}`);
 
             try {
-                const result = await processor.processImage(filePath);
+                const stats = await fs.stat(inputPath);
+                const originalSize = stats.size;
+
+                // Create WebP version
+                const webpPath = path.join(outputDir, 'webp', `${baseName}.webp`);
+                await sharp(inputPath)
+                    .webp({ quality: 85 })
+                    .toFile(webpPath);
+
+                // Create optimized JPEG version
+                const jpegPath = path.join(outputDir, 'jpeg', `${baseName}.jpg`);
+                await sharp(inputPath)
+                    .jpeg({ quality: 80, progressive: true })
+                    .toFile(jpegPath);
 
                 // Calculate space saved
-                const originalSize = result.original.size;
-                const optimizedSize = Math.min(...result.variants.map(v => v.size));
+                const webpStats = await fs.stat(webpPath);
+                const jpegStats = await fs.stat(jpegPath);
+                const optimizedSize = Math.min(webpStats.size, jpegStats.size);
                 const saved = originalSize - optimizedSize;
                 const savedPercent = ((saved / originalSize) * 100).toFixed(1);
 
@@ -52,30 +64,27 @@ async function optimizeAllImages() {
                 processedCount++;
 
                 console.log(`  ✅ Optimized: ${savedPercent}% size reduction`);
-                console.log(`  📊 Variants created: ${result.variants.length}`);
-                console.log(`  🎨 Blurhash: ${result.blurhash}\n`);
 
             } catch (error) {
-                console.error(`  ❌ Error processing ${file}: ${error.message}\n`);
+                console.error(`  ❌ Error processing ${file}: ${error.message}`);
             }
         }
 
-        // Summary
-        console.log('════════════════════════════════════════');
+        console.log('\n════════════════════════════════════════');
         console.log('📊 Optimization Summary:');
         console.log(`  • Images processed: ${processedCount}/${imageFiles.length}`);
         console.log(`  • Total space saved: ${(totalSaved / 1024 / 1024).toFixed(2)} MB`);
         console.log('════════════════════════════════════════\n');
 
     } catch (error) {
-        console.error('❌ Batch optimization failed:', error);
+        console.error('❌ Optimization failed:', error);
         process.exit(1);
     }
 }
 
 // Run if called directly
 if (require.main === module) {
-    optimizeAllImages();
+    optimizeImages();
 }
 
-module.exports = optimizeAllImages;
+module.exports = optimizeImages;

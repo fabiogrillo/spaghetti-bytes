@@ -1,4 +1,4 @@
-// server/server.js - Simplified version for Vercel deployment
+// server/server.js - Final optimized version for Vercel
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -19,7 +19,6 @@ dotenv.config();
 
 // Models
 const User = require("./models/User");
-const Comment = require("./models/Comment");
 
 // Routes
 const storyRoutes = require("./routes/storyRoute");
@@ -34,13 +33,22 @@ const commentRoutes = require("./routes/commentRoute");
 const { apiLimiter, authLimiter } = require("./middleware/rateLimiter");
 const { authValidation, sanitizeMongo } = require("./middleware/validation");
 
+// Cache middleware
+const {
+  cacheRSS,
+  cacheStory,
+  cacheWall,
+  cacheAnalytics,
+  cacheGoals,
+  cacheAdminRoutes
+} = require("./middleware/cacheRoutes");
+
 const app = express();
 
 // ====================================
-// SECURITY MIDDLEWARE
+// SECURITY & PERFORMANCE MIDDLEWARE
 // ====================================
 
-// Trust proxy - important for production
 app.set('trust proxy', 1);
 
 // Helmet for security headers
@@ -58,7 +66,7 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
 }));
 
-// Compression for all responses
+// Compression
 app.use(compression({
   filter: (req, res) => {
     if (req.headers['x-no-compression']) {
@@ -70,14 +78,14 @@ app.use(compression({
   threshold: 1024
 }));
 
-// MongoDB query sanitization
+// MongoDB sanitization
 app.use(mongoSanitize());
 
-// Body parser middleware with limits
+// Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Apply general rate limiting to all routes
+// Rate limiting
 app.use('/api/', apiLimiter);
 
 // ====================================
@@ -86,7 +94,6 @@ app.use('/api/', apiLimiter);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
     const allowedOrigins = [
@@ -122,35 +129,18 @@ const sessionConfig = {
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
-    touchAfter: 24 * 3600 // lazy session update
+    touchAfter: 24 * 3600
   }),
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    maxAge: 1000 * 60 * 60 * 24 * 7,
     sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
   },
-  name: 'sessionId' // don't use default name
+  name: 'sessionId'
 };
 
 app.use(session(sessionConfig));
-
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key-here',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
-    collectionName: 'sessions',
-    ttl: 24 * 60 * 60 // 1 day
-  }),
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
-    sameSite: 'strict'
-  }
-}));
 
 // ====================================
 // PASSPORT CONFIGURATION
@@ -199,7 +189,6 @@ passport.deserializeUser(async (id, done) => {
 // AUTHENTICATION ROUTES
 // ====================================
 
-// Login route with rate limiting
 app.post("/api/login", authLimiter, authValidation.login, async (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
@@ -214,7 +203,6 @@ app.post("/api/login", authLimiter, authValidation.login, async (req, res, next)
         return res.status(500).json({ message: "Login failed" });
       }
 
-      // Also create JWT token for API calls
       const token = jwt.sign(
         { userId: user._id, email: user.email },
         process.env.JWT_SECRET || 'default-jwt-secret',
@@ -234,7 +222,6 @@ app.post("/api/login", authLimiter, authValidation.login, async (req, res, next)
   })(req, res, next);
 });
 
-// Logout route
 app.post("/api/logout", (req, res) => {
   req.logout((err) => {
     if (err) {
@@ -250,7 +237,6 @@ app.post("/api/logout", (req, res) => {
   });
 });
 
-// Check authentication status
 app.get("/api/auth/check", (req, res) => {
   if (req.isAuthenticated()) {
     res.json({
@@ -267,37 +253,62 @@ app.get("/api/auth/check", (req, res) => {
 });
 
 // ====================================
-// API ROUTES
+// API ROUTES WITH CACHING
 // ====================================
 
-// Story routes
+// RSS feeds with caching
+app.get("/rss.xml", cacheRSS, require("./controllers/rssController").generateRSSFeed);
+app.get("/atom.xml", cacheRSS, require("./controllers/rssController").generateAtomFeed);
+app.get("/feed.json", cacheRSS, require("./controllers/rssController").generateJSONFeed);
+
+// Stories with caching
+app.get("/api/stories", cacheWall, (req, res, next) => {
+  storyRoutes(req, res, next);
+});
+app.get("/api/stories/:id", cacheStory, (req, res, next) => {
+  storyRoutes(req, res, next);
+});
+
+// Use routes without caching for write operations
 app.use("/api/stories", storyRoutes);
-
-// Goal routes
 app.use("/api/goals", goalRoutes);
-
-// Conversation routes
 app.use("/api/conversations", conversationRoutes);
-
-// Newsletter routes
 app.use("/api/newsletter", newsletterRoutes);
-
-// Analytics routes (admin only)
 app.use("/api/analytics", analyticsRoutes);
-
-// RSS feed routes
-app.use("/", rssRoute);
-
-// Comment routes
 app.use("/api/comments", commentRoutes);
+
+// Cache admin routes
+cacheAdminRoutes(app);
 
 // ====================================
 // STATIC FILES (for production)
 // ====================================
 
 if (process.env.NODE_ENV === 'production') {
-  // Serve static files from React build
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  // Serve optimized images
+  app.use('/images', express.static(path.join(__dirname, '../uploads/optimized'), {
+    maxAge: '30d',
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+      if (path.endsWith('.webp')) {
+        res.setHeader('Content-Type', 'image/webp');
+      }
+      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+    }
+  }));
+
+  // Serve React build
+  app.use(express.static(path.join(__dirname, '../client/build'), {
+    maxAge: '1d',
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+      if (path.match(/\.[0-9a-f]{8}\./)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    }
+  }));
 
   // Handle React routing
   app.get('*', (req, res) => {
@@ -309,16 +320,13 @@ if (process.env.NODE_ENV === 'production') {
 // ERROR HANDLING
 // ====================================
 
-// 404 handler
 app.use((req, res, next) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error('Server error:', err);
 
-  // Don't leak error details in production
   const message = process.env.NODE_ENV === 'production'
     ? 'Internal server error'
     : err.message;
@@ -336,16 +344,19 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log("✅ Connected to MongoDB");
 
-    // Start server
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🔐 Security: Helmet + CORS + Rate Limiting enabled`);
-      console.log(`🚄 Performance: Compression enabled`);
+      console.log(`🚄 Performance: Compression + Simple Caching enabled`);
+      console.log(`📦 Optimizations: Ready for Vercel deployment`);
     });
   })
   .catch((err) => {
