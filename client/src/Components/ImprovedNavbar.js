@@ -1,22 +1,26 @@
+// client/src/Components/ImprovedNavbar.js
+// Complete navbar component with comment notifications
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { BiShield, BiCommentCheck } from "react-icons/bi";
+import { BiShield, BiCommentCheck, BiSun, BiMoon, BiEnvelope, BiBarChart } from "react-icons/bi";
 import {
   IoIosLogIn,
   IoIosLogOut,
   IoMdHome,
   IoMdBook,
-  IoMdRocket,
   IoMdMenu,
   IoMdClose,
   IoMdSettings,
 } from "react-icons/io";
-import { BiSun, BiMoon } from "react-icons/bi";
+import { FaComments, FaBullseye } from "react-icons/fa";
+import { GrContact } from "react-icons/gr";
 import { doLogout } from "../Api";
 import Logo from "./Logo";
-import { BiEnvelope, BiBarChart } from "react-icons/bi";
+import api from "../Api";
 
+// Improved Navbar Component
 const ImprovedNavbar = ({
   authenticated,
   username,
@@ -28,6 +32,7 @@ const ImprovedNavbar = ({
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "cartoon");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [pendingCommentsCount, setPendingCommentsCount] = useState(0);
 
   // Auto theme switching based on time
   useEffect(() => {
@@ -67,6 +72,26 @@ const ImprovedNavbar = ({
     }
   }, [isSidebarOpen]);
 
+  // Fetch pending comments count for admin
+  useEffect(() => {
+    if (authenticated) {
+      fetchPendingCommentsCount();
+      // Refresh count every 30 seconds
+      const interval = setInterval(fetchPendingCommentsCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [authenticated]);
+
+  const fetchPendingCommentsCount = async () => {
+    try {
+      const response = await api.get('/comments/pending-count');
+      setPendingCommentsCount(response.data.count);
+    } catch (error) {
+      console.error('Error fetching pending comments count:', error);
+      setPendingCommentsCount(0);
+    }
+  };
+
   const toggleTheme = () => {
     const newTheme = theme === "cartoon" ? "night" : "cartoon";
     setTheme(newTheme);
@@ -84,10 +109,24 @@ const ImprovedNavbar = ({
     }
   };
 
-  const navItems = [
+  // Base navigation items
+  const baseNavItems = [
     { path: "/", label: "Home", icon: IoMdHome },
     { path: "/blog", label: "Blog", icon: IoMdBook },
-    { path: "/goals", label: "Goals", icon: IoMdRocket },
+    { path: "/goals", label: "Goals", icon: FaBullseye },
+    { path: "/contacts", label: "Contacts", icon: GrContact },
+  ];
+
+  // Add Comments with badge if authenticated
+  const navItems = [
+    ...baseNavItems,
+    ...(authenticated ? [{
+      path: "/moderate-comments",
+      label: "Comments",
+      icon: FaComments,
+      hasBadge: pendingCommentsCount > 0,
+      badgeCount: pendingCommentsCount
+    }] : [])
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -119,12 +158,19 @@ const ImprovedNavbar = ({
                     whileTap={{ scale: 0.95 }}
                     className={
                       isActive(item.path)
-                        ? `btn rounded-cartoon shadow-cartoon btn-pop bg-${color} text-white`
-                        : "btn rounded-cartoon shadow-cartoon-sm btn-pop bg-white text-gray-700 hover:shadow-cartoon hover:dark:text-white"
+                        ? `btn rounded-cartoon shadow-cartoon btn-pop bg-${color} text-white relative`
+                        : "btn rounded-cartoon shadow-cartoon-sm btn-pop bg-white text-gray-700 hover:shadow-cartoon hover:dark:text-white relative"
                     }
                   >
-                    <Icon className="text-xl" />
-                    <span className="ml-1">{item.label}</span>
+                    <div className="flex items-center gap-2">
+                      <Icon size={20} />
+                      <span>{item.label}</span>
+                      {item.hasBadge && (
+                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                          {item.badgeCount > 9 ? '9+' : item.badgeCount}
+                        </span>
+                      )}
+                    </div>
                   </motion.button>
                 </Link>
               );
@@ -135,13 +181,12 @@ const ImprovedNavbar = ({
             whileHover={{ rotate: 180 }}
             onClick={toggleTheme}
             className={`btn btn-circle shadow-cartoon-sm hover:shadow-cartoon btn-pop transition-all duration-300 ${theme === "cartoon"
-              ? "bg-gradient-to-br from-yellow-300 to-yellow-500"
-              : "bg-gradient-to-br from-blue-500 to-blue-800"
+                ? "bg-gradient-to-br from-yellow-300 to-yellow-500"
+                : "bg-gradient-to-br from-blue-500 to-blue-800"
               }`}
           >
             {theme === "cartoon" ? (
               <BiMoon size={24} className="animate-pulse-slow text-white" />
-
             ) : (
               <BiSun size={24} className="animate-spin-slow text-yellow-300" />
             )}
@@ -176,9 +221,15 @@ const ImprovedNavbar = ({
                     whileHover={{ scale: 1.05, rotate: 2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate("/moderate-comments")}
-                    className="rounded-cartoon hover:bg-cartoon-orange hover:text-white flex items-center gap-2"
+                    className="rounded-cartoon hover:bg-cartoon-orange hover:text-white flex items-center gap-2 relative"
                   >
-                    <BiCommentCheck size={20} /> Comments
+                    <BiCommentCheck size={20} />
+                    Comments
+                    {pendingCommentsCount > 0 && (
+                      <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 animate-pulse">
+                        {pendingCommentsCount}
+                      </span>
+                    )}
                   </motion.button>
                 </li>
                 <li>
@@ -291,12 +342,17 @@ const ImprovedNavbar = ({
                           whileTap={{ scale: 0.95 }}
                           className={
                             isActive(item.path)
-                              ? `w-full btn justify-start rounded-cartoon shadow-cartoon bg-${color} text-white`
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-pink"
+                              ? `w-full btn justify-start rounded-cartoon shadow-cartoon bg-${color} text-white relative`
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-pink relative"
                           }
                         >
-                          <Icon className="text-xl" />
+                          <Icon size={20} />
                           <span className="ml-3">{item.label}</span>
+                          {item.hasBadge && (
+                            <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 animate-pulse">
+                              {item.badgeCount}
+                            </span>
+                          )}
                         </motion.button>
                       </Link>
                     );
@@ -314,24 +370,11 @@ const ImprovedNavbar = ({
                               : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-yellow"
                           }
                         >
-                          <IoMdBook className="text-xl" />
+                          <IoMdBook size={20} />
                           <span className="ml-3">Conversations</span>
                         </motion.button>
                       </Link>
-                      <Link to="/moderate-comments" onClick={() => setIsSidebarOpen(false)}>
-                        <motion.button
-                          whileHover={{ x: 10 }}
-                          whileTap={{ scale: 0.95 }}
-                          className={
-                            isActive("/moderate-comments")
-                              ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-blue text-white"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-purple"
-                          }
-                        >
-                          <BiCommentCheck className="text-xl" />
-                          <span className="ml-3">Comments</span>
-                        </motion.button>
-                      </Link>
+
                       <Link to="/newsletter/campaigns" onClick={() => setIsSidebarOpen(false)}>
                         <motion.button
                           whileHover={{ x: 10 }}
@@ -342,7 +385,7 @@ const ImprovedNavbar = ({
                               : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-orange"
                           }
                         >
-                          <BiEnvelope className="text-xl" />
+                          <BiEnvelope size={20} />
                           <span className="ml-3">Newsletter</span>
                         </motion.button>
                       </Link>
@@ -357,17 +400,18 @@ const ImprovedNavbar = ({
                               : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-pink"
                           }
                         >
-                          <BiBarChart className="text-xl" />
+                          <BiBarChart size={20} />
                           <span className="ml-3">Analytics</span>
                         </motion.button>
                       </Link>
+
                       <Link to="/privacy" onClick={() => setIsSidebarOpen(false)}>
                         <motion.button
                           whileHover={{ x: 10 }}
                           whileTap={{ scale: 0.95 }}
                           className="w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-blue"
                         >
-                          <BiShield className="text-xl" />
+                          <BiShield size={20} />
                           <span className="ml-3">Privacy Policy</span>
                         </motion.button>
                       </Link>
@@ -381,8 +425,8 @@ const ImprovedNavbar = ({
                     whileHover={{ rotate: 180 }}
                     onClick={toggleTheme}
                     className={`btn btn-circle shadow-cartoon-sm hover:shadow-cartoon btn-pop transition-all duration-300 ${theme === "cartoon"
-                      ? "bg-gradient-to-br from-blue-500 to-blue-800"
-                      : "bg-gradient-to-br from-yellow-300 to-yellow-500"
+                        ? "bg-gradient-to-br from-blue-500 to-blue-800"
+                        : "bg-gradient-to-br from-yellow-300 to-yellow-500"
                       }`}
                   >
                     {theme === "cartoon" ? (

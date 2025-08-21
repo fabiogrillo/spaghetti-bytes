@@ -1,5 +1,5 @@
 // server/routes/commentRoute.js
-// Complete comment routes with moderation system
+// Complete comment routes with moderation system - FIXED
 
 const express = require('express');
 const router = express.Router();
@@ -40,12 +40,18 @@ router.get('/story/:storyId',
 );
 
 // POST /api/comments/story/:storyId - Create new comment
+// FIXED: Email validation now properly handles empty strings
 router.post('/story/:storyId',
     [
         param('storyId').isMongoId().withMessage('Invalid story ID'),
         body('content').trim().isLength({ min: 1, max: 1000 }).withMessage('Comment must be between 1 and 1000 characters'),
         body('author.name').optional().trim().isLength({ max: 100 }),
-        body('author.email').optional().isEmail().normalizeEmail()
+        // FIXED: Email is now completely optional and allows empty strings
+        body('author.email')
+            .optional({ checkFalsy: true }) // This makes empty strings pass validation
+            .isEmail()
+            .normalizeEmail()
+            .withMessage('Please provide a valid email address')
     ],
     validate,
     commentController.createComment
@@ -77,6 +83,12 @@ router.post('/:commentId/flag',
 router.get('/moderate',
     isAdmin,
     commentController.getPendingComments
+);
+
+// GET /api/comments/pending-count - Get count of pending comments (for navbar badge)
+router.get('/pending-count',
+    isAdmin,
+    commentController.getPendingCount
 );
 
 // POST /api/comments/:commentId/approve - Approve comment

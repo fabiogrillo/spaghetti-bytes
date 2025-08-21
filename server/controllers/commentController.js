@@ -1,5 +1,5 @@
 // server/controllers/commentController.js
-// Complete comment system with moderation workflow
+// Complete comment system with moderation workflow - UPDATED
 
 const Comment = require('../models/Comment');
 const Story = require('../models/Story');
@@ -82,16 +82,23 @@ exports.createComment = async (req, res) => {
             return res.status(404).json({ error: 'Story not found' });
         }
 
+        // Handle empty email properly
+        const authorData = {
+            name: author.name || 'Anonymous',
+            userId: req.user ? req.user._id : null,
+            sessionId: author.sessionId
+        };
+
+        // Only add email if it's not empty
+        if (author.email && author.email.trim() !== '') {
+            authorData.email = author.email;
+        }
+
         // Create comment with pending status for moderation
         const newComment = new Comment({
             story: storyId,
             content,
-            author: {
-                name: author.name || 'Anonymous',
-                email: author.email,
-                userId: req.user ? req.user._id : null,
-                sessionId: author.sessionId
-            },
+            author: authorData,
             parentComment: parentId || null,
             status: 'pending', // All new comments start as pending
             reactions: {
@@ -126,25 +133,76 @@ exports.createComment = async (req, res) => {
 // Get comments pending moderation (admin only)
 exports.getPendingComments = async (req, res) => {
     try {
-        if (!req.user || req.user.role !== 'admin') {
+        // First check if user is admin
+        if (!req.user) {
             return res.status(403).json({ error: 'Admin access required' });
         }
 
+        // Fetch comments with safer population
         const comments = await Comment.find({
             status: { $in: ['pending', 'spam'] }
         })
-            .populate('story', 'title slug')
-            .populate('author.userId', 'username')
+            .populate({
+                path: 'story',
+                select: 'title slug',
+                options: { strictPopulate: false }
+            })
             .sort({ createdAt: -1 })
-            .limit(100);
+            .limit(100)
+            .lean(); // Use lean() for better performance and to avoid toJSON issues
+
+        // Clean up the comments data before sending
+        const cleanedComments = comments.map(comment => {
+            return {
+                _id: comment._id,
+                content: comment.content,
+                status: comment.status,
+                createdAt: comment.createdAt,
+                author: {
+                    name: comment.author?.name || 'Anonymous',
+                    email: comment.author?.email || '',
+                    sessionId: comment.author?.sessionId || null
+                },
+                story: comment.story ? {
+                    _id: comment.story._id,
+                    title: comment.story.title,
+                    slug: comment.story.slug
+                } : null,
+                reactions: comment.reactions || {
+                    likes: [],
+                    hearts: [],
+                    claps: [],
+                    totalCount: 0
+                },
+                flagReason: comment.flagReason || null
+            };
+        });
 
         res.json({
-            comments,
-            total: comments.length
+            comments: cleanedComments,
+            total: cleanedComments.length
         });
     } catch (error) {
         console.error('Error fetching pending comments:', error);
         res.status(500).json({ error: 'Failed to fetch pending comments' });
+    }
+};
+
+// Get count of pending comments (for navbar badge)
+exports.getPendingCount = async (req, res) => {
+    try {
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
+
+        const count = await Comment.countDocuments({
+            status: { $in: ['pending', 'spam'] }
+        });
+
+        res.json({ count });
+    } catch (error) {
+        console.error('Error fetching pending count:', error);
+        res.status(500).json({ error: 'Failed to fetch pending count' });
     }
 };
 
@@ -204,9 +262,9 @@ exports.rejectComment = async (req, res) => {
         }
 
         comment.status = 'rejected';
-        comment.moderationReason = reason || 'Content violates community guidelines';
         comment.moderatedBy = req.user._id;
         comment.moderatedAt = new Date();
+        comment.moderationReason = reason || 'Rejected by moderator';
         await comment.save();
 
         res.json({
@@ -219,7 +277,7 @@ exports.rejectComment = async (req, res) => {
     }
 };
 
-// Delete comment (admin only or comment owner)
+// Delete comment (owner or admin)
 exports.deleteComment = async (req, res) => {
     try {
         const { commentId } = req.params;
@@ -229,22 +287,17 @@ exports.deleteComment = async (req, res) => {
             return res.status(404).json({ error: 'Comment not found' });
         }
 
-        // Check permissions
-        const isAdmin = req.user && req.user.role === 'admin';
-        const isOwner = req.user && comment.author.userId &&
-            comment.author.userId.toString() === req.user._id.toString();
+        // Check permission
+        const canDelete = req.user && (
+            req.user.role === 'admin' ||
+            (comment.author.userId && comment.author.userId.toString() === req.user._id.toString())
+        );
 
-        if (!isAdmin && !isOwner) {
+        if (!canDelete) {
             return res.status(403).json({ error: 'Permission denied' });
         }
 
-        // Delete comment and all replies
-        await Comment.deleteMany({
-            $or: [
-                { _id: commentId },
-                { parentComment: commentId }
-            ]
-        });
+        await Comment.findByIdAndDelete(commentId);
 
         // Update story comment count
         const story = await Story.findById(comment.story);

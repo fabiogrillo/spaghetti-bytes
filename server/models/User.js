@@ -224,17 +224,56 @@ userSchema.statics.findByEmail = function (email) {
 };
 
 // Remove sensitive information when converting to JSON
-userSchema.methods.toJSON = function () {
-    const user = this.toObject();
-
+userSchema.methods.toJSON = function() {
+    const userObject = this.toObject();
+    
     // Remove sensitive fields
-    delete user.password;
-    delete user.security.twoFactorSecret;
-    delete user.security.passwordResetToken;
-    delete user.security.emailVerificationToken;
-    delete user.__v;
-
-    return user;
+    delete userObject.password;
+    delete userObject.__v;
+    
+    // Safely handle socialLinks if it exists
+    if (userObject.socialLinks && typeof userObject.socialLinks === 'object') {
+        // Remove empty social links
+        const socialLinks = {};
+        Object.keys(userObject.socialLinks).forEach(key => {
+            if (userObject.socialLinks[key]) {
+                socialLinks[key] = userObject.socialLinks[key];
+            }
+        });
+        
+        // Only include socialLinks if it has values
+        if (Object.keys(socialLinks).length > 0) {
+            userObject.socialLinks = socialLinks;
+        } else {
+            delete userObject.socialLinks;
+        }
+    }
+    
+    // Safely handle preferences if it exists
+    if (userObject.preferences && typeof userObject.preferences === 'object') {
+        // Check if preferences has any actual content
+        const hasPreferences = userObject.preferences.newsletter || 
+                              userObject.preferences.notifications || 
+                              userObject.preferences.theme;
+        
+        if (!hasPreferences) {
+            delete userObject.preferences;
+        }
+    }
+    
+    // Safely handle metadata if it exists
+    if (userObject.metadata && typeof userObject.metadata === 'object') {
+        // Check if metadata has any actual content
+        const hasMetadata = userObject.metadata.lastLogin || 
+                           userObject.metadata.loginCount || 
+                           userObject.metadata.ipAddress;
+        
+        if (!hasMetadata) {
+            delete userObject.metadata;
+        }
+    }
+    
+    return userObject;
 };
 
 const User = mongoose.model("User", userSchema);

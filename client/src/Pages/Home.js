@@ -6,8 +6,11 @@ import { GoGoal } from "react-icons/go";
 import { FaProjectDiagram, FaRocket } from "react-icons/fa";
 import { BiCodeAlt, BiHeart } from "react-icons/bi";
 import { BsStars } from "react-icons/bs";
+import StatsDisplay from "../Components/StatsDisplay";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
   const fadeInUp = {
     initial: { opacity: 0, y: 60 },
     animate: { opacity: 1, y: 0 },
@@ -82,73 +85,35 @@ const Home = () => {
 
             {/* Animated Emoji - Right */}
             <motion.div
-              className="relative flex justify-center items-center"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="mb-12"
             >
-              <div className="relative">
-                <motion.div
-                  className="text-[150px] md:text-[200px] select-none"
-                  animate={{
-                    y: [0, -20, 0],
-                    rotate: [-5, 5, -5]
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                >
-                  👨‍💻
-                </motion.div>
+              <StatsDisplay variant="horizontal" showAnimation={true} />
+            </motion.div>
 
-                {/* Floating elements around */}
-                <motion.div
-                  className="absolute top-0 -right-10 text-6xl"
-                  animate={{
-                    y: [0, -30, 0],
-                    x: [0, 10, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: 0.5
-                  }}
-                >
-                  💡
-                </motion.div>
-
-                <motion.div
-                  className="absolute bottom-10 -left-10 text-5xl"
-                  animate={{
-                    y: [0, 20, 0],
-                    rotate: [0, 360, 0]
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    delay: 1
-                  }}
-                >
-                  ⚡
-                </motion.div>
-
-                <motion.div
-                  className="absolute top-20 -left-20 text-4xl"
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.8, 1, 0.8]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: 1.5
-                  }}
-                >
-                  ✨
-                </motion.div>
-              </div>
+            {/* Blog Stats Info */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="text-center mt-8"
+            >
+              <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                📚 Dive into my collection of carefully crafted stories where code meets creativity.
+                Each article is a byte-sized adventure waiting to be discovered!
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/blog')}
+                className="px-8 py-4 bg-gradient-to-r from-cartoon-pink to-cartoon-purple text-white 
+                       font-bold rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover
+                       transition-all duration-300"
+              >
+                Explore the Blog
+              </motion.button>
             </motion.div>
           </div>
         </div>

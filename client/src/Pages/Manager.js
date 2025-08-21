@@ -1,31 +1,29 @@
 // client/src/Pages/Manager.js
-// Redesigned with better organization and UI
+// Updated Manager component with real statistics
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  BiPlus, BiEdit, BiStats, BiTargetLock,
-  BiCommentCheck, BiConversation, BiUser
-} from "react-icons/bi";
-import {
-  FaNewspaper, FaBullseye,
-  FaComments, FaEnvelope,
+  FaEdit, FaBullseye, FaComments
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import {
+  BiMessageSquareAdd, BiCommentCheck,
+  BiTargetLock, BiStats, BiPaperPlane
+} from "react-icons/bi";
+import StatsDisplay from "../Components/StatsDisplay";
 
-const Manager = ({ username = 'admin', isAuthenticated = false }) => {
+const Manager = () => {
   const navigate = useNavigate();
 
-  // Redirect if not admin
-  if (!isAuthenticated || username !== 'admin') {
-    navigate('/login');
-    return null;
-  }
-
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
+        staggerChildren: 0.15,
+        delayChildren: 0.2
       }
     }
   };
@@ -42,24 +40,25 @@ const Manager = ({ username = 'admin', isAuthenticated = false }) => {
     }
   };
 
+  // Section configurations
   const sections = [
     {
-      title: "📝 Content Management",
-      description: "Create and manage your blog posts",
+      title: "✍️ Content Management",
+      description: "Create and manage your blog content",
       gridCols: 3,
       buttons: [
         {
-          label: "New Story",
-          description: "Write a new blog post",
-          icon: <BiPlus size={24} />,
+          label: "Write Story",
+          description: "Create a new blog post",
+          icon: <BiMessageSquareAdd size={24} />,
           emoji: "✍️",
           color: "bg-gradient-to-br from-cartoon-pink to-pink-600",
-          action: () => navigate("/editor")
+          action: () => navigate("/publish-story")
         },
         {
-          label: "Edit Stories",
-          description: "Manage existing posts",
-          icon: <BiEdit size={24} />,
+          label: "Manage Stories",
+          description: "Edit or delete posts",
+          icon: <FaEdit size={24} />,
           emoji: "📚",
           color: "bg-gradient-to-br from-cartoon-blue to-blue-600",
           action: () => navigate("/storyTable")
@@ -108,68 +107,48 @@ const Manager = ({ username = 'admin', isAuthenticated = false }) => {
           icon: <BiStats size={24} />,
           emoji: "📈",
           color: "bg-gradient-to-br from-green-500 to-green-700",
-          action: () => navigate("/newsletter/analytics")
+          action: () => navigate("/analytics")
         },
         {
           label: "Conversations",
-          description: "Chat messages from visitors",
-          icon: <BiConversation size={24} />,
-          emoji: "💌",
+          description: "Chat history & support",
+          icon: <FaComments size={24} />,
+          emoji: "💬",
           color: "bg-gradient-to-br from-indigo-500 to-indigo-700",
           action: () => navigate("/conversations")
         },
         {
           label: "Newsletter",
-          description: "Subscriber management",
-          icon: <FaEnvelope size={24} />,
-          emoji: "📮",
-          color: "bg-gradient-to-br from-red-500 to-red-700",
-          action: () => navigate("/newsletter/campaigns")
+          description: "Manage campaigns",
+          icon: <BiPaperPlane size={24} />,
+          emoji: "📧",
+          color: "bg-gradient-to-br from-purple-500 to-purple-700",
+          action: () => navigate("/newsletter")
         }
       ]
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-7xl mx-auto"
+        className="space-y-8"
       >
         {/* Header */}
-        <motion.div
-          variants={sectionVariants}
-          className="text-center mb-12"
-        >
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cartoon-pink via-cartoon-purple to-cartoon-blue bg-clip-text text-transparent">
-            Admin Dashboard
+        <motion.div variants={sectionVariants} className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cartoon-pink to-cartoon-purple bg-clip-text text-transparent">
+            Content Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
-            Welcome back, <span className="font-semibold text-cartoon-purple">{username}</span>!
             Ready to create something amazing today?
           </p>
         </motion.div>
 
-        {/* Quick Stats Bar */}
-        <motion.div
-          variants={sectionVariants}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
-        >
-          {[
-            { label: "Total Posts", value: "42", icon: <FaNewspaper />, color: "text-cartoon-pink" },
-            { label: "Comments", value: "128", icon: <FaComments />, color: "text-cartoon-blue" },
-            { label: "Goals", value: "8", icon: <FaBullseye />, color: "text-cartoon-yellow" },
-            { label: "Visitors", value: "1.2k", icon: <BiUser />, color: "text-cartoon-purple" }
-          ].map((stat, index) => (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-4 text-center">
-              <div className={`text-3xl ${stat.color} mb-2`}>{stat.icon}</div>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>
-            </div>
-          ))}
-        </motion.div>
+        {/* Real Stats Component */}
+        <StatsDisplay variant="grid" showAnimation={true} className="mb-8" />
 
         {/* Main Sections */}
         {sections.map((section, sectionIndex) => (
@@ -179,7 +158,7 @@ const Manager = ({ username = 'admin', isAuthenticated = false }) => {
             className="mb-8"
           >
             <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+              <h2 className="text-2xl font-bold dark:text-gray">
                 {section.title}
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
