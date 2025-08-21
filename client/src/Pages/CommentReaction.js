@@ -64,8 +64,8 @@ const CommentReaction = () => {
               </div>
               <div className="mb-2 text-gray-700">{comment.content}</div>
               <div className="flex gap-2">
-                <button className="btn btn-success btn-sm" onClick={() => handleApprove(comment._id)}><FaCheck /> Approva</button>
-                <button className="btn btn-error btn-sm" onClick={() => handleDelete(comment._id)}><FaTrash /> Elimina</button>
+                <button className="btn btn-success btn-sm" onClick={() => handleApprove(comment._id)}><FaCheck /> Approve</button>
+                <button className="btn btn-error btn-sm" onClick={() => handleDelete(comment._id)}><FaTrash /> Delete</button>
               </div>
             </li>
           ))}

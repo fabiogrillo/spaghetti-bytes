@@ -1,21 +1,30 @@
 // client/src/Components/CommentSection.js
-// Fixed version without AuthContext dependency
+// Modified version that checks auth internally
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiMessageCircle, FiSend, FiHeart, FiThumbsUp,
-    FiX
+    FiX, FiTrash2, FiChevronDown, FiChevronUp,
+    FiUser, FiMail
 } from 'react-icons/fi';
 import { BiReply } from 'react-icons/bi';
 import api from '../Api';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 
-// Single Comment Component
-const Comment = ({ comment, onReply, onDelete, onReaction, depth = 0, isAdmin = false }) => {
+// Single Comment Component with Delete Button
+const Comment = ({
+    comment,
+    onReply,
+    onDelete,
+    onReaction,
+    depth = 0,
+    isAdmin = false
+}) => {
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [replyContent, setReplyContent] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleReaction = async (type) => {
         try {
@@ -28,24 +37,30 @@ const Comment = ({ comment, onReply, onDelete, onReaction, depth = 0, isAdmin = 
             });
 
             onReaction(comment._id, type);
+            toast.success('Reaction added!');
         } catch (error) {
             toast.error('Failed to add reaction');
         }
     };
 
     const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this comment?')) {
-            try {
-                const endpoint = isAdmin
-                    ? `/comments/${comment._id}/admin`
-                    : `/comments/${comment._id}`;
+        if (!window.confirm('Are you sure you want to delete this comment? This action cannot be undone.')) {
+            return;
+        }
 
-                await api.delete(endpoint);
-                onDelete(comment._id);
-                toast.success('Comment deleted successfully');
-            } catch (error) {
-                toast.error('Failed to delete comment');
-            }
+        setIsDeleting(true);
+        try {
+            // Admin can force delete any comment
+            const endpoint = `/comments/${comment._id}/admin`;
+
+            await api.delete(endpoint);
+            onDelete(comment._id);
+            toast.success('Comment deleted successfully');
+        } catch (error) {
+            console.error('Delete error:', error);
+            toast.error(error.response?.data?.error || 'Failed to delete comment');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -87,89 +102,87 @@ const Comment = ({ comment, onReply, onDelete, onReaction, depth = 0, isAdmin = 
                 bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon-sm 
                 p-4 mb-4 transition-all hover:shadow-cartoon
                 ${comment.status === 'pending' ? 'opacity-75' : ''}
+                ${comment.status === 'rejected' ? 'opacity-50' : ''}
             `}>
-                {/* Header */}
-                <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-cartoon-pink to-cartoon-purple rounded-full flex items-center justify-center text-white font-bold">
-                            {comment.author.name[0].toUpperCase()}
+                {/* Comment Header */}
+                <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-cartoon-purple rounded-full flex items-center justify-center">
+                            <span className="text-white text-sm font-bold">
+                                {comment.author?.name?.[0]?.toUpperCase() || 'A'}
+                            </span>
                         </div>
                         <div>
-                            <div className="flex items-center gap-2">
-                                <span className="font-semibold">
-                                    {comment.author.name}
-                                </span>
-                                {isAdmin && getStatusBadge()}
-                            </div>
-                            <span className="text-xs text-gray-500">
+                            <p className="font-semibold text-sm">
+                                {comment.author?.name || 'Anonymous'}
+                            </p>
+                            <p className="text-xs text-gray-500">
                                 {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-                            </span>
+                            </p>
                         </div>
                     </div>
 
-                    {/* Admin Delete Button */}
-                    {isAdmin && (
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={handleDelete}
-                            className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50"
-                            title="Delete comment"
-                        >
-                            <FiX size={20} />
-                        </motion.button>
-                    )}
+                    <div className="flex items-center gap-2">
+                        {getStatusBadge()}
+
+                        {/* Delete Button - Only visible to admin (authenticated user) */}
+                        {isAdmin && (
+                            <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                                className={`
+                                    p-2 rounded-full transition-colors
+                                    ${isDeleting
+                                        ? 'bg-gray-200 cursor-not-allowed'
+                                        : 'hover:bg-red-100 text-red-600'
+                                    }
+                                `}
+                                title="Delete comment"
+                            >
+                                {isDeleting ? (
+                                    <div className="animate-spin">
+                                        <FiX className="w-4 h-4" />
+                                    </div>
+                                ) : (
+                                    <FiTrash2 className="w-4 h-4" />
+                                )}
+                            </motion.button>
+                        )}
+                    </div>
                 </div>
 
-                {/* Content */}
-                <div className="text-gray-700 dark:text-gray-300 mb-4">
+                {/* Comment Content */}
+                <p className="text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">
                     {comment.content}
-                </div>
+                </p>
 
-                {/* Actions */}
+                {/* Comment Actions */}
                 <div className="flex items-center gap-4">
                     {/* Reactions */}
                     <div className="flex items-center gap-2">
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                        <button
                             onClick={() => handleReaction('like')}
-                            className={`
-                                flex items-center gap-1 px-3 py-1 rounded-full
-                                ${comment.reactions.likes.length > 0
-                                    ? 'bg-blue-100 text-blue-600'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-blue-50'}
-                            `}
+                            className="flex items-center gap-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
-                            <FiThumbsUp size={16} />
-                            {comment.reactions.likes.length > 0 && (
-                                <span className="text-sm">{comment.reactions.likes.length}</span>
-                            )}
-                        </motion.button>
-
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                            <FiThumbsUp className="w-4 h-4" />
+                            <span className="text-sm">{comment.reactions?.likes?.length || 0}</span>
+                        </button>
+                        <button
                             onClick={() => handleReaction('heart')}
-                            className={`
-                                flex items-center gap-1 px-3 py-1 rounded-full
-                                ${comment.reactions.hearts.length > 0
-                                    ? 'bg-red-100 text-red-600'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-red-50'}
-                            `}
+                            className="flex items-center gap-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
-                            <FiHeart size={16} />
-                            {comment.reactions.hearts.length > 0 && (
-                                <span className="text-sm">{comment.reactions.hearts.length}</span>
-                            )}
-                        </motion.button>
+                            <FiHeart className="w-4 h-4" />
+                            <span className="text-sm">{comment.reactions?.hearts?.length || 0}</span>
+                        </button>
                     </div>
 
                     {/* Reply Button */}
                     {depth < 2 && comment.status === 'approved' && (
                         <button
                             onClick={() => setShowReplyForm(!showReplyForm)}
-                            className="flex items-center gap-1 text-gray-600 hover:text-cartoon-blue text-sm"
+                            className="flex items-center gap-1 text-sm text-cartoon-blue hover:underline"
                         >
                             <BiReply />
                             Reply
@@ -178,61 +191,64 @@ const Comment = ({ comment, onReply, onDelete, onReaction, depth = 0, isAdmin = 
                 </div>
 
                 {/* Reply Form */}
-                {showReplyForm && (
-                    <motion.form
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        onSubmit={handleReply}
-                        className="mt-4"
-                    >
-                        <textarea
-                            value={replyContent}
-                            onChange={(e) => setReplyContent(e.target.value)}
-                            placeholder="Write your reply..."
-                            className="w-full p-3 border-2 border-gray-200 rounded-cartoon focus:border-cartoon-blue outline-none resize-none"
-                            rows="3"
-                        />
-                        <div className="flex justify-end gap-2 mt-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowReplyForm(false)}
-                                className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="px-4 py-2 bg-cartoon-blue text-white rounded-cartoon hover:shadow-cartoon"
-                            >
-                                Reply
-                            </button>
-                        </div>
-                    </motion.form>
+                <AnimatePresence>
+                    {showReplyForm && (
+                        <motion.form
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            onSubmit={handleReply}
+                            className="mt-3 pl-4 border-l-2 border-cartoon-blue"
+                        >
+                            <textarea
+                                value={replyContent}
+                                onChange={(e) => setReplyContent(e.target.value)}
+                                placeholder="Write a reply..."
+                                className="w-full p-2 border-2 border-gray-200 rounded-cartoon resize-none focus:outline-none focus:border-cartoon-blue"
+                                rows="3"
+                            />
+                            <div className="flex gap-2 mt-2">
+                                <button
+                                    type="submit"
+                                    className="btn btn-sm btn-primary rounded-cartoon"
+                                >
+                                    Send Reply
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowReplyForm(false)}
+                                    className="btn btn-sm btn-ghost rounded-cartoon"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </motion.form>
+                    )}
+                </AnimatePresence>
+
+                {/* Nested Replies */}
+                {comment.replies && comment.replies.length > 0 && (
+                    <div className="mt-4">
+                        {comment.replies.map((reply) => (
+                            <Comment
+                                key={reply._id}
+                                comment={reply}
+                                onReply={onReply}
+                                onDelete={onDelete}
+                                onReaction={onReaction}
+                                depth={depth + 1}
+                                isAdmin={isAdmin}
+                            />
+                        ))}
+                    </div>
                 )}
             </div>
-
-            {/* Replies */}
-            {comment.replies && comment.replies.length > 0 && (
-                <div className="mt-2">
-                    {comment.replies.map(reply => (
-                        <Comment
-                            key={reply._id}
-                            comment={reply}
-                            onReply={onReply}
-                            onDelete={onDelete}
-                            onReaction={onReaction}
-                            depth={depth + 1}
-                            isAdmin={isAdmin}
-                        />
-                    ))}
-                </div>
-            )}
         </motion.div>
     );
 };
 
-// Main Comment Section Component
-const CommentSection = ({ storyId, username = '', isAuthenticated = false }) => {
+// Main Comment Section Component - Self-contained auth check
+const CommentSection = ({ storyId }) => {
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
@@ -242,7 +258,37 @@ const CommentSection = ({ storyId, username = '', isAuthenticated = false }) => 
     });
     const [submitting, setSubmitting] = useState(false);
     const [sortBy, setSortBy] = useState('newest');
-    const isAdmin = isAuthenticated && username === 'admin';
+    const [showCommentForm, setShowCommentForm] = useState(false);
+
+    // Auth state - check internally
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [username, setUsername] = useState('');
+
+    const isAdmin = isAuthenticated; // Since only admin can login
+    const hasComments = comments.length > 0;
+
+    // Check authentication on mount
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await api.get('/auth/check');
+                if (response.data.authenticated) {
+                    setIsAuthenticated(true);
+                    setUsername(response.data.user?.username || '');
+                    console.log('CommentSection auth check:', {
+                        authenticated: true,
+                        username: response.data.user?.username
+                    });
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                setIsAuthenticated(false);
+                setUsername('');
+            }
+        };
+
+        checkAuth();
+    }, []);
 
     const fetchComments = useCallback(async () => {
         try {
@@ -272,12 +318,14 @@ const CommentSection = ({ storyId, username = '', isAuthenticated = false }) => 
             };
 
             setComments(organizeComments(response.data.comments));
+            console.log('Comments loaded:', response.data.comments.length, 'isAdmin:', isAdmin);
         } catch (error) {
+            console.error('Failed to load comments:', error);
             toast.error('Failed to load comments');
         } finally {
             setLoading(false);
         }
-    }, [storyId, sortBy]);
+    }, [storyId, sortBy, isAdmin]);
 
     useEffect(() => {
         fetchComments();
@@ -285,7 +333,10 @@ const CommentSection = ({ storyId, username = '', isAuthenticated = false }) => 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.content.trim()) return;
+        if (!formData.content.trim()) {
+            toast.error('Please write a comment');
+            return;
+        }
 
         try {
             setSubmitting(true);
@@ -296,19 +347,22 @@ const CommentSection = ({ storyId, username = '', isAuthenticated = false }) => 
                 content: formData.content,
                 author: {
                     name: formData.name || 'Anonymous',
-                    email: formData.email,
+                    email: formData.email || '',
                     sessionId
                 }
             });
 
-            toast.success('Comment submitted for moderation');
-            setFormData({ name: '', email: '', content: '' });
+            toast.success(isAdmin
+                ? 'Comment posted successfully!'
+                : 'Comment submitted! It will appear after moderation.');
 
-            // Refresh comments if admin
-            if (isAdmin) {
-                fetchComments();
-            }
+            setFormData({ name: '', email: '', content: '' });
+            setShowCommentForm(false);
+
+            // Refresh comments
+            fetchComments();
         } catch (error) {
+            console.error('Submit error:', error);
             toast.error('Failed to submit comment');
         } finally {
             setSubmitting(false);
@@ -328,20 +382,31 @@ const CommentSection = ({ storyId, username = '', isAuthenticated = false }) => 
                 parentId
             });
 
-            toast.success('Reply submitted for moderation');
+            toast.success(isAdmin
+                ? 'Reply posted successfully!'
+                : 'Reply submitted for moderation');
 
-            if (isAdmin) {
-                fetchComments();
-            }
+            fetchComments();
         } catch (error) {
             toast.error('Failed to submit reply');
         }
     };
 
     const handleDelete = (commentId) => {
-        setComments(prevComments =>
-            prevComments.filter(comment => comment._id !== commentId)
-        );
+        // Remove comment from state immediately for better UX
+        const removeComment = (comments) => {
+            return comments.filter(comment => {
+                if (comment._id === commentId) {
+                    return false;
+                }
+                if (comment.replies) {
+                    comment.replies = removeComment(comment.replies);
+                }
+                return true;
+            });
+        };
+
+        setComments(prevComments => removeComment(prevComments));
     };
 
     const handleReaction = () => {
@@ -351,90 +416,45 @@ const CommentSection = ({ storyId, username = '', isAuthenticated = false }) => 
 
     return (
         <div className="max-w-4xl mx-auto py-8">
+            {/* Debug info - remove in production */}
+            {process.env.NODE_ENV === 'development' && (
+                <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
+                    Debug: Auth: {String(isAuthenticated)} | Username: {username} | Admin: {String(isAdmin)}
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
                     <FiMessageCircle className="text-cartoon-blue" />
-                    Comments
+                    Comments {hasComments && `(${comments.length})`}
                 </h2>
 
-                <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="px-3 py-1 border-2 border-black rounded-cartoon focus:outline-none focus:border-cartoon-blue"
-                >
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="popular">Most Popular</option>
-                </select>
+                {hasComments && (
+                    <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="px-3 py-1 border-2 border-black rounded-cartoon focus:outline-none focus:border-cartoon-blue text-sm"
+                    >
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                )}
             </div>
 
-            {/* Comment Form */}
-            <motion.form
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                onSubmit={handleSubmit}
-                className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-6 mb-8"
-            >
-                <h3 className="text-lg font-semibold mb-4">Leave a Comment</h3>
-
-                {!isAuthenticated && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <input
-                            type="text"
-                            placeholder="Your Name (optional)"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="px-4 py-2 border-2 border-gray-200 rounded-cartoon focus:border-cartoon-blue outline-none"
-                        />
-                        <input
-                            type="email"
-                            placeholder="Your Email (optional)"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="px-4 py-2 border-2 border-gray-200 rounded-cartoon focus:border-cartoon-blue outline-none"
-                        />
-                    </div>
-                )}
-
-                <textarea
-                    placeholder="Share your thoughts..."
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-cartoon focus:border-cartoon-blue outline-none resize-none"
-                    rows="4"
-                    required
-                />
-
-                <div className="flex justify-between items-center mt-4">
-                    <p className="text-sm text-gray-500">
-                        Comments are moderated before appearing
-                    </p>
-                    <button
-                        type="submit"
-                        disabled={submitting}
-                        className="px-6 py-2 bg-cartoon-blue text-white rounded-cartoon hover:shadow-cartoon disabled:opacity-50 flex items-center gap-2"
-                    >
-                        <FiSend />
-                        {submitting ? 'Submitting...' : 'Submit'}
-                    </button>
-                </div>
-            </motion.form>
-
-            {/* Comments List */}
-            {loading ? (
+            {/* Loading State */}
+            {loading && (
                 <div className="flex justify-center py-8">
-                    <div className="loading loading-spinner loading-lg text-cartoon-blue"></div>
+                    <div className="loading loading-spinner loading-lg"></div>
                 </div>
-            ) : comments.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-cartoon">
-                    <FiMessageCircle className="mx-auto text-4xl text-gray-400 mb-4" />
-                    <p className="text-gray-600">No comments yet. Be the first to share your thoughts!</p>
-                </div>
-            ) : (
-                <div className="space-y-4">
+            )}
+
+            {/* Comments List - Show first if comments exist */}
+            {!loading && hasComments && (
+                <div className="space-y-4 mb-8">
                     <AnimatePresence>
-                        {comments.map(comment => (
+                        {comments.map((comment) => (
                             <Comment
                                 key={comment._id}
                                 comment={comment}
@@ -447,6 +467,129 @@ const CommentSection = ({ storyId, username = '', isAuthenticated = false }) => 
                     </AnimatePresence>
                 </div>
             )}
+
+            {/* No Comments Message */}
+            {!loading && !hasComments && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-cartoon mb-6"
+                >
+                    <FiMessageCircle className="mx-auto text-4xl text-gray-400 mb-3" />
+                    <p className="text-gray-600 dark:text-gray-400">
+                        No comments yet. Be the first to share your thoughts!
+                    </p>
+                </motion.div>
+            )}
+
+            {/* Add Comment Section - Collapsible and compact */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-4"
+            >
+                {/* Toggle Button for Comment Form */}
+                <button
+                    onClick={() => setShowCommentForm(!showCommentForm)}
+                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-cartoon transition-colors"
+                >
+                    <span className="font-semibold flex items-center gap-2">
+                        <FiMessageCircle />
+                        {hasComments ? 'Add a Comment' : 'Write the First Comment'}
+                    </span>
+                    {showCommentForm ? <FiChevronUp /> : <FiChevronDown />}
+                </button>
+
+                {/* Collapsible Comment Form */}
+                <AnimatePresence>
+                    {showCommentForm && (
+                        <motion.form
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            onSubmit={handleSubmit}
+                            className="mt-4 space-y-4"
+                        >
+                            {/* Name and Email in one row - Hide if authenticated */}
+                            {!isAuthenticated && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="relative">
+                                        <FiUser className="absolute left-3 top-3 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="Your Name (optional)"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-cartoon focus:outline-none focus:border-cartoon-blue"
+                                        />
+                                    </div>
+                                    <div className="relative">
+                                        <FiMail className="absolute left-3 top-3 text-gray-400" />
+                                        <input
+                                            type="email"
+                                            placeholder="Your Email (optional)"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-cartoon focus:outline-none focus:border-cartoon-blue"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Show who's commenting if authenticated */}
+                            {isAuthenticated && (
+                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                    Commenting as: <span className="font-semibold">{username}</span>
+                                </div>
+                            )}
+
+                            {/* Comment textarea */}
+                            <textarea
+                                placeholder="Share your thoughts..."
+                                value={formData.content}
+                                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                                className="w-full p-3 border-2 border-gray-200 rounded-cartoon resize-none focus:outline-none focus:border-cartoon-blue"
+                                rows="4"
+                                required
+                            />
+
+                            {/* Submit button */}
+                            <div className="flex justify-end gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCommentForm(false)}
+                                    className="btn btn-ghost rounded-cartoon"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={submitting || !formData.content.trim()}
+                                    className="btn btn-primary rounded-cartoon shadow-cartoon flex items-center gap-2"
+                                >
+                                    {submitting ? (
+                                        <>
+                                            <span className="loading loading-spinner loading-sm"></span>
+                                            Submitting...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FiSend />
+                                            Post Comment
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
+                            {!isAdmin && (
+                                <p className="text-xs text-gray-500 text-center">
+                                    Comments are moderated and will appear after approval.
+                                </p>
+                            )}
+                        </motion.form>
+                    )}
+                </AnimatePresence>
+            </motion.div>
         </div>
     );
 };

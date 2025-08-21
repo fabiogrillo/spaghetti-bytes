@@ -1,490 +1,538 @@
-# 🍝 Spaghetti Bytes
+# 🍝 Spaghetti Bytes - Technical Blog Platform
 
 <div align="center">
-  <img src="https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react" alt="React Version" />
-  <img src="https://img.shields.io/badge/Node.js-16+-339933?style=for-the-badge&logo=node.js" alt="Node Version" />
-  <img src="https://img.shields.io/badge/MongoDB-6.0+-47A248?style=for-the-badge&logo=mongodb" alt="MongoDB Version" />
-  <img src="https://img.shields.io/badge/Tailwind-3.4.4-06B6D4?style=for-the-badge&logo=tailwindcss" alt="Tailwind Version" />
+  <img src="https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js" alt="Node.js" />
+  <img src="https://img.shields.io/badge/MongoDB-6.0+-47A248?style=for-the-badge&logo=mongodb" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Tailwind-3.4.4-06B6D4?style=for-the-badge&logo=tailwindcss" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel" alt="Vercel" />
 </div>
 
 <p align="center">
-  <strong>A cartoon-themed technical blog where code meets creativity</strong><br>
-  Untangling spaghetti code, one byte at a time 🚀
+  <strong>Where code meets creativity - A cartoon-themed technical blog with a twist of spaghetti</strong>
 </p>
 
-## 📖 Table of Contents
+---
+
+## 📑 Table of Contents
 
 - [Overview](#-overview)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
+- [Architecture](#-architecture)
 - [Installation](#-installation)
-- [Environment Variables](#-environment-variables)
-- [Development](#-development)
 - [API Documentation](#-api-documentation)
-- [Component Architecture](#-component-architecture)
-- [Design System](#-design-system)
+- [Frontend Documentation](#-frontend-documentation)
+- [Backend Documentation](#-backend-documentation)
 - [Deployment](#-deployment)
 - [Contributing](#-contributing)
 
 ## 🌟 Overview
 
-Spaghetti Bytes is a modern, cartoon-themed technical blog platform that combines playful aesthetics with serious technical content. Built with React and Node.js, it features a unique design system that makes reading technical articles fun and engaging.
+Spaghetti Bytes is a full-stack blog platform that combines playful cartoon aesthetics with serious technical content. Built with React, Node.js, and MongoDB, it features a unique design system, advanced content management, and interactive features like comments, reactions, and a chat bot.
 
-### 🎯 Purpose
-
-- **Share technical knowledge** in an approachable, fun format
-- **Track personal goals** and professional development
-- **Enable reader interaction** through an innovative chat bot system
-- **Showcase projects** with a unique visual style
+### 🎯 Core Philosophy
+- **Approachable Technical Content**: Making complex topics digestible
+- **Interactive Learning**: Engage readers through comments and reactions
+- **Visual Appeal**: Cartoon-themed design that makes reading fun
+- **Performance First**: Optimized for speed and SEO
 
 ## ✨ Features
 
-### 🎨 Unique Cartoon Design System
-- Custom shadow effects (`shadow-cartoon`)
-- Playful color palette with 5 vibrant colors
-- Animated components with Framer Motion
-- Consistent border-radius and spacing
+### Content Management
+- **Rich Text Editor** (TipTap) with syntax highlighting
+- **Comment System** with moderation workflow
+- **Reactions** (likes, hearts, claps)
+- **Newsletter Integration** with analytics
+- **RSS/Atom/JSON Feed** generation
+- **Medium Cross-posting** capability
 
-### 📝 Advanced Content Editor
-- **TipTap Editor** with rich text capabilities
-- Code syntax highlighting with multiple language support
-- Image embedding and link management
-- Markdown shortcuts support
-- Real-time preview
+### User Experience
+- **Dark/Light Theme** (Cartoon/Night modes)
+- **Progressive Web App** capabilities
+- **Responsive Design** (mobile-first)
+- **Interactive Chat Bot** for contact
+- **Reading Progress** indicator
+- **Search & Filter** functionality
 
-### 💬 Interactive Chat Bot
-- Replaces traditional contact forms
-- Context-aware responses
-- Conversation persistence in MongoDB
-- Email notifications for new messages
-- Animated UI with smooth transitions
-
-### 📊 Goal Tracking System
-- Create and manage personal/professional goals
-- Step-by-step progress tracking
-- Visual progress indicators
-- Timeline view of achievements
-
-### 🔐 Authentication & Admin
-- Secure login system with bcrypt
-- Session management with Express sessions
-- Protected admin routes
-- Content management dashboard
-
-### 📱 Fully Responsive
-- Mobile-first design approach
-- Animated sidebar for mobile navigation
-- Touch-friendly interactions
-- Optimized layouts for all screen sizes
+### Admin Features
+- **Dashboard** with analytics
+- **Comment Moderation** panel
+- **Content Scheduling**
+- **SEO Optimization** tools
+- **Cache Management**
+- **Email Notifications**
 
 ## 🛠 Tech Stack
 
-### Frontend
-- **React 18.3.1** - UI framework
-- **Tailwind CSS 3.4.4** - Utility-first CSS
-- **DaisyUI 4.12.10** - Component library
-- **Framer Motion 11.2.12** - Animations
-- **TipTap** - Modern rich text editor
-- **React Router 6.24.0** - Navigation
-- **React Icons 5.2.1** - Icon library
-- **date-fns 3.6.0** - Date utilities
+### Frontend (`/client`)
+```json
+{
+  "core": {
+    "react": "18.3.1",
+    "react-router-dom": "6.24.0",
+    "axios": "1.7.2"
+  },
+  "ui": {
+    "tailwindcss": "3.4.4",
+    "daisyui": "4.12.10",
+    "framer-motion": "11.2.12"
+  },
+  "editor": {
+    "@tiptap/react": "2.5.9",
+    "@tiptap/starter-kit": "2.5.9",
+    "highlight.js": "11.10.0"
+  },
+  "utilities": {
+    "date-fns": "3.6.0",
+    "react-hot-toast": "2.4.1",
+    "react-icons": "5.2.1"
+  }
+}
+```
 
-### Backend
-- **Node.js** - Runtime environment
-- **Express 4.19.2** - Web framework
-- **MongoDB 6.8.0** - Database
-- **Mongoose 8.4.4** - ODM
-- **Passport.js 0.7.0** - Authentication
-- **bcrypt 5.1.1** - Password hashing
-- **express-session 1.18.0** - Session management
-- **Axios 1.7.2** - HTTP client (for Medium API)
+### Backend (`/server`)
+```json
+{
+  "core": {
+    "express": "4.19.2",
+    "mongoose": "8.4.4",
+    "mongodb": "6.8.0"
+  },
+  "auth": {
+    "passport": "0.7.0",
+    "passport-local": "1.0.0",
+    "bcrypt": "5.1.1",
+    "express-session": "1.18.0"
+  },
+  "middleware": {
+    "cors": "2.8.5",
+    "helmet": "8.1.0",
+    "compression": "1.8.1",
+    "express-rate-limit": "8.0.1"
+  },
+  "utilities": {
+    "nodemailer": "6.10.1",
+    "express-validator": "7.2.1",
+    "dotenv": "16.6.1"
+  }
+}
+```
 
-### Deployment
-- **Vercel** - Hosting platform
-- **GitHub** - Version control
+## 🏗 Architecture
 
-## 📁 Project Structure
-
+### Directory Structure
 ```
 spaghetti-bytes/
-├── client/                    # React frontend
-│   ├── public/               # Static assets
+├── client/                    # React Frontend
+│   ├── public/               
 │   ├── src/
-│   │   ├── Assets/          # Images and animations
-│   │   ├── Components/      # Reusable components
-│   │   │   ├── ChatBot.js  # Interactive chat widget
-│   │   │   ├── Footer.js   # Site footer
-│   │   │   ├── ImprovedNavbar.js  # Responsive navigation
-│   │   │   ├── ImprovedStoryCard.js  # Article card
-│   │   │   ├── TipTapEditor.js  # Rich text editor
-│   │   │   └── Wall.js     # Blog listing component
-│   │   ├── Pages/          # Route components
-│   │   │   ├── Blog.js     # Blog listing page
-│   │   │   ├── Contacts.js # Contact page (with chat bot)
-│   │   │   ├── Goals.js    # Goals display page
-│   │   │   ├── GoalPublisher.js  # Goal creation/editing
-│   │   │   ├── Home.js     # Landing page
-│   │   │   ├── Login.js    # Authentication page
-│   │   │   ├── StoryManager.js  # Admin dashboard
-│   │   │   ├── StoryPublisher.js # Story creation/editing
-│   │   │   ├── StoryVisualizer.js # Story reading view
-│   │   │   ├── TableGoals.js    # Goals management
-│   │   │   └── TableManager.js  # Stories management
-│   │   ├── Api.js          # API service layer
-│   │   ├── App.js          # Main app component
-│   │   ├── index.css       # Global styles
-│   │   └── index.js        # Entry point
-│   ├── tailwind.config.js  # Tailwind configuration
-│   └── package.json        # Frontend dependencies
+│   │   ├── Assets/           # Images, animations
+│   │   ├── Components/       # Reusable components
+│   │   │   ├── CommentSection.js    # Comment system with delete
+│   │   │   ├── ImprovedNavbar.js    # Navigation with auth
+│   │   │   ├── TipTapEditor.js      # Rich text editor
+│   │   │   ├── ChatBot.js           # Interactive contact
+│   │   │   └── ...
+│   │   ├── Pages/            # Route components
+│   │   │   ├── Blog.js              
+│   │   │   ├── StoryVisualizer.js   
+│   │   │   ├── StoryPublisher.js    
+│   │   │   ├── ModerateComments.js  
+│   │   │   └── ...
+│   │   ├── hooks/            # Custom React hooks
+│   │   ├── utils/            # Helper functions
+│   │   └── Api.js            # API service layer
+│   └── package.json
 │
-├── server/                  # Express backend
-│   ├── controllers/        # Business logic
-│   │   ├── goalController.js
+├── server/                   # Express Backend
+│   ├── controllers/          
 │   │   ├── storyController.js
-│   │   └── conversationController.js
-│   ├── models/            # MongoDB schemas
-│   │   ├── Goal.js
+│   │   ├── commentController.js     # With delete methods
+│   │   ├── newsletterController.js
+│   │   └── ...
+│   ├── models/              
 │   │   ├── Story.js
+│   │   ├── Comment.js               # With moderation fields
 │   │   ├── User.js
-│   │   └── Conversation.js
-│   ├── routes/            # API routes
-│   │   ├── goalRoute.js
+│   │   └── ...
+│   ├── routes/              
 │   │   ├── storyRoute.js
-│   │   └── conversationRoute.js
-│   ├── server.js          # Express server
-│   └── package.json       # Backend dependencies
+│   │   ├── commentRoute.js          # With admin delete routes
+│   │   └── ...
+│   ├── middleware/          
+│   ├── utils/               
+│   ├── server.js            
+│   └── package.json
 │
-├── vercel.json           # Vercel deployment config
-├── .gitignore           # Git ignore rules
-├── package.json         # Root package file
-└── README.md           # This file
+├── vercel.json              # Deployment config
+└── README.md
 ```
 
-## 🚀 Installation
+## 📡 API Documentation
 
-### Prerequisites
+### Base URL
+- Development: `http://localhost:5000/api`
+- Production: `https://api.spaghettibytes.blog/api`
 
-- Node.js 16+ and npm/yarn
-- MongoDB 6.0+ (local or Atlas)
-- Git
+### Authentication
+```http
+POST /api/login
+POST /api/logout
+POST /api/register
+GET  /api/auth/status
+```
 
-### Setup Instructions
+### Stories/Articles
+```http
+GET    /api/stories              # Get all stories
+GET    /api/stories/:id          # Get single story
+POST   /api/stories/publish      # Create story (auth)
+PUT    /api/stories/:id          # Update story (auth)
+DELETE /api/stories/:id          # Delete story (auth)
+GET    /api/stories/:id/reactions
+POST   /api/stories/:id/reactions
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/fabiogrillo/spaghetti-bytes.git
-   cd spaghetti-bytes
-   ```
+### Comments System
+```http
+GET    /api/comments/story/:storyId     # Get comments
+POST   /api/comments/story/:storyId     # Create comment
+POST   /api/comments/:id/reaction       # Add reaction
+POST   /api/comments/:id/flag           # Flag comment
+DELETE /api/comments/:id                # Delete (owner)
+DELETE /api/comments/:id/admin          # Force delete (admin)
 
-2. **Install root dependencies**
-   ```bash
-   npm install
-   ```
+# Admin routes
+GET    /api/comments/moderate           # Pending comments
+GET    /api/comments/pending-count      # Badge count
+POST   /api/comments/:id/approve        # Approve
+POST   /api/comments/:id/reject         # Reject
+GET    /api/comments/stats              # Statistics
+```
 
-3. **Install client dependencies**
-   ```bash
-   cd client
-   npm install
-   ```
+### Newsletter
+```http
+POST   /api/newsletter/subscribe
+POST   /api/newsletter/unsubscribe
+GET    /api/newsletter/stats            # Admin only
+POST   /api/newsletter/send             # Admin only
+```
 
-4. **Install server dependencies**
-   ```bash
-   cd ../server
-   npm install
-   ```
+### Goals
+```http
+GET    /api/goals
+GET    /api/goals/:id
+POST   /api/goals                       # Admin only
+PUT    /api/goals/:id                   # Admin only
+DELETE /api/goals/:id                   # Admin only
+```
 
-5. **Set up environment variables** (see below)
+### Chat/Conversations
+```http
+POST   /api/conversations               # Create conversation
+GET    /api/conversations               # Get all (auth)
+GET    /api/conversations/:id           # Get single (auth)
+POST   /api/conversations/:id/reply     # Add reply (auth)
+```
 
-6. **Install concurrently for development**
-   ```bash
-   npm install -g concurrently
-   ```
+### Feeds
+```http
+GET    /api/rss/feed.xml                # RSS 2.0
+GET    /api/rss/atom.xml                # Atom
+GET    /api/rss/feed.json               # JSON Feed
+```
 
-## 🔐 Environment Variables
+## 🎨 Frontend Documentation
 
-### Server Environment Variables
+### Key Components
 
-Create a `.env` file in the `/server` directory:
+#### CommentSection.js
+- **Features**: 
+  - Nested comments support
+  - Admin delete functionality
+  - Moderation workflow
+  - Reactions system
+  - Collapsible comment form
+- **Props**: `storyId`, `username`, `isAuthenticated`
 
-```env
-# MongoDB Connection
-MONGODB_URI=mongodb://localhost:27017/spaghetti-bytes
-# or for MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/spaghetti-bytes
+#### TipTapEditor.js
+- **Features**:
+  - Rich text editing
+  - Code syntax highlighting
+  - Image upload
+  - Markdown shortcuts
+- **Usage**: Used in StoryPublisher for content creation
 
-# Session Secret
-SECRET_KEY=your-super-secret-session-key
+#### ImprovedNavbar.js
+- **Features**:
+  - Responsive design
+  - Theme toggle (Cartoon/Night)
+  - Authentication state
+  - Pending comments badge (admin)
+  - Mobile sidebar
 
-# Medium API (optional)
-MEDIUM_ACCESS_TOKEN=your-medium-integration-token
-MEDIUM_AUTHOR_ID=your-medium-author-id
+#### ChatBot.js
+- **Features**:
+  - Interactive conversation
+  - Email notifications
+  - Conversation persistence
+  - Animated UI
 
-# Server Port
-PORT=5000
+### State Management
+- **Authentication**: Session-based with Express
+- **Theme**: LocalStorage persistence
+- **Comments**: Real-time updates for admin
+- **Reactions**: Optimistic UI updates
 
-# Email Notifications (for chat bot)
+### Styling System
+```css
+/* Custom Tailwind utilities */
+.shadow-cartoon {
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 1);
+}
+
+.rounded-cartoon {
+  border-radius: 8px;
+}
+
+/* Theme colors */
+--cartoon-purple: #A855F7
+--cartoon-blue: #3B82F6
+--cartoon-green: #10B981
+--cartoon-pink: #EC4899
+--cartoon-yellow: #FBBF24
+```
+
+## 🔧 Backend Documentation
+
+### Database Schema
+
+#### Story Model
+```javascript
+{
+  title: String,
+  slug: String,
+  content: String,
+  author: String,
+  summary: String,
+  tags: [String],
+  coverImage: String,
+  readingTime: Number,
+  reactions: {
+    likes: [String],
+    hearts: [String],
+    shares: Number
+  },
+  commentCount: Number,
+  published: Boolean,
+  featured: Boolean,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### Comment Model
+```javascript
+{
+  story: ObjectId,
+  content: String,
+  author: {
+    name: String,
+    email: String,
+    userId: ObjectId,
+    sessionId: String
+  },
+  parentComment: ObjectId,
+  status: 'pending' | 'approved' | 'rejected' | 'spam',
+  reactions: {
+    likes: [String],
+    hearts: [String],
+    claps: [String],
+    totalCount: Number
+  },
+  moderatedBy: ObjectId,
+  moderatedAt: Date,
+  flagReason: String,
+  createdAt: Date
+}
+```
+
+### Middleware
+
+#### Authentication
+```javascript
+// Session-based auth with Passport.js
+passport.use(new LocalStrategy({...}))
+
+// Admin middleware
+const isAdmin = (req, res, next) => {
+  if (req.user?.role === 'admin') next();
+  else res.status(403).json({error: 'Admin required'});
+}
+```
+
+#### Rate Limiting
+```javascript
+// API rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests
+});
+```
+
+#### Caching
+- RSS feeds: 1 hour
+- Stories: 10 minutes
+- Analytics: 5 minutes
+- Goals: 10 minutes
+
+### Email Configuration
+```javascript
+// Nodemailer setup for notifications
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+```
+
+## 🚀 Deployment
+
+### Vercel Configuration
+
+#### vercel.json
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/server/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/$1"
+    }
+  ]
+}
+```
+
+### Environment Variables
+
+#### Production (.env)
+```bash
+# MongoDB
+MONGODB_URI=mongodb+srv://...
+
+# Session
+SESSION_SECRET=your-secret-key
+
+# Email
 EMAIL_SERVICE=gmail
 EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-password
-ADMIN_EMAIL=admin@spaghetti-bytes.com
+EMAIL_PASS=app-specific-password
+ADMIN_EMAIL=admin@spaghettibytes.blog
+
+# URLs
+FRONTEND_URL=https://spaghettibytes.blog
+API_URL=https://api.spaghettibytes.blog
+
+# Features
+NODE_ENV=production
 ```
 
-### Client Environment Variables
+### Deployment Steps
+1. Push to GitHub
+2. Connect repo to Vercel
+3. Configure environment variables
+4. Deploy
 
-Create a `.env` file in the `/client` directory:
+## 🔨 Development
 
-```env
-# EmailJS Configuration (if still using contact form)
-REACT_APP_EMAILJS_SERVICE_ID=your-service-id
-REACT_APP_EMAILJS_TEMPLATE_ID=your-template-id
-REACT_APP_EMAILJS_USER_ID=your-user-id
-
-# API URL (for production)
-REACT_APP_API_URL=https://your-api-url.com
-```
-
-## 💻 Development
-
-### Running the Development Server
-
-From the root directory:
-
+### Setup
 ```bash
-# Run both client and server concurrently
-npm run dev
-```
+# Clone repository
+git clone https://github.com/yourusername/spaghetti-bytes.git
 
-Or run them separately:
+# Install dependencies
+cd spaghetti-bytes
+npm install
+cd client && npm install
+cd ../server && npm install
 
-```bash
-# Terminal 1 - Start the backend
-cd server
-npm run dev
+# Setup environment variables
+cp .env.example .env
 
-# Terminal 2 - Start the frontend
-cd client
-npm start
+# Run development servers
+npm run dev  # Runs both client and server
 ```
 
 ### Available Scripts
 
-**Root directory:**
-- `npm run dev` - Run client and server concurrently
-- `npm run install-all` - Install all dependencies
-
-**Client directory:**
-- `npm start` - Start React development server
+#### Root
+- `npm run dev` - Run full stack
 - `npm run build` - Build for production
+
+#### Client
+- `npm start` - Development server
+- `npm run build` - Production build
 - `npm test` - Run tests
 
-**Server directory:**
-- `npm run dev` - Start server with nodemon
-- `npm start` - Start server in production mode
-
-## 📡 API Documentation
-
-### Authentication Endpoints
-
-```http
-POST /api/register
-Content-Type: application/json
-
-{
-  "username": "string",
-  "email": "string",
-  "password": "string"
-}
-```
-
-```http
-POST /api/login
-Content-Type: application/json
-
-{
-  "email": "string",
-  "password": "string"
-}
-```
-
-```http
-POST /api/logout
-```
-
-### Stories Endpoints
-
-```http
-GET /api/stories
-# Get all published stories
-
-GET /api/stories/:id
-# Get single story by ID
-
-POST /api/stories/publish
-# Create new story (requires auth)
-
-PUT /api/stories/:id
-# Update story (requires auth)
-
-DELETE /api/stories/:id
-# Delete story (requires auth)
-```
-
-### Goals Endpoints
-
-```http
-GET /api/goals
-# Get all goals
-
-GET /api/goals/:id
-# Get single goal by ID
-
-POST /api/goals
-# Create new goal (requires auth)
-
-PUT /api/goals/:id
-# Update goal (requires auth)
-
-DELETE /api/goals/:id
-# Delete goal (requires auth)
-```
-
-### Conversations Endpoints
-
-```http
-POST /api/conversations
-# Save new chat conversation
-
-GET /api/conversations
-# Get all conversations (requires auth)
-
-PUT /api/conversations/:id/read
-# Mark conversation as read (requires auth)
-```
-
-## 🎨 Design System
-
-### Color Palette
-
-```css
-/* Cartoon Theme Colors */
---cartoon-pink: #FF6B9D;
---cartoon-yellow: #FFC107;
---cartoon-blue: #4ECDC4;
---cartoon-purple: #9B59B6;
---cartoon-orange: #FF8C42;
-
-/* Base Colors */
---base-100: #FFF8DC; /* Cream background */
---neutral: #2A2A2A;  /* Dark text */
-```
-
-### Shadow System
-
-```css
-/* Cartoon shadows with black borders */
-.shadow-cartoon { box-shadow: 4px 4px 0px #000; }
-.shadow-cartoon-hover { box-shadow: 6px 6px 0px #000; }
-.shadow-cartoon-sm { box-shadow: 2px 2px 0px #000; }
-```
-
-### Animation Classes
-
-```css
-/* Wiggle animation for playful elements */
-.animate-wiggle {
-  animation: wiggle 1s ease-in-out infinite;
-}
-
-/* Bounce animation for floating elements */
-.animate-bounce-slow {
-  animation: bounce 3s infinite;
-}
-```
-
-### Component Styling Guidelines
-
-1. **Always use rounded corners**: `rounded-cartoon` (1.5rem)
-2. **Black borders**: `border-2 border-black`
-3. **Hover effects**: Translate on hover for depth
-4. **Color rotation**: Use different colors for adjacent elements
-5. **Consistent spacing**: Use Tailwind's spacing scale
-
-## 🚀 Deployment
-
-### Vercel Deployment
-
-1. **Connect GitHub repository to Vercel**
-
-2. **Configure environment variables in Vercel dashboard**
-
-3. **Deploy with vercel.json configuration**:
-   ```json
-   {
-     "version": 2,
-     "builds": [
-       {
-         "src": "server/server.js",
-         "use": "@vercel/node"
-       },
-       {
-         "src": "client/package.json",
-         "use": "@vercel/static-build",
-         "config": { "distDir": "build" }
-       }
-     ],
-     "routes": [
-       {
-         "src": "/api/(.*)",
-         "dest": "/server/server.js"
-       },
-       {
-         "src": "/(.*)",
-         "dest": "/client/index.html"
-       }
-     ]
-   }
-   ```
-
-### Build Commands
-
-```bash
-# Build client
-cd client && npm run build
-
-# Build server
-cd server && npm run build
-```
+#### Server
+- `npm run dev` - Development with nodemon
+- `npm start` - Production server
 
 ## 🤝 Contributing
 
-While this is a personal project, I'm open to discussions and feedback! Feel free to:
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
 
-1. Open issues for bugs or suggestions
-2. Fork the repository for your own use
-3. Contact me through the chat bot on the site
-
-### Code Style Guidelines
-
-- Use functional React components with hooks
-- Follow Tailwind utility-first approach
-- Maintain cartoon theme consistency
-- Keep components small and focused
-- Add proper TypeScript types (future enhancement)
+### Coding Standards
+- Use ESLint configuration
+- Follow React best practices
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License - feel free to use this project for your own purposes.
+
+## 👨‍💻 Author
+
+**Fabio Grillo**
+- Website: [spaghettibytes.blog](https://spaghettibytes.blog)
+- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
+- GitHub: [@fabiogrillo](https://github.com/fabiogrillo)
 
 ## 🙏 Acknowledgments
 
-- Illustrations from [Icons8 Ouch!](https://icons8.com/illustrations)
-- Icons from [React Icons](https://react-icons.github.io/react-icons/)
-- UI components inspired by [DaisyUI](https://daisyui.com/)
-- Rich text editing by [TipTap](https://tiptap.dev/)
+- React team for the amazing framework
+- Tailwind CSS for the utility-first approach
+- DaisyUI for the component library
+- TipTap for the rich text editor
+- All contributors and supporters
 
 ---
 
-<div align="center">
-  Made with 🍝 and ❤️ by Fabio Grillo
-</div>
+<p align="center">Made with ❤️ and lots of ☕ by Fabio Grillo</p>
+<p align="center">© 2024 Spaghetti Bytes. All rights reserved.</p>

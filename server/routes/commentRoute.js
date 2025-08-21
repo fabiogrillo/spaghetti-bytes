@@ -1,5 +1,5 @@
 // server/routes/commentRoute.js
-// Complete comment routes with moderation system - FIXED
+// Simplified authentication - any authenticated user is admin
 
 const express = require('express');
 const router = express.Router();
@@ -15,7 +15,7 @@ const validate = (req, res, next) => {
     next();
 };
 
-// Authentication middleware
+// Authentication middleware - simplified
 const isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated && req.isAuthenticated()) {
         return next();
@@ -23,13 +23,8 @@ const isAuthenticated = (req, res, next) => {
     return res.status(401).json({ error: 'Authentication required' });
 };
 
-// Admin middleware
-const isAdmin = (req, res, next) => {
-    if (req.isAuthenticated && req.isAuthenticated() && req.user && req.user.role === 'admin') {
-        return next();
-    }
-    return res.status(403).json({ error: 'Admin access required' });
-};
+// Since you're the only one who can login, isAdmin = isAuthenticated
+const isAdmin = isAuthenticated;
 
 // Public routes
 // GET /api/comments/story/:storyId - Get comments for a story
@@ -40,15 +35,13 @@ router.get('/story/:storyId',
 );
 
 // POST /api/comments/story/:storyId - Create new comment
-// FIXED: Email validation now properly handles empty strings
 router.post('/story/:storyId',
     [
         param('storyId').isMongoId().withMessage('Invalid story ID'),
         body('content').trim().isLength({ min: 1, max: 1000 }).withMessage('Comment must be between 1 and 1000 characters'),
         body('author.name').optional().trim().isLength({ max: 100 }),
-        // FIXED: Email is now completely optional and allows empty strings
         body('author.email')
-            .optional({ checkFalsy: true }) // This makes empty strings pass validation
+            .optional({ checkFalsy: true })
             .isEmail()
             .normalizeEmail()
             .withMessage('Please provide a valid email address')
@@ -78,7 +71,7 @@ router.post('/:commentId/flag',
     commentController.flagComment
 );
 
-// Admin routes
+// Admin routes (require authentication)
 // GET /api/comments/moderate - Get pending comments for moderation
 router.get('/moderate',
     isAdmin,
@@ -110,7 +103,7 @@ router.post('/:commentId/reject',
     commentController.rejectComment
 );
 
-// DELETE /api/comments/:commentId - Delete comment (owner or admin)
+// DELETE /api/comments/:commentId - Delete comment
 router.delete('/:commentId',
     [param('commentId').isMongoId().withMessage('Invalid comment ID')],
     validate,

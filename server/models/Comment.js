@@ -1,5 +1,5 @@
 // server/models/Comment.js
-// Complete comment model with moderation workflow
+// Fixed model - no role field needed
 
 const mongoose = require('mongoose');
 
@@ -119,15 +119,9 @@ commentSchema.virtual('replyCount', {
 commentSchema.methods.canDelete = function (user) {
     if (!user) return false;
 
-    // Admin can delete any comment
-    if (user.role === 'admin') return true;
-
-    // User can delete their own comment
-    if (this.author.userId && this.author.userId.toString() === user._id.toString()) {
-        return true;
-    }
-
-    return false;
+    // Any authenticated user (admin) can delete any comment
+    // Since only admin can login, authenticated = admin
+    return true;
 };
 
 // Method to check if user has reacted
