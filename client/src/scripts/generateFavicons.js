@@ -6,8 +6,8 @@ const fs = require('fs').promises;
 const path = require('path');
 
 async function generateFavicons() {
-    const sourceImage = path.join(__dirname, '../client/public/logo.png');
-    const publicDir = path.join(__dirname, '../client/public');
+    const sourceImage = path.join(__dirname, '../../public/logo.png');
+    const publicDir = path.join(__dirname, '../../public');
 
     // Check if source image exists
     try {
