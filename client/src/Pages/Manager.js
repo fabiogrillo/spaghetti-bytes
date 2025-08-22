@@ -53,7 +53,7 @@ const Manager = () => {
           icon: <BiMessageSquareAdd size={24} />,
           emoji: "✍️",
           color: "bg-gradient-to-br from-cartoon-pink to-pink-600",
-          action: () => navigate("/publish-story")
+          action: () => navigate("/editor")
         },
         {
           label: "Manage Stories",
@@ -107,7 +107,7 @@ const Manager = () => {
           icon: <BiStats size={24} />,
           emoji: "📈",
           color: "bg-gradient-to-br from-green-500 to-green-700",
-          action: () => navigate("/analytics")
+          action: () => navigate("/newsletter/analytics")
         },
         {
           label: "Conversations",
@@ -123,7 +123,7 @@ const Manager = () => {
           icon: <BiPaperPlane size={24} />,
           emoji: "📧",
           color: "bg-gradient-to-br from-purple-500 to-purple-700",
-          action: () => navigate("/newsletter")
+          action: () => navigate("/newsletter/campaigns")
         }
       ]
     }

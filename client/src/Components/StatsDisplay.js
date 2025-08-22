@@ -161,7 +161,7 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
                             <span className="text-white text-2xl">{stat.icon}</span>
                         </motion.div>
                         <div className="text-center">
-                            <div className="text-3xl font-bold text-gray-800 dark:text-white">
+                            <div className="text-3xl font-bold text-gray-800 dark:text-gray-500">
                                 {formatNumber(stat.value)}
                             </div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>

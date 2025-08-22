@@ -493,7 +493,7 @@ const CommentSection = ({ storyId }) => {
                     onClick={() => setShowCommentForm(!showCommentForm)}
                     className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-cartoon transition-colors"
                 >
-                    <span className="font-semibold flex items-center gap-2">
+                    <span className="font-semibold flex items-center gap-2 text-cartoon-pink">
                         <FiMessageCircle />
                         {hasComments ? 'Add a Comment' : 'Write the First Comment'}
                     </span>
@@ -558,14 +558,14 @@ const CommentSection = ({ storyId }) => {
                                 <button
                                     type="button"
                                     onClick={() => setShowCommentForm(false)}
-                                    className="btn btn-ghost rounded-cartoon"
+                                    className="btn btn-ghost rounded-cartoon text-cartoon-pink"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={submitting || !formData.content.trim()}
-                                    className="btn btn-primary rounded-cartoon shadow-cartoon flex items-center gap-2"
+                                    className="bg-cartoon-purple text-white text-sm rounded-cartoon hover:shadow-cartoon flex items-center gap-2 px-2"
                                 >
                                     {submitting ? (
                                         <>
