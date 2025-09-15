@@ -399,6 +399,72 @@ const transporter = nodemailer.createTransport({
 });
 ```
 
+## 🚨 Security Features
+
+### Authentication & Authorization
+- **Session-based Authentication** with Passport.js
+- **CSRF Protection** via express-rate-limit
+- **Input Validation** with express-validator
+- **SQL/NoSQL Injection Prevention** via mongo-sanitize
+- **XSS Protection** with helmet
+- **Content Security Policy** headers
+
+### Data Protection
+- **Password Hashing** with bcrypt (12 rounds)
+- **Environment Variables** for sensitive data
+- **Rate Limiting** on API endpoints
+- **CORS Configuration** for cross-origin requests
+- **HTTPS Enforcement** in production
+
+### Newsletter Security
+- **Email Validation** with regex patterns
+- **Token-based Confirmation** for subscriptions
+- **Unsubscribe Protection** with secure tokens
+- **Admin-only Campaign Management**
+
+## 🐛 Known Issues & Solutions
+
+### Newsletter Subscription Issue (FIXED)
+**Problem**: Users received errors when subscribing to newsletter
+**Cause**: Hardcoded localhost URL in confirmation emails
+**Solution**: ✅ Fixed in `newsletterController.js` - now uses environment-based URLs
+
+### MongoDB Deprecation Warnings (FIXED)
+**Problem**: `useNewUrlParser` and `useUnifiedTopology` warnings
+**Solution**: ✅ Removed deprecated options from mongoose connection
+
+### Potential Issues to Monitor
+- **Rate Limiting**: May need adjustment based on traffic
+- **Session Storage**: Consider Redis for horizontal scaling
+- **Image Uploads**: Implement file size limits
+- **Cache Strategy**: Monitor hit rates and adjust TTL
+
+## 🧪 Testing
+
+### Client Testing
+```bash
+cd client
+npm test                    # Run unit tests
+npm test -- --coverage     # Run with coverage
+npm run test:e2e           # End-to-end tests
+```
+
+### Server Testing
+```bash
+cd server
+npm test                   # Run API tests
+npm run test:integration   # Integration tests
+```
+
+### Manual Testing Checklist
+- [ ] Newsletter subscription flow
+- [ ] Comment creation and moderation
+- [ ] Authentication (login/logout)
+- [ ] Article publishing workflow
+- [ ] Theme switching (light/dark)
+- [ ] Mobile responsiveness
+- [ ] RSS feed generation
+
 ## 🚀 Deployment
 
 ### Vercel Configuration

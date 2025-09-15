@@ -4,7 +4,13 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { BiShield, BiCommentCheck, BiSun, BiMoon, BiEnvelope, BiBarChart } from "react-icons/bi";
+import {
+  BiShield,
+  BiCommentCheck,
+  BiEnvelope,
+  BiBarChart,
+  BiBookmarkHeart,
+} from "react-icons/bi";
 import {
   IoIosLogIn,
   IoIosLogOut,
@@ -19,6 +25,7 @@ import { GrContact } from "react-icons/gr";
 import { doLogout } from "../Api";
 import Logo from "./Logo";
 import api from "../Api";
+import ThemeToggle from "./ThemeToggle";
 
 // Improved Navbar Component
 const ImprovedNavbar = ({
@@ -29,24 +36,9 @@ const ImprovedNavbar = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "cartoon");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [pendingCommentsCount, setPendingCommentsCount] = useState(0);
-
-  // Auto theme switching based on time
-  useEffect(() => {
-    const hour = new Date().getHours();
-    const isNightTime = hour >= 19 || hour < 7;
-    if (!localStorage.getItem("theme-manual")) {
-      setTheme(isNightTime ? "night" : "cartoon");
-    }
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -84,18 +76,12 @@ const ImprovedNavbar = ({
 
   const fetchPendingCommentsCount = async () => {
     try {
-      const response = await api.get('/comments/pending-count');
+      const response = await api.get("/comments/pending-count");
       setPendingCommentsCount(response.data.count);
     } catch (error) {
-      console.error('Error fetching pending comments count:', error);
+      console.error("Error fetching pending comments count:", error);
       setPendingCommentsCount(0);
     }
-  };
-
-  const toggleTheme = () => {
-    const newTheme = theme === "cartoon" ? "night" : "cartoon";
-    setTheme(newTheme);
-    localStorage.setItem("theme-manual", "true");
   };
 
   const handleLogout = async () => {
@@ -114,27 +100,33 @@ const ImprovedNavbar = ({
     { path: "/", label: "Home", icon: IoMdHome },
     { path: "/blog", label: "Blog", icon: IoMdBook },
     { path: "/goals", label: "Goals", icon: FaBullseye },
+    { path: "/bookmarks", label: "Bookmarks", icon: BiBookmarkHeart },
     { path: "/contacts", label: "Contacts", icon: GrContact },
   ];
 
   // Add Comments with badge if authenticated
   const navItems = [
     ...baseNavItems,
-    ...(authenticated ? [{
-      path: "/moderate-comments",
-      label: "Comments",
-      icon: FaComments,
-      hasBadge: pendingCommentsCount > 0,
-      badgeCount: pendingCommentsCount
-    }] : [])
+    ...(authenticated
+      ? [
+          {
+            path: "/moderate-comments",
+            label: "Comments",
+            icon: FaComments,
+            hasBadge: pendingCommentsCount > 0,
+            badgeCount: pendingCommentsCount,
+          },
+        ]
+      : []),
   ];
 
   const isActive = (path) => location.pathname === path;
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 bg-base-100 ${scrolled ? "shadow-lg backdrop-blur-md" : ""
-        }`}
+      className={`sticky top-0 z-50 transition-all duration-300 bg-base-100 ${
+        scrolled ? "shadow-lg backdrop-blur-md" : ""
+      }`}
     >
       <div className="navbar p-4 max-w-7xl mx-auto">
         <div className="flex-1">
@@ -167,7 +159,7 @@ const ImprovedNavbar = ({
                       <span>{item.label}</span>
                       {item.hasBadge && (
                         <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                          {item.badgeCount > 9 ? '9+' : item.badgeCount}
+                          {item.badgeCount > 9 ? "9+" : item.badgeCount}
                         </span>
                       )}
                     </div>
@@ -177,20 +169,7 @@ const ImprovedNavbar = ({
             })}
           </nav>
 
-          <motion.button
-            whileHover={{ rotate: 180 }}
-            onClick={toggleTheme}
-            className={`btn btn-circle shadow-cartoon-sm hover:shadow-cartoon btn-pop transition-all duration-300 ${theme === "cartoon"
-                ? "bg-gradient-to-br from-yellow-300 to-yellow-500"
-                : "bg-gradient-to-br from-blue-500 to-blue-800"
-              }`}
-          >
-            {theme === "cartoon" ? (
-              <BiMoon size={24} className="animate-pulse-slow text-white" />
-            ) : (
-              <BiSun size={24} className="animate-spin-slow text-yellow-300" />
-            )}
-          </motion.button>
+          <ThemeToggle />
 
           {authenticated ? (
             <div className="dropdown dropdown-end">
@@ -328,8 +307,22 @@ const ImprovedNavbar = ({
                 <nav className="space-y-4">
                   {navItems.map((item, index) => {
                     const Icon = item.icon;
-                    const colors = ["cartoon-pink", "cartoon-blue", "cartoon-yellow"];
+                    const colors = [
+                      "cartoon-pink",
+                      "cartoon-blue",
+                      "cartoon-yellow",
+                      "cartoon-purple",
+                      "cartoon-orange"
+                    ];
+                    const hoverColors = [
+                      "hover:bg-cartoon-pink",
+                      "hover:bg-cartoon-blue", 
+                      "hover:bg-cartoon-yellow",
+                      "hover:bg-cartoon-purple",
+                      "hover:bg-cartoon-orange"
+                    ];
                     const color = colors[index % colors.length];
+                    const hoverColor = hoverColors[index % hoverColors.length];
 
                     return (
                       <Link
@@ -343,7 +336,7 @@ const ImprovedNavbar = ({
                           className={
                             isActive(item.path)
                               ? `w-full btn justify-start rounded-cartoon shadow-cartoon bg-${color} text-white relative`
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-pink relative"
+                              : `w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost ${hoverColor} hover:text-white relative`
                           }
                         >
                           <Icon size={20} />
@@ -360,14 +353,17 @@ const ImprovedNavbar = ({
 
                   {authenticated && (
                     <>
-                      <Link to="/conversations" onClick={() => setIsSidebarOpen(false)}>
+                      <Link
+                        to="/conversations"
+                        onClick={() => setIsSidebarOpen(false)}
+                      >
                         <motion.button
                           whileHover={{ x: 10 }}
                           whileTap={{ scale: 0.95 }}
                           className={
                             isActive("/conversations")
                               ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-blue text-white"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-yellow"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-blue hover:text-white"
                           }
                         >
                           <IoMdBook size={20} />
@@ -375,14 +371,17 @@ const ImprovedNavbar = ({
                         </motion.button>
                       </Link>
 
-                      <Link to="/newsletter/campaigns" onClick={() => setIsSidebarOpen(false)}>
+                      <Link
+                        to="/newsletter/campaigns"
+                        onClick={() => setIsSidebarOpen(false)}
+                      >
                         <motion.button
                           whileHover={{ x: 10 }}
                           whileTap={{ scale: 0.95 }}
                           className={
                             isActive("/newsletter/campaigns")
                               ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-pink text-white"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-orange"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-purple hover:text-white"
                           }
                         >
                           <BiEnvelope size={20} />
@@ -390,14 +389,17 @@ const ImprovedNavbar = ({
                         </motion.button>
                       </Link>
 
-                      <Link to="/newsletter/analytics" onClick={() => setIsSidebarOpen(false)}>
+                      <Link
+                        to="/newsletter/analytics"
+                        onClick={() => setIsSidebarOpen(false)}
+                      >
                         <motion.button
                           whileHover={{ x: 10 }}
                           whileTap={{ scale: 0.95 }}
                           className={
                             isActive("/newsletter/analytics")
                               ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-yellow text-black"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-pink"
+                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-orange hover:text-white"
                           }
                         >
                           <BiBarChart size={20} />
@@ -405,11 +407,14 @@ const ImprovedNavbar = ({
                         </motion.button>
                       </Link>
 
-                      <Link to="/privacy" onClick={() => setIsSidebarOpen(false)}>
+                      <Link
+                        to="/privacy"
+                        onClick={() => setIsSidebarOpen(false)}
+                      >
                         <motion.button
                           whileHover={{ x: 10 }}
                           whileTap={{ scale: 0.95 }}
-                          className="w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-blue"
+                          className="w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-yellow hover:text-black"
                         >
                           <BiShield size={20} />
                           <span className="ml-3">Privacy Policy</span>
@@ -421,20 +426,7 @@ const ImprovedNavbar = ({
 
                 {/* Theme Toggle */}
                 <div className="mt-8 flex justify-center">
-                  <motion.button
-                    whileHover={{ rotate: 180 }}
-                    onClick={toggleTheme}
-                    className={`btn btn-circle shadow-cartoon-sm hover:shadow-cartoon btn-pop transition-all duration-300 ${theme === "cartoon"
-                        ? "bg-gradient-to-br from-blue-500 to-blue-800"
-                        : "bg-gradient-to-br from-yellow-300 to-yellow-500"
-                      }`}
-                  >
-                    {theme === "cartoon" ? (
-                      <BiMoon size={24} className="animate-spin-slow text-white" />
-                    ) : (
-                      <BiSun size={24} className="animate-spin-slow text-white" />
-                    )}
-                  </motion.button>
+                  <ThemeToggle />
                 </div>
 
                 {/* Auth Section */}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TipTapEditor from "../Components/TipTapEditor";
 import { BsArrowLeft } from "react-icons/bs";
@@ -8,16 +8,25 @@ import ShareButtons from "../Components/ShareButtons";
 import NewsletterWidget from "../Components/NewsletterWidget";
 import ArticleReactions from '../Components/ArticleReactions';
 import CommentSection from "../Components/CommentSection";
+import BookmarkButton from "../Components/BookmarkButton";
+import ReadingProgress from "../Components/ReadingProgress";
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();
   const { storyId } = useParams();
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [contentRef, setContentRef] = useState(null);
   const [readingProgress, setReadingProgress] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(0);
+
+  const handleProgressChange = useCallback((progress) => {
+    setReadingProgress(progress);
+  }, []);
 
   useEffect(() => {
+    // Scroll to top when story changes
+    window.scrollTo(0, 0);
+    
     const fetchStory = async () => {
       try {
         const response = await fetch(`/api/stories/${storyId}`);
@@ -32,46 +41,6 @@ const StoryVisualizer = () => {
     fetchStory();
   }, [storyId]);
 
-  // Calculate reading progress and remaining time
-  useEffect(() => {
-    if (!story) return;
-
-    const handleScroll = () => {
-      // Calculate scroll progress
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight - windowHeight;
-      const scrollTop = window.scrollY;
-      const progress = Math.min((scrollTop / documentHeight) * 100, 100);
-      setReadingProgress(progress);
-
-      // Calculate remaining reading time
-      const wordsPerMinute = 200; // Average reading speed
-      const totalWords = story.content.split(/\s+/).length;
-      const totalReadingTime = Math.ceil(totalWords / wordsPerMinute);
-      const remainingPercent = (100 - progress) / 100;
-      const timeLeft = Math.ceil(totalReadingTime * remainingPercent);
-      setRemainingTime(timeLeft);
-    };
-
-    // Add throttling for performance
-    let ticking = false;
-    const scrollListener = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", scrollListener);
-    handleScroll(); // Initial calculation
-
-    return () => {
-      window.removeEventListener("scroll", scrollListener);
-    };
-  }, [story]);
 
   if (loading) {
     return (
@@ -101,46 +70,17 @@ const StoryVisualizer = () => {
 
   return (
     <>
-      {/* Reading Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <div className="h-1 bg-gray-200 dark:bg-gray-700">
-          <motion.div
-            className="h-full bg-gradient-to-r from-cartoon-pink to-cartoon-purple"
-            style={{ width: `${readingProgress}%` }}
-            initial={{ width: 0 }}
-            animate={{ width: `${readingProgress}%` }}
-            transition={{ duration: 0.1 }}
-          />
-        </div>
+      <ReadingProgress 
+        contentRef={{ current: contentRef }} 
+        onProgressChange={handleProgressChange}
+      />
 
-        {/* Reading Stats Bar */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="container mx-auto px-4 py-2 flex justify-between items-center text-sm">
-            <div className="flex items-center gap-4">
-              <span className="text-gray-600 dark:text-gray-400">
-                Progress: <strong className="text-cartoon-pink">{Math.round(readingProgress)}%</strong>
-              </span>
-              <span className="text-gray-600 dark:text-gray-400">
-                {remainingTime > 0 ? (
-                  <>Time left: <strong className="text-cartoon-purple">{remainingTime} min</strong></>
-                ) : (
-                  <strong className="text-cartoon-green">Completed!</strong>
-                )}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-              <BiBookReader />
-              <span>{readingTime} min total</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content - Add padding top for fixed header */}
+      {/* Main Content */}
       <motion.div
+        ref={(el) => setContentRef(el)}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="container mx-auto p-4 md:p-8 max-w-4xl mt-12"
+        className="container mx-auto p-4 md:p-8 max-w-4xl"
       >
         {/* Header */}
         <motion.div
@@ -193,18 +133,19 @@ const StoryVisualizer = () => {
           <p className="text-lg italic text-center">{story.summary}</p>
         </motion.div>
 
-        {/* Share Buttons */}
+        {/* Share & Bookmark Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="flex justify-center mb-8"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
         >
           <ShareButtons
             url={window.location.href}
             title={story.title}
             summary={story.summary}
           />
+          <BookmarkButton storyId={storyId} />
         </motion.div>
 
         <div className="divider"></div>

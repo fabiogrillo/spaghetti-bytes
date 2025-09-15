@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BiEnvelope, BiCheck } from 'react-icons/bi';
-import { HiSparkles } from "react-icons/hi2";
+import { BsStars } from "react-icons/bs";
 import { useToast } from './ToastProvider';
 
 const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
@@ -39,7 +39,7 @@ const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
                 body: JSON.stringify({
                     email,
                     source,
-                    referrer: document.referrer
+                    ...(document.referrer && { referrer: document.referrer })
                 })
             });
 
@@ -83,7 +83,7 @@ const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
         return (
             <div className="bg-gradient-to-r from-cartoon-pink to-cartoon-purple p-6 rounded-cartoon shadow-cartoon border-2 border-black">
                 <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                    <HiSparkles className="animate-pulse" />
+                    <BsStars className="animate-pulse" />
                     Never Miss a Byte!
                 </h3>
                 <p className="text-white/90 mb-4">

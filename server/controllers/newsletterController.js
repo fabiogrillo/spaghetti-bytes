@@ -114,8 +114,11 @@ const sendCampaignEmail = async (campaign, subscriber) => {
         let htmlContent = campaign.content.html || '';
         let textContent = campaign.content.text || '';
 
-        // Replace placeholders
-        const unsubscribeLink = `${process.env.SITE_URL || 'http://localhost:3000'}/api/newsletter/unsubscribe/${subscriber.tokens.unsubscribeToken}`;
+        // Replace placeholders  
+        const baseUrl = process.env.NODE_ENV === 'production' 
+            ? (process.env.SITE_URL || 'https://www.spaghettibytes.blog')
+            : 'http://localhost:3000';
+        const unsubscribeLink = `${baseUrl}/api/newsletter/unsubscribe/${subscriber.tokens.unsubscribeToken}`;
 
         htmlContent = htmlContent
             .replace(/{{email}}/g, subscriber.email)
@@ -187,8 +190,16 @@ const subscribe = async (req, res) => {
 
         if (subscriber) {
             if (subscriber.status === 'active') {
-                return res.status(400).json({
-                    error: "You're already subscribed!"
+                return res.status(409).json({
+                    error: "You're already subscribed to our newsletter!",
+                    success: false
+                });
+            } else if (subscriber.status === 'pending') {
+                // Resend confirmation email for pending subscriptions
+                await sendConfirmationEmail(subscriber);
+                return res.status(200).json({
+                    success: true,
+                    message: "Confirmation email resent! Please check your inbox."
                 });
             } else if (subscriber.status === 'unsubscribed') {
                 // Reactivate subscription
@@ -254,7 +265,7 @@ const confirmSubscription = async (req, res) => {
                 <body>
                     <h1>Invalid or Expired Link</h1>
                     <p>This confirmation link is invalid or has expired.</p>
-                    <a href="${process.env.SITE_URL || 'http://localhost:3000'}">Go to Spaghetti Bytes</a>
+                    <a href="${process.env.SITE_URL || 'https://www.spaghettibytes.blog'}">Go to Spaghetti Bytes</a>
                 </body>
                 </html>
             `);
@@ -289,7 +300,7 @@ const confirmSubscription = async (req, res) => {
                 <h1>🎉 Welcome to Spaghetti Bytes!</h1>
                 <p>Your subscription has been confirmed.</p>
                 <p>You'll receive our next newsletter in your inbox.</p>
-                <a href="${process.env.SITE_URL || 'http://localhost:3000'}">Visit Spaghetti Bytes</a>
+                <a href="${process.env.SITE_URL || 'https://www.spaghettibytes.blog'}">Visit Spaghetti Bytes</a>
             </body>
             </html>
         `);
@@ -513,6 +524,25 @@ const getSubscriberStats = async (req, res) => {
             ? ((thisMonth - lastMonth) / lastMonth * 100).toFixed(1)
             : 100;
 
+        // Calculate source breakdown
+        const sourceStats = await Subscriber.aggregate([
+            { $match: { status: { $ne: 'unsubscribed' } } },
+            {
+                $group: {
+                    _id: '$metadata.source',
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { count: -1 } }
+        ]);
+
+        const totalActiveSubscribers = active + pending;
+        const sourceBreakdown = sourceStats.map(stat => ({
+            name: stat._id || 'Unknown',
+            value: totalActiveSubscribers > 0 ? Math.round((stat.count / totalActiveSubscribers) * 100) : 0,
+            count: stat.count
+        }));
+
         res.json({
             active,
             total,
@@ -522,7 +552,8 @@ const getSubscriberStats = async (req, res) => {
                 thisMonth,
                 lastMonth,
                 percentChange: parseFloat(percentChange)
-            }
+            },
+            sourceBreakdown
         });
     } catch (error) {
         console.error("Stats error:", error);
@@ -532,7 +563,10 @@ const getSubscriberStats = async (req, res) => {
 
 // Email templates
 const sendConfirmationEmail = async (subscriber) => {
-    const confirmUrl = `${process.env.SITE_URL || 'http://localhost:5000'}/api/newsletter/confirm/${subscriber.tokens.confirmToken}`;
+    const baseUrl = process.env.NODE_ENV === 'production' 
+        ? (process.env.SITE_URL || 'https://www.spaghettibytes.blog')
+        : 'http://localhost:3000';
+    const confirmUrl = `${baseUrl}/api/newsletter/confirm/${subscriber.tokens.confirmToken}`;
 
     const mailOptions = {
         from: `Spaghetti Bytes <${process.env.EMAIL_USER}>`,
@@ -597,7 +631,7 @@ const sendWelcomeEmail = async (subscriber) => {
                 <hr style="border: 1px solid #eee; margin: 30px 0;">
                 
                 <p style="text-align: center;">
-                    <a href="${process.env.SITE_URL || 'http://localhost:3000'}" 
+                    <a href="${process.env.SITE_URL || 'https://www.spaghettibytes.blog'}" 
                        style="color: #FF6B9D;">Visit Spaghetti Bytes</a>
                 </p>
             </div>

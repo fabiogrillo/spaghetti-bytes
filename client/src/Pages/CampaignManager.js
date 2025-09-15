@@ -15,6 +15,7 @@ const CampaignManager = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('campaigns');
+    const [subscriberFilter, setSubscriberFilter] = useState('all'); // all, active, pending, unsubscribed
 
     // Data states with proper initialization
     const [campaigns, setCampaigns] = useState([]);
@@ -196,6 +197,11 @@ const CampaignManager = () => {
             return 'Invalid Date';
         }
     };
+
+    // Filter subscribers based on selected filter
+    const filteredSubscribers = subscriberFilter === 'all' 
+        ? subscribers 
+        : subscribers.filter(subscriber => subscriber.status === subscriberFilter);
 
     const getStatusBadge = (status) => {
         const badges = {
@@ -438,17 +444,41 @@ const CampaignManager = () => {
                             exit={{ opacity: 0, y: -20 }}
                             className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-6"
                         >
-                            <div className="flex justify-between items-center mb-6">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                                 <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                                    Subscribers ({subscribers.length})
+                                    Subscribers ({filteredSubscribers.length} of {subscribers.length})
                                 </h2>
+                                
+                                {/* Filter Controls */}
+                                <div className="flex gap-2">
+                                    <select
+                                        value={subscriberFilter}
+                                        onChange={(e) => setSubscriberFilter(e.target.value)}
+                                        className="select select-bordered select-sm rounded-cartoon"
+                                    >
+                                        <option value="all">All Status</option>
+                                        <option value="active">Active Only</option>
+                                        <option value="pending">Pending Only</option>
+                                        <option value="unsubscribed">Unsubscribed Only</option>
+                                    </select>
+                                    
+                                    {subscriberFilter !== 'all' && (
+                                        <button
+                                            onClick={() => setSubscriberFilter('all')}
+                                            className="btn btn-sm btn-ghost rounded-cartoon"
+                                            title="Clear filter"
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
-                            {subscribers.length === 0 ? (
+                            {filteredSubscribers.length === 0 ? (
                                 <div className="text-center py-12">
                                     <FaUsers className="text-6xl text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                                     <p className="text-gray-500 dark:text-gray-400">
-                                        No subscribers yet.
+                                        {subscribers.length === 0 ? 'No subscribers yet.' : `No ${subscriberFilter} subscribers.`}
                                     </p>
                                 </div>
                             ) : (
@@ -464,7 +494,7 @@ const CampaignManager = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {subscribers.map((subscriber) => (
+                                            {filteredSubscribers.map((subscriber) => (
                                                 <tr key={subscriber._id} className="border-b dark:border-gray-700">
                                                     <td className="py-3 px-4 font-medium">{subscriber.email}</td>
                                                     <td className="py-3 px-4">

@@ -27,12 +27,34 @@ const ChatBot = () => {
     scrollToBottom();
   }, [messages]);
 
-  const quickReplies = [
+  const [suggestedTopics, setSuggestedTopics] = useState([
     "I'd like to collaborate 🤝",
-    "Question about your blog 📝",
+    "Question about your blog 📝", 
     "Just saying hi! 👋",
     "Technical question 💻",
-  ];
+  ]);
+
+  // FAQ responses
+  const faqResponses = {
+    'what do you write about': "I write about web development, JavaScript, React, Node.js, programming tips, and tech insights. You can find all my articles in the blog section! 📝",
+    'how to contact': "You can contact Fabio through this chat, or connect on LinkedIn. He usually responds within 24 hours! 📞",
+    'newsletter': "You can subscribe to the newsletter for weekly updates on new articles and tech insights. Just look for the newsletter signup! 📧",
+    'collaboration': "Fabio is always open to interesting collaborations! Feel free to share your project ideas and he'll get back to you soon. 🤝",
+    'experience': "Fabio is a fullstack developer with experience in React, Node.js, databases, and modern web technologies. Check out the blog for examples of his work! 💻",
+    'services': "Fabio offers web development consultations, code reviews, and project collaborations. What kind of project are you working on? 🚀",
+  };
+
+  const getContextualSuggestions = (userMessage) => {
+    const msg = userMessage.toLowerCase();
+    if (msg.includes('blog') || msg.includes('article')) {
+      return ["Show me recent articles 📚", "What topics do you cover? 🔍", "How often do you post? ⏰"];
+    } else if (msg.includes('collaborate') || msg.includes('project')) {
+      return ["What's your experience? 💼", "Tell me about your services 🛠️", "How can we work together? 🤝"];
+    } else if (msg.includes('technical') || msg.includes('code')) {
+      return ["What technologies do you use? ⚡", "Can you help with code review? 👀", "Do you offer consulting? 💡"];
+    }
+    return suggestedTopics;
+  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -75,16 +97,32 @@ const ChatBot = () => {
         saveConversation({ ...userInfo, email: userMessage });
       }
     } else {
-      // Context-aware responses
-      if (userMessage.toLowerCase().includes('collaborate') || userMessage.toLowerCase().includes('project')) {
+      // Check FAQ responses first
+      const msg = userMessage.toLowerCase();
+      let faqMatch = Object.keys(faqResponses).find(key => 
+        msg.includes(key) || key.split(' ').some(word => msg.includes(word))
+      );
+
+      if (faqMatch) {
+        botReply = faqResponses[faqMatch];
+      } else if (msg.includes('recent articles') || msg.includes('show me articles')) {
+        botReply = "Here are some recent topics I've covered: React best practices, Node.js performance, JavaScript tips, and full-stack development. Check out the blog section for the full articles! 📚";
+      } else if (msg.includes('technologies') || msg.includes('tech stack')) {
+        botReply = "I work with JavaScript/TypeScript, React, Node.js, MongoDB, PostgreSQL, Express, Next.js, and modern web technologies. Always learning new things! ⚡";
+      } else if (msg.includes('consulting') || msg.includes('help')) {
+        botReply = "Yes! Fabio offers consulting for web development projects, code reviews, architecture planning, and technical mentoring. What kind of help are you looking for? 💡";
+      } else if (msg.includes('collaborate') || msg.includes('project')) {
         botReply = "That's awesome! Fabio loves collaborating on interesting projects. I'll make sure he sees this. Could you tell me a bit more about what you have in mind? 🚀";
-      } else if (userMessage.toLowerCase().includes('blog') || userMessage.toLowerCase().includes('article')) {
+      } else if (msg.includes('blog') || msg.includes('article')) {
         botReply = "Thanks for your interest in the blog! Is there a specific article you'd like to discuss, or would you like to suggest a topic? 📚";
-      } else if (userMessage.toLowerCase().includes('technical') || userMessage.toLowerCase().includes('code')) {
+      } else if (msg.includes('technical') || msg.includes('code')) {
         botReply = "Great technical question! I'll make sure Fabio sees this. He usually responds within 24 hours. Feel free to share more details! 💻";
       } else {
         botReply = "Thanks for sharing! I've noted this down and Fabio will get back to you soon. Is there anything else you'd like to add? 😊";
       }
+
+      // Update suggestions based on context
+      setSuggestedTopics(getContextualSuggestions(userMessage));
     }
 
     const botMessage = {
@@ -271,7 +309,7 @@ const ChatBot = () => {
             {/* Quick Replies */}
             {stage === 'greeting' && (
               <div className="px-4 pt-3 pb-2 flex flex-wrap gap-2">
-                {quickReplies.map((reply, index) => (
+                {suggestedTopics.map((reply, index) => (
                   <button
                     key={index}
                     onClick={() => handleQuickReply(reply)}

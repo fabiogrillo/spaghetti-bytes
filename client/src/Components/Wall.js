@@ -4,6 +4,8 @@ import ImprovedStoryCard from "./ImprovedStoryCard";
 import { FaRegBookmark, FaSearch } from "react-icons/fa";
 import { LuTags } from "react-icons/lu";
 import { BsStars } from "react-icons/bs";
+import { BiFilter } from "react-icons/bi";
+import AdvancedSearch from "./AdvancedSearch";
 
 const Wall = () => {
   const [stories, setStories] = useState([]);
@@ -13,6 +15,7 @@ const Wall = () => {
   const [lastMonthStories, setLastMonthStories] = useState(0);
   const [distinctTags, setDistinctTags] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -76,6 +79,11 @@ const Wall = () => {
 
     sortAndFilterStories();
   }, [sortOption, searchTag, stories]);
+
+  const handleAdvancedSearchResults = (results) => {
+    setFilteredStories(results);
+    setShowAdvancedSearch(false);
+  };
 
   return (
     <div className="container mx-auto p-8">
@@ -245,6 +253,16 @@ const Wall = () => {
             <FaSearch />
           </div>
         </div>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowAdvancedSearch(true)}
+          className="btn bg-cartoon-blue text-white rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover"
+        >
+          <BiFilter size={20} />
+          Advanced Search
+        </motion.button>
       </motion.div>
 
       {/* Stories Grid */}
@@ -282,6 +300,15 @@ const Wall = () => {
             </div>
           )}
         </motion.div>
+      )}
+
+      {/* Advanced Search Modal */}
+      {showAdvancedSearch && (
+        <AdvancedSearch
+          allStories={stories}
+          onResults={handleAdvancedSearchResults}
+          onClose={() => setShowAdvancedSearch(false)}
+        />
       )}
     </div>
   );

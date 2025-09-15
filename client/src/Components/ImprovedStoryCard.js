@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { GoBook } from "react-icons/go";
 import { BiTime } from "react-icons/bi";
 import { motion } from "framer-motion";
+import BookmarkButton from "./BookmarkButton";
 
 const ImprovedStoryCard = ({ story, index }) => {
   const navigate = useNavigate();
@@ -82,29 +83,32 @@ const ImprovedStoryCard = ({ story, index }) => {
 
         {/* Footer Section */}
         <div className="mt-auto pt-4 border-t-2 border-dashed border-gray-300">
-          <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
             <div className="flex items-center gap-1">
               <BiTime />
               <span>{new Date(story.createdAt).toLocaleDateString()}</span>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className={`
-                btn btn-sm rounded-cartoon
-                ${colorScheme.bg} ${colorScheme.text}
-                shadow-cartoon-sm hover:shadow-cartoon
-                border-2 border-black
-              `}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/visualizer/${story._id}`);
-              }}
-            >
-              <GoBook className="text-lg mr-1" />
-              Read
-            </motion.button>
+            <div onClick={(e) => e.stopPropagation()}>
+              <BookmarkButton storyId={story._id} variant="compact" />
+            </div>
           </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`
+              btn btn-sm rounded-cartoon w-full
+              ${colorScheme.bg} ${colorScheme.text}
+              shadow-cartoon-sm hover:shadow-cartoon
+              border-2 border-black
+            `}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/visualizer/${story._id}`);
+            }}
+          >
+            <GoBook className="text-lg mr-1" />
+            Read Story
+          </motion.button>
         </div>
       </div>
     </motion.div>

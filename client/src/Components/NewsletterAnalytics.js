@@ -85,19 +85,14 @@ const NewsletterAnalytics = () => {
                     },
                     growthData: generateGrowthData(timeRange),
                     campaignPerformance: processedCampaigns.slice(0, 10), // Last 10 campaigns
-                    sourceBreakdown: [
-                        { name: 'Website', value: 45, color: '#FF6B9D' },
-                        { name: 'Blog Posts', value: 30, color: '#4ECDC4' },
-                        { name: 'Direct', value: 15, color: '#FFC107' },
-                        { name: 'Other', value: 10, color: '#9B59B6' }
+                    sourceBreakdown: stats.sourceBreakdown?.length > 0 ? stats.sourceBreakdown.map((source, index) => ({
+                        ...source,
+                        color: ['#FF6B9D', '#4ECDC4', '#FFC107', '#9B59B6', '#34D399'][index % 5]
+                    })) : [
+                        { name: 'No data', value: 100, color: '#94A3B8' }
                     ],
-                    topLocations: [
-                        { country: 'United States', subscribers: Math.floor(stats.active * 0.33), percentage: 33 },
-                        { country: 'United Kingdom', subscribers: Math.floor(stats.active * 0.16), percentage: 16 },
-                        { country: 'Canada', subscribers: Math.floor(stats.active * 0.12), percentage: 12 },
-                        { country: 'Germany', subscribers: Math.floor(stats.active * 0.09), percentage: 9 },
-                        { country: 'France', subscribers: Math.floor(stats.active * 0.07), percentage: 7 }
-                    ],
+                    // Remove hardcoded locations for now - would need geolocation data
+                    topLocations: [],
                     engagementByDay: [
                         { day: 'Mon', opens: 22, clicks: 8 },
                         { day: 'Tue', opens: 28, clicks: 10 },
