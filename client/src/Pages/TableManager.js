@@ -18,7 +18,8 @@ const TableManager = () => {
       setLoading(true);
       const response = await fetch("/api/stories");
       const data = await response.json();
-      setStories(data);
+      const storiesArray = data.stories || [];
+      setStories(storiesArray);
     } catch (error) {
       console.error("Error fetching stories:", error);
     } finally {
@@ -73,7 +74,7 @@ const TableManager = () => {
       render: (story) => (
         <div className="flex flex-wrap gap-1">
           {story.tags.slice(0, 3).map(tag => (
-            <span key={tag} className="badge badge-sm bg-cartoon-blue text-white">
+            <span key={tag} className="badge badge-sm bg-primary text-white">
               {tag}
             </span>
           ))}
@@ -114,7 +115,7 @@ const TableManager = () => {
 
         {loading ? (
           <div className="flex flex-col items-center mt-20">
-            <span className="loading loading-infinity loading-lg text-cartoon-pink"></span>
+            <span className="loading loading-infinity loading-lg text-error"></span>
             <p className="mt-4 text-lg">Loading stories...</p>
           </div>
         ) : (
@@ -125,7 +126,7 @@ const TableManager = () => {
               onEdit={editStory}
               onDelete={deleteStory}
               title=""
-              colorScheme="cartoon-blue"
+              colorScheme="primary"
             />
           </div>
         )}
@@ -135,7 +136,7 @@ const TableManager = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             type="button"
-            className="btn btn-primary rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
+            className="btn btn-primary rounded-soft shadow-soft hover:shadow-soft-lg"
             onClick={() => navigate("/manager")}
           >
             <BsArrowLeft /> Back to Manager

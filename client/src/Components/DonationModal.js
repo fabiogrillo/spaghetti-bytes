@@ -26,7 +26,7 @@ const DonationModal = ({
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white rounded-cartoon shadow-cartoon border-2 border-black p-6 max-w-md w-full"
+                className="bg-white rounded-soft shadow-soft-lg border border-base-300 p-6 max-w-md w-full"
                 onClick={(e) => e.stopPropagation()}
             >
                 <h2 className="text-2xl text-black font-bold mb-2 text-center">
@@ -46,9 +46,9 @@ const DonationModal = ({
                                 setSelectedAmount(amount.value);
                                 setCustomAmount('');
                             }}
-                            className={`p-4 rounded-cartoon border-2 border-black ${selectedAmount === amount.value && !customAmount
-                                    ? 'bg-cartoon-yellow shadow-cartoon'
-                                    : 'bg-white shadow-cartoon-sm hover:shadow-cartoon'
+                            className={`p-4 rounded-soft border border-base-300 ${selectedAmount === amount.value && !customAmount
+                                    ? 'bg-warning shadow-soft-lg'
+                                    : 'bg-white shadow-soft hover:shadow-soft-lg'
                                 }`}
                         >
                             <div className="text-3xl mb-1">{amount.emoji}</div>
@@ -63,13 +63,13 @@ const DonationModal = ({
                         <span className="label-text">Or enter custom amount:</span>
                     </label>
                     <div className="input-group">
-                        <span className="text-cartoon-orange">€</span>
+                        <span className="text-accent">€</span>
                         <input
                             type="number"
                             value={customAmount}
                             onChange={(e) => setCustomAmount(e.target.value)}
                             placeholder="0.00"
-                            className="input input-bordered w-full rounded-r-cartoon"
+                            className="input input-bordered w-full rounded-r-soft"
                             min="1"
                             step="0.01"
                         />
@@ -79,7 +79,7 @@ const DonationModal = ({
                 <div className="flex gap-3">
                     <button
                         onClick={onClose}
-                        className="btn btn-ghost rounded-cartoon flex-1"
+                        className="btn btn-ghost rounded-soft flex-1"
                     >
                         Maybe later
                     </button>
@@ -87,7 +87,7 @@ const DonationModal = ({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={handleDonation}
-                        className="btn bg-gradient-to-r from-cartoon-orange to-cartoon-pink text-white rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover flex-1"
+                        className="btn bg-gradient-to-r from-accent to-error text-white rounded-soft shadow-soft-lg hover:shadow-soft-hover flex-1"
                     >
                         <BiHeart />
                         Donate €{customAmount || selectedAmount}

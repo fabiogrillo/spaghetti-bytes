@@ -1,7 +1,7 @@
 // client/src/Pages/Contacts.js
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BiEnvelope, BiChat, BiTime } from 'react-icons/bi';
+import { BiEnvelope, BiTime } from 'react-icons/bi';
 import { FaGithub, FaLinkedin, FaMedium } from 'react-icons/fa';
 
 const Contacts = () => {
@@ -14,7 +14,7 @@ const Contacts = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-12"
                 >
-                    <h1 className="text-5xl font-bold text-cartoon-purple mb-4">
+                    <h1 className="text-5xl font-bold text-secondary mb-4">
                         Let's Connect!
                     </h1>
                     <p className="text-xl text-gray-600 dark:text-gray-400">
@@ -29,27 +29,15 @@ const Contacts = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-8 h-full">
-                            <h2 className="text-2xl font-bold text-cartoon-pink mb-6">
+                        <div className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg p-8 h-full">
+                            <h2 className="text-2xl font-bold text-error mb-6">
                                 Get in Touch
                             </h2>
 
                             <div className="space-y-6">
-                                {/* Chat Bot Info */}
-                                <div className="flex items-start space-x-4">
-                                    <BiChat className="text-3xl text-cartoon-blue mt-1" />
-                                    <div>
-                                        <h3 className="font-semibold text-lg mb-1">Live Chat</h3>
-                                        <p className="text-gray-600 dark:text-gray-400">
-                                            Use the chat bot in the bottom right corner for instant assistance.
-                                            I'll get back to you as soon as possible!
-                                        </p>
-                                    </div>
-                                </div>
-
                                 {/* Response Time */}
                                 <div className="flex items-start space-x-4">
-                                    <BiTime className="text-3xl text-cartoon-yellow mt-1" />
+                                    <BiTime className="text-3xl text-warning mt-1" />
                                     <div>
                                         <h3 className="font-semibold text-lg mb-1">Response Time</h3>
                                         <p className="text-gray-600 dark:text-gray-400">
@@ -61,7 +49,7 @@ const Contacts = () => {
 
                                 {/* Email */}
                                 <div className="flex items-start space-x-4">
-                                    <BiEnvelope className="text-3xl text-cartoon-purple mt-1" />
+                                    <BiEnvelope className="text-3xl text-secondary mt-1" />
                                     <div>
                                         <h3 className="font-semibold text-lg mb-1">Email</h3>
                                         <p className="text-gray-600 dark:text-gray-400">
@@ -79,7 +67,7 @@ const Contacts = () => {
                                         href="https://github.com/fabiogrillo"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="btn btn-circle shadow-cartoon-sm hover:shadow-cartoon transition-all"
+                                        className="btn btn-circle shadow-soft hover:shadow-soft-lg transition-all"
                                     >
                                         <FaGithub className="text-xl" />
                                     </a>
@@ -87,15 +75,15 @@ const Contacts = () => {
                                         href="https://www.linkedin.com/in/fabgrillo"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="btn btn-circle shadow-cartoon-sm hover:shadow-cartoon transition-all"
+                                        className="btn btn-circle shadow-soft hover:shadow-soft-lg transition-all"
                                     >
-                                        <FaLinkedin className="text-xl text-cartoon-blue" />
+                                        <FaLinkedin className="text-xl text-primary" />
                                     </a>
                                     <a
                                         href="https://medium.com/@fgrillo123"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="btn btn-circle shadow-cartoon-sm hover:shadow-cartoon transition-all"
+                                        className="btn btn-circle shadow-soft hover:shadow-soft-lg transition-all"
                                     >
                                         <FaMedium className="text-xl" />
                                     </a>
@@ -110,13 +98,13 @@ const Contacts = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
                     >
-                        <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-8 h-full">
-                            <h2 className="text-2xl font-bold text-cartoon-orange mb-6">
+                        <div className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg p-8 h-full">
+                            <h2 className="text-2xl font-bold text-accent mb-6">
                                 Frequently Asked Questions
                             </h2>
 
                             <div className="space-y-4">
-                                <details className="collapse collapse-arrow bg-base-200 rounded-cartoon">
+                                <details className="collapse collapse-arrow bg-base-200 rounded-soft">
                                     <summary className="collapse-title text-lg font-medium">
                                         How can I contribute to the blog?
                                     </summary>
@@ -128,7 +116,7 @@ const Contacts = () => {
                                     </div>
                                 </details>
 
-                                <details className="collapse collapse-arrow bg-base-200 rounded-cartoon">
+                                <details className="collapse collapse-arrow bg-base-200 rounded-soft">
                                     <summary className="collapse-title text-lg font-medium">
                                         Can I use your code in my projects?
                                     </summary>
@@ -140,7 +128,7 @@ const Contacts = () => {
                                     </div>
                                 </details>
 
-                                <details className="collapse collapse-arrow bg-base-200 rounded-cartoon">
+                                <details className="collapse collapse-arrow bg-base-200 rounded-soft">
                                     <summary className="collapse-title text-lg font-medium">
                                         Do you offer consulting services?
                                     </summary>
@@ -152,7 +140,7 @@ const Contacts = () => {
                                     </div>
                                 </details>
 
-                                <details className="collapse collapse-arrow bg-base-200 rounded-cartoon">
+                                <details className="collapse collapse-arrow bg-base-200 rounded-soft">
                                     <summary className="collapse-title text-lg font-medium">
                                         How often do you publish new content?
                                     </summary>
@@ -168,23 +156,6 @@ const Contacts = () => {
                     </motion.div>
                 </div>
 
-                {/* Call to Action */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="mt-12 text-center"
-                >
-                    <div className="bg-gradient-to-r from-cartoon-pink to-cartoon-purple rounded-cartoon shadow-cartoon p-8 text-white">
-                        <h2 className="text-3xl font-bold mb-4">Ready to Start a Conversation?</h2>
-                        <p className="text-xl mb-6">
-                            Click the chat button in the bottom right corner to send me a message!
-                        </p>
-                        <div className="text-6xl animate-bounce">
-                            ↘️
-                        </div>
-                    </div>
-                </motion.div>
             </div>
         </div>
     );

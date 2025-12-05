@@ -13,6 +13,10 @@ const goalSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+// Add indexes for better query performance
+goalSchema.index({ createdAt: -1 });
+goalSchema.index({ 'steps.completed': 1 });
+
 const Goal = mongoose.model("Goal", goalSchema);
 
 module.exports = Goal;

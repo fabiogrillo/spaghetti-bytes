@@ -52,7 +52,7 @@ const CookieSettings = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 left-6 z-40 btn btn-circle btn-sm bg-cartoon-yellow text-black shadow-cartoon hover:shadow-cartoon-hover"
+                className="fixed bottom-6 left-6 z-40 btn btn-circle btn-sm bg-warning text-black shadow-soft-lg hover:shadow-soft-hover"
                 aria-label="Cookie settings"
             >
                 <BiCookie size={20} />
@@ -73,10 +73,10 @@ const CookieSettings = () => {
                         animate={{ scale: 1, opacity: 1 }}
                         className="fixed inset-0 flex items-center justify-center z-50 p-4"
                     >
-                        <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                        <div className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg border border-base-300 p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
-                                    <BiCookie className="text-cartoon-yellow" />
+                                    <BiCookie className="text-warning" />
                                     Cookie Preferences
                                 </h2>
                                 <button
@@ -152,14 +152,14 @@ const CookieSettings = () => {
                             <div className="mt-6 flex gap-2">
                                 <button
                                     onClick={savePreferences}
-                                    className="btn btn-primary rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon flex-1"
+                                    className="btn btn-primary rounded-soft shadow-soft hover:shadow-soft-lg flex-1"
                                 >
                                     <BiCheck size={20} />
                                     Save Preferences
                                 </button>
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className="btn btn-ghost rounded-cartoon"
+                                    className="btn btn-ghost rounded-soft"
                                 >
                                     Cancel
                                 </button>

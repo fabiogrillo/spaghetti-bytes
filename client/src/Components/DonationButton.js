@@ -31,7 +31,7 @@ const DonationButton = ({ variant = 'floating', compact = false }) => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setShowModal(true)}
-                    className="fixed bottom-24 left-4 z-40 btn btn-circle btn-lg bg-gradient-to-br from-cartoon-orange to-cartoon-pink text-white shadow-cartoon hover:shadow-cartoon-hover"
+                    className="fixed bottom-24 left-4 z-40 btn btn-circle btn-lg bg-gradient-to-br from-accent to-error text-white shadow-soft-lg hover:shadow-soft-hover"
                 >
                     <motion.div
                         animate={{ rotate: [0, -10, 10, -10, 0] }}
@@ -46,7 +46,7 @@ const DonationButton = ({ variant = 'floating', compact = false }) => {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`bg-gradient-to-r from-cartoon-orange to-cartoon-pink ${compact ? 'p-4' : 'p-6'} rounded-cartoon shadow-cartoon border-2 border-black`}
+                    className={`bg-gradient-to-r from-accent to-error ${compact ? 'p-4' : 'p-6'} rounded-soft shadow-soft-lg border border-base-300`}
                 >
                     {!compact && (
                         <>
@@ -63,7 +63,7 @@ const DonationButton = ({ variant = 'floating', compact = false }) => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setShowModal(true)}
-                        className={`btn bg-white text-cartoon-pink rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon ${compact ? 'btn-sm w-full' : ''}`}
+                        className={`btn bg-white text-error rounded-soft shadow-soft hover:shadow-soft-lg ${compact ? 'btn-sm w-full' : ''}`}
                     >
                         <BiCoffee size={compact ? 16 : 20} />
                         {compact ? 'Donate' : 'Buy me a coffee'}

@@ -60,10 +60,10 @@ const CookieBanner = () => {
                 className="fixed bottom-0 left-0 right-0 z-50 p-4"
             >
                 <div className="container mx-auto">
-                    <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg border border-base-300 p-6">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
-                                <BiCookie className="text-4xl text-cartoon-yellow animate-bounce" />
+                                <BiCookie className="text-4xl text-warning animate-bounce" />
                                 <h3 className="text-xl font-bold">Cookie Time! 🍪</h3>
                             </div>
                             <button
@@ -101,19 +101,19 @@ const CookieBanner = () => {
                         <div className="flex flex-col sm:flex-row gap-2">
                             <button
                                 onClick={acceptAll}
-                                className="btn btn-primary rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
+                                className="btn btn-primary rounded-soft shadow-soft hover:shadow-soft-lg"
                             >
                                 Accept all cookies
                             </button>
                             <button
                                 onClick={acceptNecessary}
-                                className="btn btn-outline rounded-cartoon"
+                                className="btn btn-outline rounded-soft"
                             >
                                 Only essentials
                             </button>
                             <button
                                 onClick={() => setShowDetails(!showDetails)}
-                                className="btn btn-ghost rounded-cartoon"
+                                className="btn btn-ghost rounded-soft"
                             >
                                 {showDetails ? 'Nascondi' : 'Mostra'} details
                             </button>
@@ -121,7 +121,7 @@ const CookieBanner = () => {
 
                         <p className="text-xs mt-4 text-gray-600 dark:text-gray-400">
                             You can change your mind whenever you want. Read the{' '}
-                            <Link to="/privacy" className="underline hover:text-cartoon-pink">
+                            <Link to="/privacy" className="underline hover:text-error">
                                 Privacy Policy
                             </Link>
                         </p>

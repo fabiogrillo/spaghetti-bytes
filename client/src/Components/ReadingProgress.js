@@ -59,7 +59,7 @@ const ReadingProgress = ({ contentRef, onProgressChange }) => {
             >
                 <div className="relative">
                     <motion.div
-                        className="h-1 bg-gradient-to-r from-cartoon-pink to-cartoon-purple"
+                        className="h-1 bg-gradient-to-r from-error to-secondary"
                         style={{ width: `${progress}%` }}
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}

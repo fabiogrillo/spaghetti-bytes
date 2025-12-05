@@ -4,6 +4,7 @@ import { GoBook } from "react-icons/go";
 import { BiTime } from "react-icons/bi";
 import { motion } from "framer-motion";
 import BookmarkButton from "./BookmarkButton";
+import { minimal } from "../utils/minimalAnimations";
 
 const ImprovedStoryCard = ({ story, index }) => {
   const navigate = useNavigate();
@@ -13,40 +14,33 @@ const ImprovedStoryCard = ({ story, index }) => {
 
   // Cartoon color palette rotation
   const colorSchemes = [
-    { bg: 'bg-cartoon-pink', text: 'text-white', border: 'border-cartoon-pink' },
-    { bg: 'bg-cartoon-blue', text: 'text-white', border: 'border-cartoon-blue' },
-    { bg: 'bg-cartoon-yellow', text: 'text-black', border: 'border-cartoon-yellow' },
-    { bg: 'bg-cartoon-purple', text: 'text-white', border: 'border-cartoon-purple' },
-    { bg: 'bg-cartoon-orange', text: 'text-white', border: 'border-cartoon-orange' },
+    { bg: 'bg-error', text: 'text-white', border: 'border-error' },
+    { bg: 'bg-primary', text: 'text-white', border: 'border-primary' },
+    { bg: 'bg-warning', text: 'text-black', border: 'border-warning' },
+    { bg: 'bg-secondary', text: 'text-white', border: 'border-secondary' },
+    { bg: 'bg-accent', text: 'text-white', border: 'border-accent' },
   ];
 
   const colorScheme = colorSchemes[index % colorSchemes.length];
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      whileHover={{ y: -5 }}
+      whileHover={minimal.hover}
       className="relative group"
     >
       {isNew && (
         <div className="absolute -top-3 -right-3 z-10">
-          <motion.div
-            animate={{ rotate: [0, -10, 10, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="bg-cartoon-yellow text-black px-3 py-1 rounded-cartoon text-sm font-bold shadow-cartoon-sm border-2 border-black"
-          >
-            NEW! ✨
-          </motion.div>
+          <div className="bg-warning text-black px-3 py-1 rounded-soft text-sm font-bold shadow-soft border border-base-300">
+            NEW
+          </div>
         </div>
       )}
 
       <div
         className={`
-          h-full p-6 rounded-cartoon cursor-pointer
-          bg-white border-2 border-black shadow-cartoon
-          hover:shadow-cartoon-hover transform transition-all duration-200
+          h-full p-6 rounded-soft cursor-pointer
+          bg-white border border-base-300 shadow-soft-lg
+          hover:shadow-soft-hover transform transition-all duration-200
           hover:translate-x-1 hover:translate-y-1
           flex flex-col justify-between
         `}
@@ -64,12 +58,10 @@ const ImprovedStoryCard = ({ story, index }) => {
             <span
               key={tag}
               className={`
-                px-3 py-1 rounded-cartoon text-xs font-bold
+                px-3 py-1 rounded-soft text-xs font-bold
                 ${colorScheme.bg} ${colorScheme.text}
-                shadow-cartoon-sm border border-black
-                group-hover:animate-wiggle
+                shadow-soft border border-black
               `}
-              style={{ animationDelay: `${tagIndex * 100}ms` }}
             >
               #{tag}
             </span>
@@ -93,13 +85,13 @@ const ImprovedStoryCard = ({ story, index }) => {
             </div>
           </div>
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={minimal.hover}
+            whileTap={minimal.tap}
             className={`
-              btn btn-sm rounded-cartoon w-full
+              btn btn-sm rounded-soft w-full
               ${colorScheme.bg} ${colorScheme.text}
-              shadow-cartoon-sm hover:shadow-cartoon
-              border-2 border-black
+              shadow-soft hover:shadow-soft-lg
+              border border-base-300
             `}
             onClick={(e) => {
               e.stopPropagation();

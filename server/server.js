@@ -26,7 +26,6 @@ const goalRoutes = require("./routes/goalRoute");
 const conversationRoutes = require("./routes/conversationRoute");
 const newsletterRoutes = require("./routes/newsletterRoute");
 const analyticsRoutes = require("./routes/analyticsRoute");
-const rssRoute = require("./routes/rssRoute");
 const commentRoutes = require("./routes/commentRoute");
 
 // Middleware

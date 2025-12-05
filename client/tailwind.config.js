@@ -3,23 +3,13 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      colors: {
-        'cartoon': {
-          'pink': '#FF6B9D',
-          'yellow': '#FFC107',
-          'blue': '#4ECDC4',
-          'purple': '#9B59B6',
-          'orange': '#FF8C42',
-          'blue-dark': '#031e2bff',
-        }
-      },
       boxShadow: {
-        'cartoon': '4px 4px 0px #000',
-        'cartoon-hover': '6px 6px 0px #000',
-        'cartoon-sm': '2px 2px 0px #000',
+        'soft': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        'soft-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'soft-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       },
       borderRadius: {
-        'cartoon': '1.5rem',
+        'soft': '0.5rem',
       },
       animation: {
         'bounce-slow': 'bounce 3s infinite',
@@ -38,19 +28,51 @@ module.exports = {
   daisyui: {
     themes: [
       {
-        cartoon: {
-          "primary": "#FF6B9D",
-          "secondary": "#4ECDC4",
-          "accent": "#FFC107",
-          "neutral": "#2A2A2A",
-          "base-100": "#FFF8DC",
-          "info": "#4ECDC4",
-          "success": "#66D9A8",
-          "warning": "#FFB347",
-          "error": "#FF6B6B",
+        // Tema "modern" - Light professionale
+        modern: {
+          "primary": "#2563eb",      // Blue 600
+          "secondary": "#7c3aed",    // Violet 600
+          "accent": "#0891b2",       // Cyan 600
+          "neutral": "#1f2937",      // Gray 800
+          "base-100": "#ffffff",
+          "base-200": "#f9fafb",     // Gray 50
+          "base-300": "#e5e7eb",     // Gray 200
+          "info": "#3b82f6",
+          "success": "#10b981",
+          "warning": "#f59e0b",
+          "error": "#ef4444",
         },
-      },
-      "night",
+
+        // Tema "midnight" - Dark ad alto contrasto
+        midnight: {
+          "primary": "#60a5fa",      // Blue 400
+          "secondary": "#a78bfa",    // Violet 400
+          "accent": "#22d3ee",       // Cyan 400
+          "neutral": "#e5e7eb",      // Gray 200
+          "base-100": "#0f172a",     // Slate 900
+          "base-200": "#1e293b",     // Slate 800
+          "base-300": "#334155",     // Slate 700
+          "info": "#3b82f6",
+          "success": "#10b981",
+          "warning": "#f59e0b",
+          "error": "#ef4444",
+        },
+
+        // Tema "festive" - Christmas (temporaneo fino al 15 gen)
+        festive: {
+          "primary": "#dc2626",      // Red 600 - rosso natalizio
+          "secondary": "#059669",    // Emerald 600 - verde natalizio
+          "accent": "#f59e0b",       // Amber 500 - oro
+          "neutral": "#1f2937",
+          "base-100": "#fef2f2",     // Red 50 - sfondo caldo
+          "base-200": "#fee2e2",     // Red 100
+          "base-300": "#fecaca",     // Red 200
+          "info": "#3b82f6",
+          "success": "#059669",
+          "warning": "#f59e0b",
+          "error": "#dc2626",
+        }
+      }
     ],
   },
   plugins: [require("daisyui")],

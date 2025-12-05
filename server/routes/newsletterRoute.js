@@ -9,10 +9,6 @@ const {
     unsubscribe,
     getSubscribers,
     deleteSubscriber,
-    createCampaign,
-    getCampaigns,
-    sendCampaign,
-    deleteCampaign,
     getSubscriberStats
 } = require("../controllers/newsletterController");
 
@@ -80,46 +76,6 @@ router.delete(
     requireAuth, // Check authentication
     requireAdmin, // Check admin role
     deleteSubscriber
-);
-
-// ====================================
-// CAMPAIGN MANAGEMENT - Admin only
-// ====================================
-
-// Create new campaign
-router.post(
-    "/campaigns",
-    requireAuth, // Check authentication
-    requireAdmin, // Check admin role
-    contentLimiter, // Rate limit content creation
-    campaignValidation.create, // Validate campaign data
-    createCampaign
-);
-
-// Get all campaigns
-router.get(
-    "/campaigns",
-    requireAuth, // Check authentication
-    requireAdmin, // Check admin role
-    queryValidation.pagination, // Validate pagination
-    getCampaigns
-);
-
-// Send a campaign
-router.post(
-    "/campaigns/:campaignId/send",
-    requireAuth, // Check authentication
-    requireAdmin, // Check admin role
-    campaignValidation.send, // Validate campaign ID
-    sendCampaign
-);
-
-// Delete a campaign
-router.delete(
-    "/campaigns/:campaignId",
-    requireAuth, // Check authentication
-    requireAdmin, // Check admin role
-    deleteCampaign
 );
 
 // ====================================

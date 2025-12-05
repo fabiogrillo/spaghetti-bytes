@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#FF6B6B"/>
+
+  <!-- Plate -->
+  <ellipse cx="256" cy="320" rx="180" ry="30" fill="#FFFFFF" opacity="0.3"/>
+  <ellipse cx="256" cy="316" rx="170" ry="25" fill="#F0F0F0"/>
+
+  <!-- Spaghetti strands (curved paths) -->
+  <g opacity="0.9">
+    <!-- Strand 1 -->
+    <path d="M 180 280 Q 200 240 220 280 T 260 280"
+          stroke="#FFD93D" stroke-width="12" fill="none"
+          stroke-linecap="round"/>
+
+    <!-- Strand 2 -->
+    <path d="M 200 290 Q 230 250 260 290 T 320 290"
+          stroke="#FFC107" stroke-width="12" fill="none"
+          stroke-linecap="round"/>
+
+    <!-- Strand 3 -->
+    <path d="M 220 300 Q 240 270 270 300 T 330 300"
+          stroke="#FFD93D" stroke-width="12" fill="none"
+          stroke-linecap="round"/>
+
+    <!-- Strand 4 -->
+    <path d="M 170 270 Q 210 230 250 270 T 310 270"
+          stroke="#FFC107" stroke-width="12" fill="none"
+          stroke-linecap="round"/>
+
+    <!-- Strand 5 -->
+    <path d="M 240 285 Q 260 260 290 285 T 340 285"
+          stroke="#FFD93D" stroke-width="12" fill="none"
+          stroke-linecap="round"/>
+  </g>
+
+  <!-- Binary code particles (bytes) -->
+  <g fill="#4ECDC4" font-family="monospace" font-size="24" font-weight="bold">
+    <text x="160" y="200" opacity="0.8">01</text>
+    <text x="300" y="210" opacity="0.8">10</text>
+    <text x="220" y="180" opacity="0.8">11</text>
+    <text x="280" y="240" opacity="0.8">00</text>
+  </g>
+
+  <!-- Code brackets -->
+  <g fill="#3B3B98" font-size="48" font-weight="bold" opacity="0.7">
+    <text x="140" y="260">&lt;</text>
+    <text x="340" y="260">/&gt;</text>
+  </g>
+
+  <!-- Fork on top -->
+  <g transform="translate(256, 160)">
+    <!-- Fork handle -->
+    <rect x="-8" y="0" width="16" height="80" fill="#C0C0C0" rx="4"/>
+
+    <!-- Fork prongs -->
+    <rect x="-20" y="-30" width="6" height="35" fill="#C0C0C0" rx="3"/>
+    <rect x="-7" y="-35" width="6" height="40" fill="#C0C0C0" rx="3"/>
+    <rect x="6" y="-35" width="6" height="40" fill="#C0C0C0" rx="3"/>
+    <rect x="19" y="-30" width="6" height="35" fill="#C0C0C0" rx="3"/>
+  </g>
+</svg>

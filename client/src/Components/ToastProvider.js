@@ -36,7 +36,7 @@ const Toast = ({ id, message, type, onClose }) => {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 100, scale: 0.9 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className={`${colors[type]} text-white rounded-cartoon shadow-cartoon p-4 mb-3 
+            className={`${colors[type]} text-white rounded-soft shadow-soft-lg p-4 mb-3 
                   max-w-sm flex items-center gap-3 cursor-pointer`}
             onClick={() => onClose(id)}
         >

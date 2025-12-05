@@ -18,7 +18,8 @@ const TableGoals = () => {
       setLoading(true);
       const response = await fetch("/api/goals");
       const data = await response.json();
-      setGoals(data);
+      const goalsArray = data.goals || [];
+      setGoals(goalsArray);
     } catch (error) {
       console.error("Error fetching goals:", error);
     } finally {
@@ -132,7 +133,7 @@ const TableGoals = () => {
 
         {loading ? (
           <div className="flex flex-col items-center mt-20">
-            <span className="loading loading-infinity loading-lg text-cartoon-yellow"></span>
+            <span className="loading loading-infinity loading-lg text-warning"></span>
             <p className="mt-4 text-lg">Loading goals...</p>
           </div>
         ) : (
@@ -143,7 +144,7 @@ const TableGoals = () => {
               onEdit={editGoal}
               onDelete={deleteGoal}
               title=""
-              colorScheme="cartoon-yellow"
+              colorScheme="warning"
             />
           </div>
         )}
@@ -153,7 +154,7 @@ const TableGoals = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             type="button"
-            className="btn btn-primary rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
+            className="btn btn-primary rounded-soft shadow-soft hover:shadow-soft-lg"
             onClick={() => navigate("/manager")}
           >
             <BsArrowLeft /> Back to Manager

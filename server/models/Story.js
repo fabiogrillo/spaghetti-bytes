@@ -16,6 +16,13 @@ const storySchema = new mongoose.Schema({
   }
 });
 
+// Add indexes for better query performance
+storySchema.index({ createdAt: -1 });
+storySchema.index({ title: 'text', summary: 'text' });
+storySchema.index({ 'reactions.love': -1 });
+storySchema.index({ 'reactions.clap': -1 });
+storySchema.index({ tags: 1 });
+
 const Story = mongoose.model("Story", storySchema);
 
 module.exports = Story;

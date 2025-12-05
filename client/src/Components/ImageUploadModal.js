@@ -143,21 +143,21 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
             />
 
             {/* Modal */}
-            <div className="relative bg-white dark:bg-gray-800 rounded-cartoon 
-                          border-2 border-black shadow-cartoon-xl 
+            <div className="relative bg-white dark:bg-gray-800 rounded-soft 
+                          border border-base-300 shadow-soft-lg-xl 
                           w-full max-w-lg">
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 
-                              border-b-2 border-black bg-cartoon-yellow 
-                              rounded-t-cartoon">
-                    <h3 className="text-xl font-bold text-black">
+                <div className="flex items-center justify-between p-4
+                              border-b border-base-300 bg-base-200
+                              rounded-t-soft">
+                    <h3 className="text-xl font-bold text-base-content">
                         Upload Image
                     </h3>
                     <button
                         onClick={handleClose}
                         className="btn btn-circle btn-sm bg-white 
-                                 hover:bg-cartoon-pink hover:text-white 
+                                 hover:bg-error hover:text-white 
                                  transition-colors"
                     >
                         <FaTimes />
@@ -169,7 +169,7 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                     {isLoading ? (
                         // Loading state
                         <div className="flex flex-col items-center justify-center py-12">
-                            <div className="loading loading-spinner loading-lg text-cartoon-pink"></div>
+                            <div className="loading loading-spinner loading-lg text-error"></div>
                             <p className="mt-4 text-gray-600 dark:text-gray-400">
                                 Processing image...
                             </p>
@@ -181,24 +181,24 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                                 <img
                                     src={previewUrl}
                                     alt="Preview"
-                                    className="w-full h-64 object-cover rounded-cartoon 
-                                             border-2 border-black shadow-cartoon"
+                                    className="w-full h-64 object-cover rounded-soft 
+                                             border border-base-300 shadow-soft-lg"
                                 />
                             </div>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setPreviewUrl(null)}
                                     className="btn btn-outline flex-1 
-                                             border-2 border-black shadow-cartoon-sm 
-                                             hover:shadow-cartoon"
+                                             border border-base-300 shadow-soft 
+                                             hover:shadow-soft-lg"
                                 >
                                     Choose Different
                                 </button>
                                 <button
                                     onClick={handleConfirm}
-                                    className="btn bg-cartoon-pink text-white flex-1 
-                                             border-2 border-black shadow-cartoon-sm 
-                                             hover:shadow-cartoon"
+                                    className="btn bg-error text-white flex-1 
+                                             border border-base-300 shadow-soft 
+                                             hover:shadow-soft-lg"
                                 >
                                     <FaCheck className="mr-2" />
                                     Use This Image
@@ -211,9 +211,9 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                             <div
                                 onClick={() => fileInputRef.current?.click()}
                                 className="border-3 border-dashed border-gray-400 
-                                         dark:border-gray-600 rounded-cartoon p-12 
+                                         dark:border-gray-600 rounded-soft p-12 
                                          text-center cursor-pointer transition-all
-                                         hover:border-cartoon-pink hover:bg-gray-50 
+                                         hover:border-error hover:bg-gray-50 
                                          dark:hover:bg-gray-700"
                             >
                                 <FaUpload className="text-5xl text-gray-400 mx-auto mb-4" />
@@ -237,7 +237,7 @@ const ImageUploadModal = ({ isOpen, onClose, onImageSelect }) => {
                             />
 
                             {/* Tip */}
-                            <div className="bg-cartoon-yellow bg-opacity-20 rounded-cartoon p-3">
+                            <div className="bg-warning bg-opacity-20 rounded-soft p-3">
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
                                     💡 <span className="font-medium">Tip:</span> For best results,
                                     use images with 16:9 or 4:3 aspect ratio

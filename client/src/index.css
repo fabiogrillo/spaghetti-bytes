@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -17,24 +17,54 @@ body,
   flex-direction: column;
 }
 
-/* Base font and smooth scrolling */
-body {
-  font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif;
-  font-weight: 400;
-}
-
+/* Responsive Typography Base */
 html {
+  font-size: 16px;
   scroll-behavior: smooth;
 }
 
-/* Logo font */
-.logo-font {
-  font-family: 'Pacifico', cursive;
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
 }
 
-/* Cartoon theme additions */
-.rounded-cartoon {
-  border-radius: 1.5rem !important;
+@media (min-width: 1280px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+/* Base font and smooth scrolling */
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+}
+
+/* Logo font and display headings */
+.logo-font,
+.font-display {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Professional utility classes */
+.shadow-soft {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.shadow-soft-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.rounded-soft {
+  border-radius: 0.5rem;
+}
+
+.text-emphasis {
+  background: linear-gradient(135deg, theme('colors.primary') 0%, theme('colors.secondary') 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Pop-cartoon button styles */
@@ -42,7 +72,13 @@ html {
   @apply transform transition-all duration-200 hover:translate-x-1 hover:translate-y-1;
 }
 
-/* Dark mode fixes */
+/* Dark mode fixes - updated for new themes */
+[data-theme="midnight"] {
+  --tw-prose-body: #e5e7eb;
+  --tw-prose-headings: #f3f4f6;
+  --tw-prose-links: #60a5fa;
+}
+
 [data-theme="night"] {
   --tw-prose-body: #e5e7eb;
   --tw-prose-headings: #f3f4f6;
@@ -54,10 +90,15 @@ html {
   @apply outline-none;
 }
 
+[data-theme="midnight"] .ProseMirror,
 [data-theme="night"] .ProseMirror {
   @apply text-gray-100;
 }
 
+[data-theme="midnight"] .ProseMirror h1,
+[data-theme="midnight"] .ProseMirror h2,
+[data-theme="midnight"] .ProseMirror h3,
+[data-theme="midnight"] .ProseMirror h4,
 [data-theme="night"] .ProseMirror h1,
 [data-theme="night"] .ProseMirror h2,
 [data-theme="night"] .ProseMirror h3,
@@ -65,26 +106,27 @@ html {
   @apply text-white;
 }
 
+[data-theme="midnight"] .ProseMirror p,
 [data-theme="night"] .ProseMirror p {
   @apply text-gray-200;
 }
 
+[data-theme="midnight"] .ProseMirror code,
 [data-theme="night"] .ProseMirror code {
   @apply bg-gray-800 text-gray-300;
 }
 
+[data-theme="midnight"] .ProseMirror pre,
 [data-theme="night"] .ProseMirror pre {
   @apply bg-gray-900 text-gray-100;
 }
 
-/* Custom animations */
+/* Commented out old cartoon animations - no longer used
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0px);
   }
-
   50% {
     transform: translateY(-10px);
   }
@@ -94,7 +136,6 @@ html {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Fixed gradient text with better visibility */
 .gradient-text {
   background-image: linear-gradient(90deg, #ff80ab 10%, #b388ff 40%, #3399cc 90%);
   @apply bg-clip-text text-transparent font-bold;
@@ -102,6 +143,7 @@ html {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+*/
 
 /* Card hover effects */
 .card-hover {
@@ -109,16 +151,16 @@ html {
 }
 
 /* Progress bar custom styles */
-.progress-cartoon {
+.progress-modern {
   @apply rounded-full overflow-hidden bg-gray-200;
 }
 
-.progress-cartoon::-webkit-progress-bar {
+.progress-modern::-webkit-progress-bar {
   @apply bg-gray-200;
 }
 
-.progress-cartoon::-webkit-progress-value {
-  @apply bg-gradient-to-r from-cartoon-pink to-cartoon-purple;
+.progress-modern::-webkit-progress-value {
+  background: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
 }
 
 /* Custom scrollbar */
@@ -131,15 +173,22 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-cartoon-pink rounded-full hover:bg-cartoon-purple;
+  background: #2563eb;
+  @apply rounded-full;
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
+}
+
+[data-theme="midnight"] ::-webkit-scrollbar-track,
 [data-theme="night"] ::-webkit-scrollbar-track {
   @apply bg-gray-800;
 }
 
+[data-theme="midnight"] ::-webkit-scrollbar-thumb,
 [data-theme="night"] ::-webkit-scrollbar-thumb {
-  @apply bg-cartoon-blue;
+  background: #60a5fa;
 }
 
 /* Steps component fixes for mobile */
@@ -212,10 +261,7 @@ html {
 /* Specific fixes for common components */
 
 /* Cards and containers */
-.dark .card,
-.dark .shadow-cartoon,
-.dark .shadow-cartoon-sm,
-.dark .shadow-cartoon-hover {
+.dark .card {
   background-color: rgb(31 41 55);
   /* gray-800 */
   color: rgb(229 231 235);
@@ -223,6 +269,16 @@ html {
   border-color: rgb(75 85 99);
   /* gray-600 */
 }
+
+/* Commented out - no longer using cartoon shadows
+.dark .shadow-cartoon,
+.dark .shadow-cartoon-sm,
+.dark .shadow-cartoon-hover {
+  background-color: rgb(31 41 55);
+  color: rgb(229 231 235);
+  border-color: rgb(75 85 99);
+}
+*/
 
 /* Buttons in dark mode */
 .dark .btn {

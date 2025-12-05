@@ -16,7 +16,8 @@ const Goals = () => {
       try {
         const response = await fetch("/api/goals");
         const data = await response.json();
-        setGoals(data);
+        const goalsArray = data.goals || [];
+        setGoals(goalsArray);
       } catch (error) {
         console.error("Error fetching goals:", error);
       } finally {
@@ -40,7 +41,7 @@ const Goals = () => {
     const progressColor = getProgressColor(percentage);
 
     // Rotate colors for variety
-    const cardColors = ['cartoon-pink', 'cartoon-blue', 'cartoon-yellow', 'cartoon-purple', 'cartoon-orange'];
+    const cardColors = ['error', 'primary', 'warning', 'secondary', 'accent'];
     const cardColor = cardColors[index % cardColors.length];
 
     return (
@@ -51,9 +52,9 @@ const Goals = () => {
         whileHover={{ y: -5 }}
         className="h-full"
       >
-        <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon border-2 border-black hover:shadow-cartoon-hover transform transition-all h-full flex flex-col">
+        <div className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg border border-base-300 hover:shadow-soft-hover transform transition-all h-full flex flex-col">
           {/* Header */}
-          <div className={`bg-${cardColor} text-white p-6 rounded-t-cartoon`}>
+          <div className={`bg-${cardColor} text-white p-6 rounded-t-soft`}>
             <div className="flex items-start justify-between mb-2">
               <BiTargetLock className="text-3xl" />
               <motion.div
@@ -148,7 +149,7 @@ const Goals = () => {
           className="inline-block mb-6"
           whileHover={{ scale: 1.05 }}
         >
-          <span className="badge badge-lg bg-cartoon-yellow text-black shadow-cartoon-sm px-6 py-3">
+          <span className="badge badge-lg bg-warning text-black shadow-soft px-6 py-3">
             <FaFire className="mr-2" /> My Journey Tracker
           </span>
         </motion.div>
@@ -221,7 +222,7 @@ const Goals = () => {
       {/* Goals Grid */}
       {loading ? (
         <div className="flex flex-col items-center mt-20">
-          <span className="loading loading-spinner loading-lg text-cartoon-yellow"></span>
+          <span className="loading loading-spinner loading-lg text-warning"></span>
           <p className="mt-4 text-lg">Loading goals...</p>
         </div>
       ) : goals.length === 0 ? (
@@ -244,7 +245,7 @@ const Goals = () => {
       {/* Summary Stats */}
       {goals.length > 0 && (
         <motion.div
-          className="mt-12 p-8 bg-gradient-to-br from-cartoon-pink to-cartoon-purple text-white rounded-cartoon shadow-cartoon"
+          className="mt-12 p-8 bg-gradient-to-br from-error to-secondary text-white rounded-soft shadow-soft-lg"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}

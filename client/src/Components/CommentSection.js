@@ -99,15 +99,15 @@ const Comment = ({
             className={`${depth > 0 ? 'ml-8 border-l-2 border-gray-200 pl-4' : ''}`}
         >
             <div className={`
-                bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon-sm 
-                p-4 mb-4 transition-all hover:shadow-cartoon
+                bg-white dark:bg-gray-800 rounded-soft shadow-soft 
+                p-4 mb-4 transition-all hover:shadow-soft-lg
                 ${comment.status === 'pending' ? 'opacity-75' : ''}
                 ${comment.status === 'rejected' ? 'opacity-50' : ''}
             `}>
                 {/* Comment Header */}
                 <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-cartoon-purple rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
                             <span className="text-white text-sm font-bold">
                                 {comment.author?.name?.[0]?.toUpperCase() || 'A'}
                             </span>
@@ -182,7 +182,7 @@ const Comment = ({
                     {depth < 2 && comment.status === 'approved' && (
                         <button
                             onClick={() => setShowReplyForm(!showReplyForm)}
-                            className="flex items-center gap-1 text-sm text-cartoon-blue hover:underline"
+                            className="flex items-center gap-1 text-sm text-primary hover:underline"
                         >
                             <BiReply />
                             Reply
@@ -198,26 +198,26 @@ const Comment = ({
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             onSubmit={handleReply}
-                            className="mt-3 pl-4 border-l-2 border-cartoon-blue"
+                            className="mt-3 pl-4 border-l-2 border-primary"
                         >
                             <textarea
                                 value={replyContent}
                                 onChange={(e) => setReplyContent(e.target.value)}
                                 placeholder="Write a reply..."
-                                className="w-full p-2 border-2 border-gray-200 rounded-cartoon resize-none focus:outline-none focus:border-cartoon-blue"
+                                className="w-full p-2 border-2 border-gray-200 rounded-soft resize-none focus:outline-none focus:border-primary"
                                 rows="3"
                             />
                             <div className="flex gap-2 mt-2">
                                 <button
                                     type="submit"
-                                    className="btn btn-sm btn-primary rounded-cartoon"
+                                    className="btn btn-sm btn-primary rounded-soft"
                                 >
                                     Send Reply
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowReplyForm(false)}
-                                    className="btn btn-sm btn-ghost rounded-cartoon"
+                                    className="btn btn-sm btn-ghost rounded-soft"
                                 >
                                     Cancel
                                 </button>
@@ -426,7 +426,7 @@ const CommentSection = ({ storyId }) => {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
-                    <FiMessageCircle className="text-cartoon-blue" />
+                    <FiMessageCircle className="text-primary" />
                     Comments {hasComments && `(${comments.length})`}
                 </h2>
 
@@ -434,7 +434,7 @@ const CommentSection = ({ storyId }) => {
                     <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
-                        className="px-3 py-1 border-2 border-black rounded-cartoon focus:outline-none focus:border-cartoon-blue text-sm"
+                        className="px-3 py-1 border border-base-300 rounded-soft focus:outline-none focus:border-primary text-sm"
                     >
                         <option value="newest">Newest First</option>
                         <option value="oldest">Oldest First</option>
@@ -473,7 +473,7 @@ const CommentSection = ({ storyId }) => {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-cartoon mb-6"
+                    className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-soft mb-6"
                 >
                     <FiMessageCircle className="mx-auto text-4xl text-gray-400 mb-3" />
                     <p className="text-gray-600 dark:text-gray-400">
@@ -486,14 +486,14 @@ const CommentSection = ({ storyId }) => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-4"
+                className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg p-4"
             >
                 {/* Toggle Button for Comment Form */}
                 <button
                     onClick={() => setShowCommentForm(!showCommentForm)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-cartoon transition-colors"
+                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-soft transition-colors"
                 >
-                    <span className="font-semibold flex items-center gap-2 text-cartoon-pink">
+                    <span className="font-semibold flex items-center gap-2 text-error">
                         <FiMessageCircle />
                         {hasComments ? 'Add a Comment' : 'Write the First Comment'}
                     </span>
@@ -520,7 +520,7 @@ const CommentSection = ({ storyId }) => {
                                             placeholder="Your Name (optional)"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-cartoon focus:outline-none focus:border-cartoon-blue"
+                                            className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-soft focus:outline-none focus:border-primary"
                                         />
                                     </div>
                                     <div className="relative">
@@ -530,7 +530,7 @@ const CommentSection = ({ storyId }) => {
                                             placeholder="Your Email (optional)"
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-cartoon focus:outline-none focus:border-cartoon-blue"
+                                            className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-soft focus:outline-none focus:border-primary"
                                         />
                                     </div>
                                 </div>
@@ -548,7 +548,7 @@ const CommentSection = ({ storyId }) => {
                                 placeholder="Share your thoughts..."
                                 value={formData.content}
                                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                className="w-full p-3 border-2 border-gray-200 rounded-cartoon resize-none focus:outline-none focus:border-cartoon-blue"
+                                className="w-full p-3 border-2 border-gray-200 rounded-soft resize-none focus:outline-none focus:border-primary"
                                 rows="4"
                                 required
                             />
@@ -558,14 +558,14 @@ const CommentSection = ({ storyId }) => {
                                 <button
                                     type="button"
                                     onClick={() => setShowCommentForm(false)}
-                                    className="btn btn-ghost rounded-cartoon text-cartoon-pink"
+                                    className="btn btn-ghost rounded-soft text-error"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={submitting || !formData.content.trim()}
-                                    className="bg-cartoon-purple text-white text-sm rounded-cartoon hover:shadow-cartoon flex items-center gap-2 px-2"
+                                    className="bg-secondary text-white text-sm rounded-soft hover:shadow-soft-lg flex items-center gap-2 px-2"
                                 >
                                     {submitting ? (
                                         <>

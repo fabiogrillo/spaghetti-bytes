@@ -42,32 +42,32 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
             label: "Total Stories",
             value: stats.stories,
             icon: <FaNewspaper />,
-            color: "text-cartoon-orange",
-            bgGradient: "from-cartoon-orange to-orange-600",
+            color: "text-accent",
+            bgGradient: "from-accent to-orange-600",
             emoji: "📚"
         },
         {
             label: "Comments",
             value: stats.comments,
             icon: <FaComments />,
-            color: "text-cartoon-blue",
-            bgGradient: "from-cartoon-blue to-blue-600",
+            color: "text-primary",
+            bgGradient: "from-primary to-blue-600",
             emoji: "💬"
         },
         {
             label: "Goals",
             value: stats.goals,
             icon: <FaBullseye />,
-            color: "text-cartoon-yellow",
-            bgGradient: "from-cartoon-yellow to-yellow-600",
+            color: "text-warning",
+            bgGradient: "from-warning to-yellow-600",
             emoji: "🎯"
         },
         {
             label: "Visitors",
             value: stats.visitors,
             icon: <FaUsers />,
-            color: "text-cartoon-purple",
-            bgGradient: "from-cartoon-purple to-purple-600",
+            color: "text-secondary",
+            bgGradient: "from-secondary to-purple-600",
             emoji: "👥"
         }
     ];
@@ -105,7 +105,7 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
         return (
             <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${className}`}>
                 {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="bg-gray-200 dark:bg-gray-700 rounded-cartoon h-24 animate-pulse" />
+                    <div key={i} className="bg-gray-200 dark:bg-gray-700 rounded-soft h-24 animate-pulse" />
                 ))}
             </div>
         );
@@ -125,8 +125,8 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
                         key={index}
                         variants={itemVariants}
                         whileHover={{ scale: 1.05, y: -5 }}
-                        className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-4 text-center 
-                                 border-2 border-black/10 hover:shadow-cartoon-hover transition-all duration-300"
+                        className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg p-4 text-center 
+                                 border border-base-300/10 hover:shadow-soft-hover transition-all duration-300"
                     >
                         <div className={`text-3xl ${stat.color} mb-2`}>{stat.icon}</div>
                         <div className="text-2xl font-bold text-white">{formatNumber(stat.value)}</div>

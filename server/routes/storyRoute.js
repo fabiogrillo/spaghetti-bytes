@@ -10,7 +10,10 @@ const {
   getReactions,
   addReaction,
   removeReaction,
+  storyValidationRules,
+  validateStory,
 } = require("../controllers/storyController");
+const { requireAuth, requireAdmin } = require("../middleware/auth");
 
 // Route to get all stories
 router.get("/", getStories);
@@ -18,14 +21,14 @@ router.get("/", getStories);
 // Route to get a single story by ID
 router.get("/:id", getStoryById);
 
-// Route to create a new story
-router.post("/publish", createStory);
+// Route to create a new story (protected - admin only, with validation)
+router.post("/publish", requireAuth, requireAdmin, storyValidationRules, validateStory, createStory);
 
-// Route to update a story by ID
-router.put("/:id", updateStory);
+// Route to update a story by ID (protected - admin only, with validation)
+router.put("/:id", requireAuth, requireAdmin, storyValidationRules, validateStory, updateStory);
 
-// Route to delete a story by ID
-router.delete("/:id", deleteStory);
+// Route to delete a story by ID (protected - admin only)
+router.delete("/:id", requireAuth, requireAdmin, deleteStory);
 
 // Routes to manage reactions
 router.get("/:id/reactions", getReactions);

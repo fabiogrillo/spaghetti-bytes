@@ -5,11 +5,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  FaEdit, FaBullseye, FaComments
+  FaEdit, FaBullseye
 } from "react-icons/fa";
 import {
   BiMessageSquareAdd, BiCommentCheck,
-  BiTargetLock, BiStats, BiPaperPlane
+  BiTargetLock
 } from "react-icons/bi";
 import StatsDisplay from "../Components/StatsDisplay";
 
@@ -52,7 +52,7 @@ const Manager = () => {
           description: "Create a new blog post",
           icon: <BiMessageSquareAdd size={24} />,
           emoji: "✍️",
-          color: "bg-gradient-to-br from-cartoon-pink to-pink-600",
+          color: "bg-gradient-to-br from-error to-pink-600",
           action: () => navigate("/editor")
         },
         {
@@ -60,7 +60,7 @@ const Manager = () => {
           description: "Edit or delete posts",
           icon: <FaEdit size={24} />,
           emoji: "📚",
-          color: "bg-gradient-to-br from-cartoon-blue to-blue-600",
+          color: "bg-gradient-to-br from-primary to-blue-600",
           action: () => navigate("/storyTable")
         },
         {
@@ -68,7 +68,7 @@ const Manager = () => {
           description: "Review and approve comments",
           icon: <BiCommentCheck size={24} />,
           emoji: "💬",
-          color: "bg-gradient-to-br from-cartoon-purple to-purple-600",
+          color: "bg-gradient-to-br from-secondary to-purple-600",
           action: () => navigate("/moderate-comments")
         }
       ]
@@ -83,7 +83,7 @@ const Manager = () => {
           description: "Set new objectives",
           icon: <BiTargetLock size={24} />,
           emoji: "🎯",
-          color: "bg-gradient-to-br from-cartoon-yellow to-yellow-600",
+          color: "bg-gradient-to-br from-warning to-yellow-600",
           action: () => navigate("/create-goal")
         },
         {
@@ -91,39 +91,8 @@ const Manager = () => {
           description: "Track your progress",
           icon: <FaBullseye size={24} />,
           emoji: "📊",
-          color: "bg-gradient-to-br from-cartoon-orange to-orange-600",
+          color: "bg-gradient-to-br from-accent to-orange-600",
           action: () => navigate("/goalsTable")
-        }
-      ]
-    },
-    {
-      title: "📊 Analytics & Communication",
-      description: "Monitor performance and engage with readers",
-      gridCols: 3,
-      buttons: [
-        {
-          label: "Analytics",
-          description: "View site statistics",
-          icon: <BiStats size={24} />,
-          emoji: "📈",
-          color: "bg-gradient-to-br from-green-500 to-green-700",
-          action: () => navigate("/newsletter/analytics")
-        },
-        {
-          label: "Conversations",
-          description: "Chat history & support",
-          icon: <FaComments size={24} />,
-          emoji: "💬",
-          color: "bg-gradient-to-br from-indigo-500 to-indigo-700",
-          action: () => navigate("/conversations")
-        },
-        {
-          label: "Newsletter",
-          description: "Manage campaigns",
-          icon: <BiPaperPlane size={24} />,
-          emoji: "📧",
-          color: "bg-gradient-to-br from-purple-500 to-purple-700",
-          action: () => navigate("/newsletter/campaigns")
         }
       ]
     }
@@ -139,7 +108,7 @@ const Manager = () => {
       >
         {/* Header */}
         <motion.div variants={sectionVariants} className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cartoon-pink to-cartoon-purple bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-error to-secondary bg-clip-text text-transparent">
             Content Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -180,8 +149,8 @@ const Manager = () => {
                   className={`
                     group relative overflow-hidden
                     ${button.color} text-white
-                    p-6 rounded-cartoon shadow-lg
-                    border-2 border-black/10
+                    p-6 rounded-soft shadow-lg
+                    border border-base-300/10
                     transition-all duration-300
                     hover:shadow-xl
                   `}
@@ -208,27 +177,27 @@ const Manager = () => {
         {/* Quick Stats Card */}
         <motion.div
           variants={sectionVariants}
-          className="mt-12 p-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-cartoon border-2 border-gray-300 dark:border-gray-600 shadow-cartoon"
+          className="mt-12 p-6 bg-primary/10 dark:bg-primary/20 rounded-soft border-2 border-primary/30 dark:border-primary/50 shadow-soft-lg"
         >
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-base-content">
             <span className="text-2xl">💡</span> Pro Tips
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="flex items-start gap-2">
-              <span className="text-cartoon-pink">•</span>
-              <p className="text-gray-700 dark:text-gray-300">
+              <span className="text-error">•</span>
+              <p className="text-base-content">
                 Use engaging titles to capture readers' attention from the first glance
               </p>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-cartoon-yellow">•</span>
-              <p className="text-gray-700 dark:text-gray-300">
+              <span className="text-warning">•</span>
+              <p className="text-base-content">
                 Add relevant tags to help readers discover your amazing content
               </p>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-cartoon-blue">•</span>
-              <p className="text-gray-700 dark:text-gray-300">
+              <span className="text-primary">•</span>
+              <p className="text-base-content">
                 Check analytics regularly to understand what resonates with your audience
               </p>
             </div>

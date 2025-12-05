@@ -47,7 +47,9 @@ const getConversations = async (req, res) => {
   try {
     const { status, page = 1, limit = 20 } = req.query;
 
-    const query = status ? { status } : {};
+    // Validate status parameter to prevent NoSQL injection
+    const allowedStatuses = ['new', 'read', 'replied', 'archived'];
+    const query = status && allowedStatuses.includes(status) ? { status } : {};
 
     const conversations = await Conversation.find(query)
       .sort({ createdAt: -1 })

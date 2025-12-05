@@ -3,11 +3,12 @@ import TipTapEditor from "../Components/TipTapEditor";
 import { IoMdAdd } from "react-icons/io";
 import { FaTimes, FaMedium } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
-import { BsArrowLeft, BsCheck2All } from "react-icons/bs";
-import { motion } from "framer-motion";
+import { BsArrowLeft, BsArrowRight, BsCheck2All } from "react-icons/bs";
+import { motion, AnimatePresence } from "framer-motion";
 
 const StoryPublisher = () => {
   const { id } = useParams();
+  const [currentStep, setCurrentStep] = useState(1);
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [tags, setTags] = useState([]);
@@ -16,6 +17,8 @@ const StoryPublisher = () => {
   const [shareOnMedium, setShareOnMedium] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [lastSaved, setLastSaved] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const navigate = useNavigate();
 
@@ -25,6 +28,34 @@ const StoryPublisher = () => {
   useEffect(() => {
     if (id) {
       fetchStory(id);
+    }
+  }, [id]);
+
+  // Auto-save to localStorage
+  useEffect(() => {
+    if (!id && (title || summary || tags.length > 0 || content)) {
+      setIsSaving(true);
+      const saveTimer = setTimeout(() => {
+        localStorage.setItem('draft', JSON.stringify({ title, summary, tags, content }));
+        setLastSaved(new Date());
+        setIsSaving(false);
+      }, 2000);
+
+      return () => clearTimeout(saveTimer);
+    }
+  }, [title, summary, tags, content, id]);
+
+  // Load draft on mount
+  useEffect(() => {
+    if (!id) {
+      const draft = localStorage.getItem('draft');
+      if (draft) {
+        const { title: draftTitle, summary: draftSummary, tags: draftTags, content: draftContent } = JSON.parse(draft);
+        if (draftTitle) setTitle(draftTitle);
+        if (draftSummary) setSummary(draftSummary);
+        if (draftTags) setTags(draftTags);
+        if (draftContent) setContent(draftContent);
+      }
     }
   }, [id]);
 
@@ -45,22 +76,31 @@ const StoryPublisher = () => {
     }
   };
 
-  const validateForm = () => {
+  const validateStep = (step) => {
     const newErrors = {};
-    if (!title) newErrors.title = "Title is required";
-    if (!summary) newErrors.summary = "Summary is required";
-    if (tags.length < 3) newErrors.tags = "Please add at least 3 tags";
-    if (!content || content === "<p></p>") newErrors.content = "Content is required";
-    return newErrors;
+    if (step === 1) {
+      if (!title) newErrors.title = "Title is required";
+      if (!summary) newErrors.summary = "Summary is required";
+    } else if (step === 2) {
+      if (tags.length < 3) newErrors.tags = "Please add at least 3 tags";
+      if (!content || content === "<p></p>") newErrors.content = "Content is required";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formErrors = validateForm();
-    if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
-      return;
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(currentStep + 1);
     }
+  };
+
+  const handleBack = () => {
+    setCurrentStep(currentStep - 1);
+    setErrors({});
+  };
+
+  const handleSubmit = async () => {
     const storyData = {
       title,
       summary,
@@ -83,6 +123,7 @@ const StoryPublisher = () => {
       );
       if (response.ok) {
         console.log("Story published/updated successfully");
+        localStorage.removeItem('draft');
         navigate("/blog", { state: { success: true } });
       } else {
         const errorData = await response.json();
@@ -117,188 +158,351 @@ const StoryPublisher = () => {
   if (loading && id) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-cartoon-pink"></span>
+        <span className="loading loading-spinner loading-lg text-error"></span>
         <p className="mt-4">Loading story...</p>
       </div>
     );
   }
 
+  const slideVariants = {
+    enter: (direction) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0
+    }),
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction) => ({
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0
+    })
+  };
+
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto p-4 md:p-8">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center text-center"
+        className="flex flex-col items-center text-center mb-8"
       >
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold">
-            {id ? "Edit Your Story" : "Let's Write a New Incredible Story"}
-          </h1>
-          <p className="py-2 md:text-base max-w-3xl mx-auto">
-            {id
-              ? "You are currently editing your story. Please ensure all details are accurate, including the title, summary, and tags. After making your changes, you can update the story by clicking the button below"
-              : "Start by choosing a title for your story. Once the title is set, you can begin writing. Remember to provide a concise summary and include relevant tags. If you'd like, you can also share your story on Medium. Once you're ready, click the publish button"}
-          </p>
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">
+          {id ? "Edit Your Story" : "Create a New Story"}
+        </h1>
+
+        {/* Progress Indicator */}
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${currentStep >= 1 ? 'bg-primary text-white' : 'bg-base-300 text-base-content'}`}>
+            1
+          </div>
+          <div className={`w-12 h-1 ${currentStep >= 2 ? 'bg-primary' : 'bg-base-300'}`}></div>
+          <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${currentStep >= 2 ? 'bg-primary text-white' : 'bg-base-300 text-base-content'}`}>
+            2
+          </div>
+          <div className={`w-12 h-1 ${currentStep >= 3 ? 'bg-primary' : 'bg-base-300'}`}></div>
+          <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${currentStep >= 3 ? 'bg-primary text-white' : 'bg-base-300 text-base-content'}`}>
+            3
+          </div>
         </div>
+
+        <p className="text-sm text-base-content/60">
+          Step {currentStep} of 3: {currentStep === 1 ? "Basic Information" : currentStep === 2 ? "Content" : "Review & Publish"}
+        </p>
+
+        {/* Auto-save indicator */}
+        {!id && (
+          <div className="mt-2 text-xs text-base-content/40">
+            {isSaving ? (
+              <span className="flex items-center gap-1">
+                <span className="loading loading-spinner loading-xs"></span>
+                Saving draft...
+              </span>
+            ) : lastSaved ? (
+              <span>Draft saved {new Date(lastSaved).toLocaleTimeString()}</span>
+            ) : null}
+          </div>
+        )}
       </motion.div>
 
-      <div className="card my-8 space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-cartoon shadow-cartoon border-2 border-black">
-        <div className="form-control items-center w-full">
-          <label className="label font-mono text-center text-black">
-            {id ? "Edit the title of your story" : "Start with a title"}
-          </label>
-          <input
-            type="text"
-            placeholder="Your title here..."
-            className="input input-bordered w-full rounded-cartoon"
-            value={title}
-            maxLength={maxTitleLength}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
-            }}
-          />
-          {errors.title && (
-            <p className="text-error text-sm mt-1">{errors.title}</p>
-          )}
-          <p className="text-right text-xs mt-1 w-full">
-            {title.length}/{maxTitleLength} characters
-          </p>
-        </div>
-
-        <div className="form-control items-center w-full">
-          <label className="label font-mono text-center text-black">
-            {id ? "Edit the summary of your story" : "Brief description"}
-          </label>
-          <textarea
-            placeholder="Summary here..."
-            className="textarea textarea-bordered w-full rounded-cartoon"
-            value={summary}
-            maxLength={maxSummaryLength}
-            onChange={(e) => {
-              setSummary(e.target.value);
-              setErrors((prevErrors) => ({ ...prevErrors, summary: "" }));
-            }}
-          />
-          {errors.summary && (
-            <p className="text-error text-sm mt-1">{errors.summary}</p>
-          )}
-          <p className="text-right text-xs mt-1 w-full">
-            {summary.length}/{maxSummaryLength} characters
-          </p>
-        </div>
-
-        <div className="form-control items-center w-full">
-          <label className="label font-mono text-center text-black">
-            {id ? "Edit your tags" : "Add some tags (at least 3)"}
-          </label>
-          <div className="input-group flex flex-row justify-between space-x-2 w-full">
-            <input
-              type="text"
-              placeholder="New Tag..."
-              className="input input-bordered w-full rounded-cartoon"
-              value={newTag}
-              onChange={(e) => {
-                setNewTag(e.target.value);
-                setErrors((prevErrors) => ({ ...prevErrors, tags: "" }));
-              }}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddTag();
-                }
-              }}
-            />
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="button"
-              className="btn btn-primary rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
-              onClick={handleAddTag}
+      {/* Wizard Steps */}
+      <div className="max-w-4xl mx-auto">
+        <AnimatePresence mode="wait" custom={currentStep}>
+          {/* Step 1: Title & Summary */}
+          {currentStep === 1 && (
+            <motion.div
+              key="step1"
+              custom={currentStep}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.3 }}
+              className="card bg-base-100 dark:bg-base-200 p-8 rounded-soft shadow-soft-lg border border-base-300 space-y-6"
             >
-              <IoMdAdd />
-            </motion.button>
-          </div>
-          {errors.tags && <p className="text-error text-sm mt-1">{errors.tags}</p>}
-          <div className="flex flex-wrap mt-3 gap-3">
-            {tags.map((tag, index) => (
-              <motion.div
-                key={index}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="badge badge-lg bg-cartoon-pink text-white flex items-center space-x-2 p-3 shadow-cartoon-sm"
+              <h2 className="text-2xl font-bold text-center text-base-content">Basic Information</h2>
+
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-bold text-base-content">Story Title</span>
+                  <span className="label-text-alt text-base-content/60">{title.length}/{maxTitleLength}</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter a captivating title..."
+                  className="input input-bordered w-full rounded-soft"
+                  value={title}
+                  maxLength={maxTitleLength}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    setErrors((prevErrors) => ({ ...prevErrors, title: "" }));
+                  }}
+                />
+                {errors.title && (
+                  <label className="label">
+                    <span className="label-text-alt text-error">{errors.title}</span>
+                  </label>
+                )}
+              </div>
+
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-bold text-base-content">Summary</span>
+                  <span className="label-text-alt text-base-content/60">{summary.length}/{maxSummaryLength}</span>
+                </label>
+                <textarea
+                  placeholder="Brief description of your story..."
+                  className="textarea textarea-bordered w-full rounded-soft h-32"
+                  value={summary}
+                  maxLength={maxSummaryLength}
+                  onChange={(e) => {
+                    setSummary(e.target.value);
+                    setErrors((prevErrors) => ({ ...prevErrors, summary: "" }));
+                  }}
+                />
+                {errors.summary && (
+                  <label className="label">
+                    <span className="label-text-alt text-error">{errors.summary}</span>
+                  </label>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 2: Tags & Content */}
+          {currentStep === 2 && (
+            <motion.div
+              key="step2"
+              custom={currentStep}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.3 }}
+              className="card bg-base-100 dark:bg-base-200 p-8 rounded-soft shadow-soft-lg border border-base-300 space-y-6"
+            >
+              <h2 className="text-2xl font-bold text-center text-base-content">Tags & Content</h2>
+
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-bold text-base-content">Tags (minimum 3)</span>
+                  <span className="label-text-alt text-base-content/60">{tags.length} tags</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Add a tag..."
+                    className="input input-bordered flex-1 rounded-soft"
+                    value={newTag}
+                    onChange={(e) => {
+                      setNewTag(e.target.value);
+                      setErrors((prevErrors) => ({ ...prevErrors, tags: "" }));
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddTag();
+                      }
+                    }}
+                  />
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="button"
+                    className="btn btn-primary rounded-soft"
+                    onClick={handleAddTag}
+                  >
+                    <IoMdAdd size={20} />
+                  </motion.button>
+                </div>
+                {errors.tags && (
+                  <label className="label">
+                    <span className="label-text-alt text-error">{errors.tags}</span>
+                  </label>
+                )}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {tags.map((tag, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="badge badge-lg badge-primary flex items-center gap-2 px-4 py-3"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        onClick={() => handleRemoveTag(index)}
+                        className="hover:scale-110 transition-transform"
+                      >
+                        <FaTimes />
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-bold text-base-content mb-2">Story Content</span>
+                </label>
+                <TipTapEditor
+                  value={content}
+                  onChange={handleEditorChange}
+                  error={errors.content}
+                />
+                {errors.content && (
+                  <label className="label">
+                    <span className="label-text-alt text-error">{errors.content}</span>
+                  </label>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 3: Preview & Publish */}
+          {currentStep === 3 && (
+            <motion.div
+              key="step3"
+              custom={currentStep}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.3 }}
+              className="card bg-base-100 dark:bg-base-200 p-8 rounded-soft shadow-soft-lg border border-base-300 space-y-6"
+            >
+              <h2 className="text-2xl font-bold text-center text-base-content">Review & Publish</h2>
+
+              {/* Preview */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-bold text-base-content/60 mb-1">TITLE</h3>
+                  <p className="text-xl font-bold text-base-content">{title}</p>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-bold text-base-content/60 mb-1">SUMMARY</h3>
+                  <p className="text-base-content">{summary}</p>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-bold text-base-content/60 mb-1">TAGS</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, index) => (
+                      <span key={index} className="badge badge-primary badge-lg">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-bold text-base-content/60 mb-1">CONTENT PREVIEW</h3>
+                  <div className="prose max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: content.substring(0, 300) + '...' }} />
+                </div>
+              </div>
+
+              <div className="divider"></div>
+
+              {/* Medium Sharing */}
+              <div className="form-control">
+                <label className="label cursor-pointer justify-start gap-4">
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-primary toggle-lg"
+                    checked={shareOnMedium}
+                    onChange={(e) => setShareOnMedium(e.target.checked)}
+                  />
+                  <div className="flex items-center gap-3">
+                    <FaMedium className="text-3xl text-primary" />
+                    <div>
+                      <span className="label-text font-bold text-base-content">Share on Medium</span>
+                      <p className="text-xs text-base-content/60">Automatically publish to your Medium account</p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between items-center mt-8">
+          <div>
+            {currentStep > 1 ? (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                className="btn btn-outline rounded-soft shadow-soft"
+                onClick={handleBack}
               >
-                <span>{tag}</span>
-                <button 
-                  onClick={() => handleRemoveTag(index)}
-                  className="hover:scale-110 transition-transform"
-                >
-                  <FaTimes />
-                </button>
-              </motion.div>
-            ))}
+                <BsArrowLeft /> Back
+              </motion.button>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                className="btn btn-outline rounded-soft shadow-soft"
+                onClick={() => navigate("/manager")}
+              >
+                <BsArrowLeft /> Cancel
+              </motion.button>
+            )}
+          </div>
+
+          <div>
+            {currentStep < 3 ? (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                className="btn btn-primary rounded-soft shadow-soft-lg"
+                onClick={handleNext}
+              >
+                Next <BsArrowRight />
+              </motion.button>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                className="btn btn-success rounded-soft shadow-soft-lg text-white"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  <>
+                    <BsCheck2All size={20} />
+                    {id ? "Update Story" : "Publish Story"}
+                  </>
+                )}
+              </motion.button>
+            )}
           </div>
         </div>
-
-        <div className="form-control items-center w-full">
-          <label className="label font-mono text-center text-black mb-4">
-            {id ? "Edit your story" : "Now write your story"}
-          </label>
-          <TipTapEditor
-            value={content}
-            onChange={handleEditorChange}
-            error={errors.content}
-          />
-          {errors.content && (
-            <p className="text-error text-sm mt-1">{errors.content}</p>
-          )}
-        </div>
-
-        <div className="form-control flex items-center w-full">
-          <label className="label font-mono text-center text-black">
-            {id
-              ? "Edit your Medium sharing settings"
-              : "Share your story on Medium?"}
-          </label>
-          <div className="flex items-center space-x-4">
-            <input
-              type="checkbox"
-              className="toggle toggle-primary toggle-lg"
-              checked={shareOnMedium}
-              onChange={(e) => setShareOnMedium(e.target.checked)}
-            />
-            <FaMedium className="text-3xl text-cartoon-blue-dark" />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center mt-8 max-w-4xl mx-auto">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          type="button"
-          className="btn btn-primary btn-outline rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
-          onClick={() => navigate("/manager")}
-        >
-          <BsArrowLeft /> Back
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          type="submit"
-          className="btn btn-success rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="loading loading-spinner"></span>
-          ) : (
-            <>
-              <BsCheck2All />
-              {id ? "Update Story" : "Publish Story"}
-            </>
-          )}
-        </motion.button>
       </div>
     </div>
   );

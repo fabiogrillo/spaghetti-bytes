@@ -9,7 +9,7 @@ const LoadingSpinner = ({ size = 'lg', message = 'Loading...' }) => {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center justify-center p-8"
         >
-            <span className={`loading loading-infinity loading-${size} text-cartoon-pink`}></span>
+            <span className={`loading loading-infinity loading-${size} text-error`}></span>
             {message && (
                 <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">{message}</p>
             )}

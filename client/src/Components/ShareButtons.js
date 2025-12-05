@@ -61,7 +61,7 @@ const ShareButtons = ({ url, title, summary }) => {
     return (
         <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold flex items-center gap-2">
-                <FaShare className="text-cartoon-pink" />
+                <FaShare className="text-error" />
                 Share:
             </span>
 
@@ -88,7 +88,7 @@ const ShareButtons = ({ url, title, summary }) => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowAll(true)}
-                    className="btn btn-sm btn-ghost rounded-cartoon"
+                    className="btn btn-sm btn-ghost rounded-soft"
                 >
                     More...
                 </motion.button>
@@ -122,7 +122,7 @@ const ShareButtons = ({ url, title, summary }) => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={copyToClipboard}
-                className="btn btn-circle btn-sm dark:bg-gray hover:bg-cartoon-purple hover:text-white transition-colors"
+                className="btn btn-circle btn-sm dark:bg-gray hover:bg-secondary hover:text-white transition-colors"
                 aria-label="Copy link"
             >
                 <FaLink size={16} />
@@ -134,7 +134,7 @@ const ShareButtons = ({ url, title, summary }) => {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0 }}
-                    className="text-xs text-cartoon-green font-semibold"
+                    className="text-xs text-success font-semibold"
                 >
                     Copied!
                 </motion.span>

@@ -4,7 +4,7 @@ import { BiShield } from 'react-icons/bi';
 
 const Privacy = () => {
     return (
-        <div className="container mx-auto p-8 max-w-4xl">
+        <div className="container mx-auto p-4 md:p-8 max-w-4xl">
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -14,7 +14,7 @@ const Privacy = () => {
                     className="inline-block mb-6"
                     whileHover={{ scale: 1.05 }}
                 >
-                    <span className="badge badge-lg bg-cartoon-blue text-white shadow-cartoon-sm px-6 py-3">
+                    <span className="badge badge-lg bg-primary text-white shadow-soft px-6 py-3">
                         <BiShield className="mr-2" size={20} />
                         Privacy Policy
                     </span>
@@ -29,7 +29,7 @@ const Privacy = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="prose prose-lg max-w-none bg-white dark:bg-gray-800 p-8 rounded-cartoon shadow-cartoon border-2 border-black text-gray-900 dark:text-gray-100 prose-headings:text-gray-900 dark:prose-headings:text-white prose-strong:text-gray-900 dark:prose-strong:text-gray-100 prose-li:text-gray-900 dark:prose-li:text-gray-100"
+                className="prose prose-lg max-w-none bg-white dark:bg-gray-800 p-8 rounded-soft shadow-soft-lg border border-base-300 text-gray-900 dark:text-gray-100 prose-headings:text-gray-900 dark:prose-headings:text-white prose-strong:text-gray-900 dark:prose-strong:text-gray-100 prose-li:text-gray-900 dark:prose-li:text-gray-100"
             >
                 <p className="lead">
                     Last Update: {new Date().toLocaleDateString('it-IT')}

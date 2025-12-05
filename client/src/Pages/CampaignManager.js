@@ -8,7 +8,6 @@ import { BsArrowLeft } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../Api';
-import { FaClock, FaCalendarAlt } from 'react-icons/fa';
 
 
 const CampaignManager = () => {
@@ -51,22 +50,6 @@ const CampaignManager = () => {
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
         }
     });
-
-    const getCurrentDateTime = () => {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        return now.toISOString().slice(0, 16);
-    };
-
-    const formatScheduleInfo = (datetime) => {
-        if (!datetime) return '';
-        const date = new Date(datetime);
-        return `Scheduled for: ${date.toLocaleString('en-US', {
-            timeZone: 'Europe/Rome',
-            dateStyle: 'medium',
-            timeStyle: 'short'
-        })} (Rome Time)`;
-    };
 
     // Fetch data function - NOT using useCallback to avoid dependency issues
     const fetchData = async () => {
@@ -221,7 +204,7 @@ const CampaignManager = () => {
     if (loading && campaigns.length === 0 && subscribers.length === 0) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <FaSpinner className="animate-spin text-4xl text-cartoon-pink" />
+                <FaSpinner className="animate-spin text-4xl text-error" />
             </div>
         );
     }
@@ -237,7 +220,7 @@ const CampaignManager = () => {
                 >
                     <button
                         onClick={() => navigate('/manager')}
-                        className="mb-4 btn btn-ghost rounded-cartoon"
+                        className="mb-4 btn btn-ghost rounded-soft"
                     >
                         <BsArrowLeft className="mr-2" /> Back to Admin
                     </button>
@@ -256,14 +239,14 @@ const CampaignManager = () => {
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.1 }}
-                        className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon"
+                        className="bg-white dark:bg-gray-800 p-6 rounded-soft shadow-soft-lg"
                     >
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-gray-500 dark:text-gray-400">Active Subscribers</p>
-                                <p className="text-3xl font-bold text-cartoon-green">{stats.active}</p>
+                                <p className="text-3xl font-bold text-success">{stats.active}</p>
                             </div>
-                            <FaUsers className="text-3xl text-cartoon-green opacity-50" />
+                            <FaUsers className="text-3xl text-success opacity-50" />
                         </div>
                     </motion.div>
 
@@ -271,14 +254,14 @@ const CampaignManager = () => {
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon"
+                        className="bg-white dark:bg-gray-800 p-6 rounded-soft shadow-soft-lg"
                     >
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-gray-500 dark:text-gray-400">Total Campaigns</p>
-                                <p className="text-3xl font-bold text-cartoon-purple">{campaigns.length}</p>
+                                <p className="text-3xl font-bold text-secondary">{campaigns.length}</p>
                             </div>
-                            <FaEnvelope className="text-3xl text-cartoon-purple opacity-50" />
+                            <FaEnvelope className="text-3xl text-secondary opacity-50" />
                         </div>
                     </motion.div>
 
@@ -286,16 +269,16 @@ const CampaignManager = () => {
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon"
+                        className="bg-white dark:bg-gray-800 p-6 rounded-soft shadow-soft-lg"
                     >
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-gray-500 dark:text-gray-400">This Month</p>
-                                <p className="text-3xl font-bold text-cartoon-pink">
+                                <p className="text-3xl font-bold text-error">
                                     {stats.growth?.thisMonth || 0}
                                 </p>
                             </div>
-                            <FaChartLine className="text-3xl text-cartoon-pink opacity-50" />
+                            <FaChartLine className="text-3xl text-error opacity-50" />
                         </div>
                     </motion.div>
 
@@ -303,17 +286,17 @@ const CampaignManager = () => {
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon"
+                        className="bg-white dark:bg-gray-800 p-6 rounded-soft shadow-soft-lg"
                     >
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-gray-500 dark:text-gray-400">Growth Rate</p>
-                                <p className="text-3xl font-bold text-cartoon-orange">
+                                <p className="text-3xl font-bold text-accent">
                                     {stats.growth?.percentChange > 0 ? '+' : ''}
                                     {stats.growth?.percentChange || 0}%
                                 </p>
                             </div>
-                            <FaChartLine className="text-3xl text-cartoon-orange opacity-50" />
+                            <FaChartLine className="text-3xl text-accent opacity-50" />
                         </div>
                     </motion.div>
                 </div>
@@ -322,8 +305,8 @@ const CampaignManager = () => {
                 <div className="flex gap-4 mb-6">
                     <button
                         onClick={() => setActiveTab('campaigns')}
-                        className={`px-6 py-3 rounded-cartoon font-medium transition-all ${activeTab === 'campaigns'
-                            ? 'bg-cartoon-purple text-white shadow-cartoon'
+                        className={`px-6 py-3 rounded-soft font-medium transition-all ${activeTab === 'campaigns'
+                            ? 'bg-secondary text-white shadow-soft-lg'
                             : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                             }`}
                     >
@@ -332,8 +315,8 @@ const CampaignManager = () => {
                     </button>
                     <button
                         onClick={() => setActiveTab('subscribers')}
-                        className={`px-6 py-3 rounded-cartoon font-medium transition-all ${activeTab === 'subscribers'
-                            ? 'bg-cartoon-purple text-white shadow-cartoon'
+                        className={`px-6 py-3 rounded-soft font-medium transition-all ${activeTab === 'subscribers'
+                            ? 'bg-secondary text-white shadow-soft-lg'
                             : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                             }`}
                     >
@@ -350,7 +333,7 @@ const CampaignManager = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
-                            className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-6"
+                            className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg p-6"
                         >
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
@@ -358,8 +341,8 @@ const CampaignManager = () => {
                                 </h2>
                                 <button
                                     onClick={() => setShowCreateModal(true)}
-                                    className="btn btn-primary bg-cartoon-green hover:bg-cartoon-green/80 
-                                             rounded-cartoon shadow-cartoon"
+                                    className="btn btn-primary bg-success hover:bg-success/80 
+                                             rounded-soft shadow-soft-lg"
                                 >
                                     <FaPlus className="mr-2" />
                                     New Campaign
@@ -381,7 +364,7 @@ const CampaignManager = () => {
                                                 <th className="text-left py-3 px-4">Subject</th>
                                                 <th className="text-left py-3 px-4">Status</th>
                                                 <th className="text-left py-3 px-4">Recipients</th>
-                                                <th className="text-left py-3 px-4">Scheduled</th>
+                                                <th className="text-left py-3 px-4">Created</th>
                                                 <th className="text-left py-3 px-4">Actions</th>
                                             </tr>
                                         </thead>
@@ -407,14 +390,14 @@ const CampaignManager = () => {
                                                         {campaign.recipients?.sent || 0} / {campaign.recipients?.total || 0}
                                                     </td>
                                                     <td className="py-3 px-4">
-                                                        {campaign.schedule?.sendAt ? formatDate(campaign.schedule.sendAt) : 'Not scheduled'}
+                                                        {formatDate(campaign.createdAt)}
                                                     </td>
                                                     <td className="py-3 px-4">
                                                         <div className="flex gap-2">
                                                             {campaign.status === 'draft' && (
                                                                 <button
                                                                     onClick={() => handleSendCampaign(campaign._id)}
-                                                                    className="btn btn-sm bg-cartoon-green text-white rounded"
+                                                                    className="btn btn-sm bg-success text-white rounded"
                                                                     title="Send Now"
                                                                 >
                                                                     <FaPaperPlane />
@@ -442,7 +425,7 @@ const CampaignManager = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
-                            className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon p-6"
+                            className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg p-6"
                         >
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                                 <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
@@ -454,7 +437,7 @@ const CampaignManager = () => {
                                     <select
                                         value={subscriberFilter}
                                         onChange={(e) => setSubscriberFilter(e.target.value)}
-                                        className="select select-bordered select-sm rounded-cartoon"
+                                        className="select select-bordered select-sm rounded-soft"
                                     >
                                         <option value="all">All Status</option>
                                         <option value="active">Active Only</option>
@@ -465,7 +448,7 @@ const CampaignManager = () => {
                                     {subscriberFilter !== 'all' && (
                                         <button
                                             onClick={() => setSubscriberFilter('all')}
-                                            className="btn btn-sm btn-ghost rounded-cartoon"
+                                            className="btn btn-sm btn-ghost rounded-soft"
                                             title="Clear filter"
                                         >
                                             <FaTimes />
@@ -542,7 +525,7 @@ const CampaignManager = () => {
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0.9 }}
-                            className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                            className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="p-6">
@@ -568,7 +551,7 @@ const CampaignManager = () => {
                                                 ...campaignForm,
                                                 subject: e.target.value
                                             })}
-                                            className="w-full p-3 border rounded-cartoon dark:bg-gray-700 dark:border-gray-600"
+                                            className="w-full p-3 border rounded-soft dark:bg-gray-700 dark:border-gray-600"
                                             placeholder="Your awesome newsletter subject"
                                         />
                                     </div>
@@ -584,7 +567,7 @@ const CampaignManager = () => {
                                                 ...campaignForm,
                                                 preheader: e.target.value
                                             })}
-                                            className="w-full p-3 border rounded-cartoon dark:bg-gray-700 dark:border-gray-600"
+                                            className="w-full p-3 border rounded-soft dark:bg-gray-700 dark:border-gray-600"
                                             placeholder="Preview text that appears in inbox"
                                         />
                                     </div>
@@ -602,142 +585,22 @@ const CampaignManager = () => {
                                                     html: e.target.value
                                                 }
                                             })}
-                                            className="w-full p-3 border rounded-cartoon dark:bg-gray-700 dark:border-gray-600 h-48"
+                                            className="w-full p-3 border rounded-soft dark:bg-gray-700 dark:border-gray-600 h-48"
                                             placeholder="Your email HTML content..."
                                         />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
-                                            Schedule Send (Optional)
-                                            <span className="ml-2 text-xs text-gray-500">
-                                                Leave empty to send immediately
-                                            </span>
-                                        </label>
-
-                                        <div className="space-y-2">
-                                            <div className="relative">
-                                                <input
-                                                    type="datetime-local"
-                                                    value={campaignForm.schedule.sendAt}
-                                                    onChange={(e) => setCampaignForm({
-                                                        ...campaignForm,
-                                                        schedule: {
-                                                            ...campaignForm.schedule,
-                                                            sendAt: e.target.value,
-                                                            timezone: 'Europe/Rome'
-                                                        }
-                                                    })}
-                                                    min={getCurrentDateTime()}
-                                                    className="w-full p-3 pl-10 border rounded-cartoon dark:bg-gray-700 dark:border-gray-600"
-                                                />
-                                                <FaCalendarAlt className="absolute left-3 top-4 text-gray-400" />
-                                            </div>
-
-                                            {campaignForm.schedule.sendAt && (
-                                                <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-2 rounded">
-                                                    <FaClock className="inline mr-2" />
-                                                    {formatScheduleInfo(campaignForm.schedule.sendAt)}
-                                                </div>
-                                            )}
-
-                                            <div className="flex gap-2 mt-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const now = new Date();
-                                                        now.setMinutes(now.getMinutes() + 5);
-                                                        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                                                        setCampaignForm({
-                                                            ...campaignForm,
-                                                            schedule: {
-                                                                ...campaignForm.schedule,
-                                                                sendAt: now.toISOString().slice(0, 16)
-                                                            }
-                                                        });
-                                                    }}
-                                                    className="text-xs btn btn-sm btn-ghost"
-                                                >
-                                                    +5 min
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const now = new Date();
-                                                        now.setHours(now.getHours() + 1);
-                                                        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                                                        setCampaignForm({
-                                                            ...campaignForm,
-                                                            schedule: {
-                                                                ...campaignForm.schedule,
-                                                                sendAt: now.toISOString().slice(0, 16)
-                                                            }
-                                                        });
-                                                    }}
-                                                    className="text-xs btn btn-sm btn-ghost"
-                                                >
-                                                    +1 hour
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const tomorrow = new Date();
-                                                        tomorrow.setDate(tomorrow.getDate() + 1);
-                                                        tomorrow.setHours(9, 0, 0, 0);
-                                                        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
-                                                        setCampaignForm({
-                                                            ...campaignForm,
-                                                            schedule: {
-                                                                ...campaignForm.schedule,
-                                                                sendAt: tomorrow.toISOString().slice(0, 16)
-                                                            }
-                                                        });
-                                                    }}
-                                                    className="text-xs btn btn-sm btn-ghost"
-                                                >
-                                                    Tomorrow 9AM
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setCampaignForm({
-                                                        ...campaignForm,
-                                                        schedule: {
-                                                            ...campaignForm.schedule,
-                                                            sendAt: ''
-                                                        }
-                                                    })}
-                                                    className="text-xs btn btn-sm btn-ghost text-red-500"
-                                                >
-                                                    Clear
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="alert alert-info text-sm mt-4">
-                                        <FaClock className="inline mr-2" />
-                                        <div>
-                                            <p><strong>How scheduling works:</strong></p>
-                                            <ul className="list-disc list-inside mt-1">
-                                                <li>Leave empty to send immediately to all active subscribers</li>
-                                                <li>Set a future date/time to schedule the campaign</li>
-                                                <li>All times are in Rome timezone (UTC+1/+2)</li>
-                                                <li>Campaigns will be sent at the exact time specified</li>
-                                            </ul>
-                                        </div>
                                     </div>
 
                                     <div className="flex justify-end gap-3 pt-4">
                                         <button
                                             onClick={() => setShowCreateModal(false)}
-                                            className="btn btn-ghost rounded-cartoon"
+                                            className="btn btn-ghost rounded-soft"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             onClick={handleCreateCampaign}
                                             disabled={loading}
-                                            className="btn btn-primary bg-cartoon-green hover:bg-cartoon-green/80 rounded-cartoon"
+                                            className="btn btn-primary bg-success hover:bg-success/80 rounded-soft"
                                         >
                                             {loading ? <FaSpinner className="animate-spin" /> : 'Create Campaign'}
                                         </button>
@@ -763,7 +626,7 @@ const CampaignManager = () => {
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0.9 }}
-                            className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon max-w-md w-full p-6"
+                            className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg max-w-md w-full p-6"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <h3 className="text-xl font-bold mb-4">Confirm Delete</h3>
@@ -773,14 +636,14 @@ const CampaignManager = () => {
                             <div className="flex justify-end gap-3">
                                 <button
                                     onClick={() => setShowDeleteModal(false)}
-                                    className="btn btn-ghost rounded-cartoon"
+                                    className="btn btn-ghost rounded-soft"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleDelete}
                                     disabled={loading}
-                                    className="btn bg-red-500 text-white hover:bg-red-600 rounded-cartoon"
+                                    className="btn bg-red-500 text-white hover:bg-red-600 rounded-soft"
                                 >
                                     {loading ? <FaSpinner className="animate-spin" /> : 'Delete'}
                                 </button>

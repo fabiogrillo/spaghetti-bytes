@@ -8,13 +8,9 @@ const BookmarkButton = ({ storyId, variant = 'default' }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        checkBookmarkStatus();
-    }, [storyId]);
-
-    const checkBookmarkStatus = () => {
         const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
         setIsBookmarked(bookmarks.includes(storyId));
-    };
+    }, [storyId]);
 
     const toggleBookmark = async () => {
         setIsLoading(true);
@@ -51,8 +47,8 @@ const BookmarkButton = ({ storyId, variant = 'default' }) => {
                 disabled={isLoading}
                 className={`btn btn-circle btn-sm ${
                     isBookmarked 
-                        ? 'bg-cartoon-pink text-white shadow-cartoon-sm' 
-                        : 'btn-ghost hover:bg-cartoon-pink hover:text-white'
+                        ? 'bg-error text-white shadow-soft' 
+                        : 'btn-ghost hover:bg-error hover:text-white'
                 }`}
                 title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
             >
@@ -73,10 +69,10 @@ const BookmarkButton = ({ storyId, variant = 'default' }) => {
             whileTap={{ scale: 0.98 }}
             onClick={toggleBookmark}
             disabled={isLoading}
-            className={`btn rounded-cartoon shadow-cartoon-sm ${
+            className={`btn rounded-soft shadow-soft ${
                 isBookmarked 
-                    ? 'bg-cartoon-pink text-white hover:bg-cartoon-purple' 
-                    : 'btn-outline border-cartoon-pink text-cartoon-pink hover:bg-cartoon-pink hover:text-white'
+                    ? 'bg-error text-white hover:bg-secondary' 
+                    : 'btn-outline border-error text-error hover:bg-error hover:text-white'
             }`}
         >
             {isLoading ? (

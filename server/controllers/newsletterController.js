@@ -684,9 +684,7 @@ module.exports = {
     unsubscribe,
     getSubscribers,
     deleteSubscriber,
-    createCampaign,
-    getCampaigns,
-    sendCampaign,
-    deleteCampaign,
     getSubscriberStats
+    // Campaign functions removed as part of simplification
+    // createCampaign, getCampaigns, sendCampaign, deleteCampaign
 };

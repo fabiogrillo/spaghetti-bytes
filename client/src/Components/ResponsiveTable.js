@@ -9,7 +9,7 @@ const ResponsiveTable = ({
   onEdit, 
   onDelete, 
   title,
-  colorScheme = "cartoon-pink" 
+  colorScheme = "error" 
 }) => {
   const [expandedRows, setExpandedRows] = useState(new Set());
 
@@ -25,7 +25,7 @@ const ResponsiveTable = ({
 
   // Desktop Table View
   const DesktopTable = () => (
-    <div className="hidden md:block overflow-x-auto rounded-cartoon shadow-cartoon border-2 border-black">
+    <div className="hidden md:block overflow-x-auto rounded-soft shadow-soft-lg border border-base-300">
       <table className="w-full">
         <thead className={`bg-${colorScheme} text-white`}>
           <tr>
@@ -57,7 +57,7 @@ const ResponsiveTable = ({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => onEdit(item._id)}
-                    className="btn btn-sm bg-cartoon-yellow text-black shadow-cartoon-sm "
+                    className="btn btn-sm bg-warning text-black shadow-soft "
                   >
                     <FaEdit />
                   </motion.button>
@@ -65,7 +65,7 @@ const ResponsiveTable = ({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => onDelete(item._id)}
-                    className="btn btn-sm btn-error shadow-cartoon-sm hover:shadow-cartoon"
+                    className="btn btn-sm btn-error shadow-soft hover:shadow-soft-lg"
                   >
                     <FaTrashAlt />
                   </motion.button>
@@ -87,7 +87,7 @@ const ResponsiveTable = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.05 }}
-          className="bg-white rounded-cartoon shadow-cartoon border-2 border-black overflow-hidden"
+          className="bg-white rounded-soft shadow-soft-lg border border-base-300 overflow-hidden"
         >
           {/* Card Header */}
           <div
@@ -136,7 +136,7 @@ const ResponsiveTable = ({
                         e.stopPropagation();
                         onEdit(item._id);
                       }}
-                      className="flex-1 btn bg-cartoon-yellow text-black shadow-cartoon-sm hover:shadow-cartoon"
+                      className="flex-1 btn bg-warning text-black shadow-soft hover:shadow-soft-lg"
                     >
                       <FaEdit className="mr-2" /> Edit
                     </motion.button>
@@ -147,7 +147,7 @@ const ResponsiveTable = ({
                         e.stopPropagation();
                         onDelete(item._id);
                       }}
-                      className="flex-1 btn btn-error shadow-cartoon-sm hover:shadow-cartoon"
+                      className="flex-1 btn btn-error shadow-soft hover:shadow-soft-lg"
                     >
                       <FaTrashAlt className="mr-2" /> Delete
                     </motion.button>
@@ -174,7 +174,7 @@ const ResponsiveTable = ({
 
       {/* Table Content */}
       {data.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-cartoon shadow-cartoon border-2 border-black">
+        <div className="text-center py-12 bg-white rounded-soft shadow-soft-lg border border-base-300">
           <p className="text-xl text-gray">No items found</p>
           <p className="text-gray mt-2">Create your first one to get started!</p>
         </div>

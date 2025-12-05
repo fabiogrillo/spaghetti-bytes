@@ -10,8 +10,9 @@ import {
 import ImprovedNavbar from "./Components/ImprovedNavbar";
 import Footer from "./Components/Footer";
 import LoadingSpinner from "./Components/LoadingSpinner";
-import ChatBot from "./Components/ChatBot";
 import ToastProvider from "./Components/ToastProvider";
+import ChristmasDecorations from "./Components/ChristmasDecorations";
+import ChristmasBanner from "./Components/ChristmasBanner";
 import api from "./Api";
 
 // Regular imports (no lazy loading for simplicity on Vercel)
@@ -25,9 +26,6 @@ import TableManager from "./Pages/TableManager";
 import StoryVisualizer from "./Pages/StoryVisualizer";
 import GoalPublisher from "./Pages/GoalPublisher";
 import TableGoals from "./Pages/TableGoals";
-import ConversationDashboard from "./Pages/ConversationDashboard";
-import CampaignManager from "./Pages/CampaignManager";
-import NewsletterAnalytics from "./Components/NewsletterAnalytics";
 import DonationButton from "./Components/DonationButton";
 import CookieBanner from "./Components/CookieBanner";
 import CookieSettings from "./Components/CookieSettings";
@@ -52,7 +50,7 @@ const ProtectedRoute = ({ children, isAuthenticated, checkingAuth }) => {
 };
 
 // App Content Component
-const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, checkingAuth }) => {
+const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, checkingAuth, theme }) => {
   useAnalytics();
 
   return (
@@ -62,6 +60,7 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
         username={username}
         setAuthenticated={setAuthenticated}
         setUsername={setUsername}
+        theme={theme}
       />
 
       <main className="flex-grow">
@@ -142,30 +141,6 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
             }
           />
           <Route
-            path="/conversations"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
-                <ConversationDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/newsletter/campaigns"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
-                <CampaignManager />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/newsletter/analytics"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
-                <NewsletterAnalytics />
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/moderate-comments"
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
@@ -180,9 +155,9 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
             element={
               <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                  <h1 className="text-6xl font-bold text-cartoon-pink">404</h1>
+                  <h1 className="text-6xl font-bold text-error">404</h1>
                   <p className="text-xl mt-4">Page not found</p>
-                  <a href="/" className="btn bg-cartoon-purple text-white mt-8 shadow-cartoon">
+                  <a href="/" className="btn bg-secondary text-white mt-8 shadow-soft-lg">
                     Go Home
                   </a>
                 </div>
@@ -193,7 +168,6 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
       </main>
 
       <Footer />
-      <ChatBot />
       <CookieBanner />
       <CookieSettings />
       <DonationButton variant="floating" />
@@ -206,6 +180,16 @@ const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [theme, setThemeState] = useState(
+    localStorage.getItem('theme') || 'modern'
+  );
+
+  // Theme setter function
+  const setTheme = (newTheme) => {
+    setThemeState(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
 
   // Check if user is already authenticated on app load
   useEffect(() => {
@@ -226,16 +210,27 @@ const App = () => {
     checkAuth();
   }, []);
 
+  // Set initial theme
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <ToastProvider>
       <Router>
-        <div className="App min-h-screen flex flex-col">
+        <ChristmasDecorations />
+        <div className="App min-h-screen flex flex-col relative z-10">
+          <div className="container mx-auto px-4">
+            <ChristmasBanner theme={theme} setTheme={setTheme} />
+          </div>
           <AppContent
             isAuthenticated={isAuthenticated}
             setAuthenticated={setAuthenticated}
             username={username}
             setUsername={setUsername}
             checkingAuth={checkingAuth}
+            theme={theme}
           />
         </div>
       </Router>

@@ -20,7 +20,34 @@ const Bookmarks = () => {
     }, []);
 
     useEffect(() => {
-        filterStories();
+        let filtered = [...bookmarkedStories];
+
+        // Search filter
+        if (searchQuery.trim()) {
+            filtered = filtered.filter(story =>
+                story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                story.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                story.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+            );
+        }
+
+        // Sort
+        filtered.sort((a, b) => {
+            switch (sortBy) {
+                case 'dateAdded':
+                    return (b.bookmarkedAt || 0) - (a.bookmarkedAt || 0);
+                case 'datePublished':
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                case 'title':
+                    return a.title.localeCompare(b.title);
+                case 'readingTime':
+                    return (a.readingTime || 0) - (b.readingTime || 0);
+                default:
+                    return 0;
+            }
+        });
+
+        setFilteredStories(filtered);
     }, [searchQuery, sortBy, bookmarkedStories]);
 
     const loadBookmarkedStories = async () => {
@@ -54,37 +81,6 @@ const Bookmarks = () => {
         }
     };
 
-    const filterStories = () => {
-        let filtered = [...bookmarkedStories];
-
-        // Search filter
-        if (searchQuery.trim()) {
-            filtered = filtered.filter(story => 
-                story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                story.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                story.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-            );
-        }
-
-        // Sort
-        filtered.sort((a, b) => {
-            switch (sortBy) {
-                case 'dateAdded':
-                    return (b.bookmarkedAt || 0) - (a.bookmarkedAt || 0);
-                case 'datePublished':
-                    return new Date(b.createdAt) - new Date(a.createdAt);
-                case 'title':
-                    return a.title.localeCompare(b.title);
-                case 'readingTime':
-                    return (a.readingTime || 0) - (b.readingTime || 0);
-                default:
-                    return 0;
-            }
-        });
-
-        setFilteredStories(filtered);
-    };
-
     const clearAllBookmarks = () => {
         if (window.confirm('Are you sure you want to remove all bookmarks? This action cannot be undone.')) {
             localStorage.setItem('bookmarks', '[]');
@@ -102,7 +98,7 @@ const Bookmarks = () => {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center space-y-4">
-                    <span className="loading loading-ring loading-lg text-cartoon-pink"></span>
+                    <span className="loading loading-ring loading-lg text-error"></span>
                     <p className="text-gray-600 dark:text-gray-400">Loading your bookmarks...</p>
                 </div>
             </div>
@@ -119,7 +115,7 @@ const Bookmarks = () => {
                     className="text-center mb-12"
                 >
                     <h1 className="text-4xl md:text-5xl font-bold mb-4 flex items-center justify-center gap-3">
-                        <BiBookmarkHeart className="text-cartoon-pink" />
+                        <BiBookmarkHeart className="text-error" />
                         <span className="gradient-text">My Bookmarks</span>
                     </h1>
                     <p className="text-lg text-gray-600 dark:text-gray-300">
@@ -140,7 +136,7 @@ const Bookmarks = () => {
                         </p>
                         <Link
                             to="/blog"
-                            className="btn bg-cartoon-pink text-white rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover"
+                            className="btn bg-error text-white rounded-soft shadow-soft-lg hover:shadow-soft-hover"
                         >
                             <BsStars size={20} />
                             Explore Articles
@@ -153,7 +149,7 @@ const Bookmarks = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="flex flex-col md:flex-row gap-4 mb-8 bg-white dark:bg-gray-800 p-6 rounded-cartoon shadow-cartoon"
+                            className="flex flex-col md:flex-row gap-4 mb-8 bg-white dark:bg-gray-800 p-6 rounded-soft shadow-soft-lg"
                         >
                             {/* Search */}
                             <div className="flex-1">
@@ -163,9 +159,9 @@ const Bookmarks = () => {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="Search bookmarks..."
-                                        className="input input-bordered flex-1 rounded-cartoon"
+                                        className="input input-bordered flex-1 rounded-soft"
                                     />
-                                    <span className="btn btn-square bg-cartoon-blue text-white rounded-cartoon">
+                                    <span className="btn btn-square bg-primary text-white rounded-soft">
                                         <BiSearch size={20} />
                                     </span>
                                 </div>
@@ -175,7 +171,7 @@ const Bookmarks = () => {
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="select select-bordered rounded-cartoon"
+                                className="select select-bordered rounded-soft"
                             >
                                 <option value="dateAdded">Date Added</option>
                                 <option value="datePublished">Date Published</option>
@@ -186,7 +182,7 @@ const Bookmarks = () => {
                             {/* Clear All */}
                             <button
                                 onClick={clearAllBookmarks}
-                                className="btn btn-outline border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-cartoon"
+                                className="btn btn-outline border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-soft"
                             >
                                 <BiTrash size={16} />
                                 Clear All
@@ -219,7 +215,7 @@ const Bookmarks = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover transition-all duration-300 overflow-hidden"
+                                    className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg hover:shadow-soft-hover transition-all duration-300 overflow-hidden"
                                 >
                                     {story.coverImage && (
                                         <img
@@ -234,7 +230,7 @@ const Bookmarks = () => {
                                             <h3 className="font-bold text-lg line-clamp-2 flex-1">
                                                 <Link
                                                     to={`/visualizer/${story._id}`}
-                                                    className="hover:text-cartoon-pink transition-colors"
+                                                    className="hover:text-error transition-colors"
                                                 >
                                                     {story.title}
                                                 </Link>
@@ -253,7 +249,7 @@ const Bookmarks = () => {
                                             {story.tags.slice(0, 3).map(tag => (
                                                 <span
                                                     key={tag}
-                                                    className="badge badge-sm bg-cartoon-yellow text-black"
+                                                    className="badge badge-sm bg-warning text-black"
                                                 >
                                                     {tag}
                                                 </span>

@@ -46,7 +46,7 @@ const CommentReaction = () => {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen"><FaSpinner className="animate-spin text-4xl text-cartoon-pink" /></div>;
+    return <div className="flex items-center justify-center min-h-screen"><FaSpinner className="animate-spin text-4xl text-error" /></div>;
   }
 
   return (
@@ -57,9 +57,9 @@ const CommentReaction = () => {
       ) : (
         <ul className="space-y-6">
           {comments.map(comment => (
-            <li key={comment._id} className="bg-white rounded-cartoon shadow-cartoon p-4">
+            <li key={comment._id} className="bg-white rounded-soft shadow-soft-lg p-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-cartoon-purple">{comment.author.name}</span>
+                <span className="font-bold text-secondary">{comment.author.name}</span>
                 <span className={`px-2 py-1 rounded-full text-xs text-white ${comment.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'}`}>{comment.status}</span>
               </div>
               <div className="mb-2 text-gray-700">{comment.content}</div>

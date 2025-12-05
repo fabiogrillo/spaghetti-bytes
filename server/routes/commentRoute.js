@@ -1,10 +1,11 @@
 // server/routes/commentRoute.js
-// Simplified authentication - any authenticated user is admin
+// Using centralized authentication middleware
 
 const express = require('express');
 const router = express.Router();
 const commentController = require('../controllers/commentController');
 const { body, param, validationResult } = require('express-validator');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 // Validation middleware
 const validate = (req, res, next) => {
@@ -14,17 +15,6 @@ const validate = (req, res, next) => {
     }
     next();
 };
-
-// Authentication middleware - simplified
-const isAuthenticated = (req, res, next) => {
-    if (req.isAuthenticated && req.isAuthenticated()) {
-        return next();
-    }
-    return res.status(401).json({ error: 'Authentication required' });
-};
-
-// Since you're the only one who can login, isAdmin = isAuthenticated
-const isAdmin = isAuthenticated;
 
 // Public routes
 // GET /api/comments/story/:storyId - Get comments for a story
@@ -74,19 +64,19 @@ router.post('/:commentId/flag',
 // Admin routes (require authentication)
 // GET /api/comments/moderate - Get pending comments for moderation
 router.get('/moderate',
-    isAdmin,
+    requireAdmin,
     commentController.getPendingComments
 );
 
 // GET /api/comments/pending-count - Get count of pending comments (for navbar badge)
 router.get('/pending-count',
-    isAdmin,
+    requireAdmin,
     commentController.getPendingCount
 );
 
 // POST /api/comments/:commentId/approve - Approve comment
 router.post('/:commentId/approve',
-    isAdmin,
+    requireAdmin,
     [param('commentId').isMongoId().withMessage('Invalid comment ID')],
     validate,
     commentController.approveComment
@@ -94,7 +84,7 @@ router.post('/:commentId/approve',
 
 // POST /api/comments/:commentId/reject - Reject comment
 router.post('/:commentId/reject',
-    isAdmin,
+    requireAdmin,
     [
         param('commentId').isMongoId().withMessage('Invalid comment ID'),
         body('reason').optional().trim().isLength({ max: 500 })
@@ -112,7 +102,7 @@ router.delete('/:commentId',
 
 // DELETE /api/comments/:commentId/admin - Force delete (admin only)
 router.delete('/:commentId/admin',
-    isAdmin,
+    requireAdmin,
     [param('commentId').isMongoId().withMessage('Invalid comment ID')],
     validate,
     commentController.adminDeleteComment
@@ -120,7 +110,7 @@ router.delete('/:commentId/admin',
 
 // GET /api/comments/stats - Get comment statistics (admin only)
 router.get('/stats',
-    isAdmin,
+    requireAdmin,
     commentController.getCommentStats
 );
 

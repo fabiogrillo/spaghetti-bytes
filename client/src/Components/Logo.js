@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
-const Logo = ({ size = 'normal' }) => {
+const Logo = ({ size = 'normal', theme }) => {
   const sizes = {
     small: {
       emoji: 'text-2xl',
@@ -22,18 +22,37 @@ const Logo = ({ size = 'normal' }) => {
 
   const currentSize = sizes[size] || sizes.normal;
 
+  const isChristmasSeason = useMemo(() => {
+    const now = new Date();
+    const endDate = new Date('2026-01-15');
+    return now < endDate;
+  }, []);
+
+  const showChristmasDecoration = theme === 'festive' && isChristmasSeason;
+
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       className="flex items-center gap-2 cursor-pointer"
     >
-      <motion.span 
-        className={`${currentSize.emoji} animate-float`}
-        style={{ animationDelay: '0.5s' }}
-      >
-        🍝
-      </motion.span>
+      <div className="flex items-center gap-1">
+        <motion.span
+          className={`${currentSize.emoji} animate-float`}
+          style={{ animationDelay: '0.5s' }}
+        >
+          🍝
+        </motion.span>
+        {showChristmasDecoration && (
+          <motion.span
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            className={`text-lg`}
+          >
+            🎄
+          </motion.span>
+        )}
+      </div>
       <div className="flex flex-col items-start">
         <div className={`${currentSize.text} logo-font leading-tight`}>
           <span className="gradient-text block">Spaghetti</span>

@@ -113,11 +113,11 @@ const AdvancedSearch = ({ onResults, onClose, allStories = [] }) => {
             exit={{ opacity: 0, scale: 0.9 }}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
         >
-            <div className="bg-white dark:bg-gray-800 rounded-cartoon shadow-cartoon max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
                     <h2 className="text-2xl font-bold flex items-center gap-2">
-                        <BsStars className="text-cartoon-pink" />
+                        <BsStars className="text-error" />
                         Advanced Search
                     </h2>
                     <button 
@@ -140,11 +140,11 @@ const AdvancedSearch = ({ onResults, onClose, allStories = [] }) => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search articles, tutorials, tips..."
-                                className="input input-bordered flex-1 rounded-cartoon"
+                                className="input input-bordered flex-1 rounded-soft"
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                             />
                             <button 
-                                className="btn bg-cartoon-pink text-white rounded-cartoon"
+                                className="btn bg-error text-white rounded-soft"
                                 onClick={handleSearch}
                                 disabled={isLoading}
                             >
@@ -169,8 +169,8 @@ const AdvancedSearch = ({ onResults, onClose, allStories = [] }) => {
                                     onClick={() => toggleTag(tag)}
                                     className={`badge badge-lg cursor-pointer transition-all ${
                                         filters.tags.includes(tag)
-                                            ? 'bg-cartoon-pink text-white shadow-cartoon-sm'
-                                            : 'badge-outline hover:bg-cartoon-pink hover:text-white'
+                                            ? 'bg-error text-white shadow-soft'
+                                            : 'badge-outline hover:bg-error hover:text-white'
                                     }`}
                                 >
                                     {tag}
@@ -187,7 +187,7 @@ const AdvancedSearch = ({ onResults, onClose, allStories = [] }) => {
                                 <span className="label-text font-semibold">Date Range</span>
                             </label>
                             <select 
-                                className="select select-bordered rounded-cartoon"
+                                className="select select-bordered rounded-soft"
                                 value={filters.dateRange}
                                 onChange={(e) => setFilters(prev => ({...prev, dateRange: e.target.value}))}
                             >
@@ -204,7 +204,7 @@ const AdvancedSearch = ({ onResults, onClose, allStories = [] }) => {
                                 <span className="label-text font-semibold">Reading Time</span>
                             </label>
                             <select 
-                                className="select select-bordered rounded-cartoon"
+                                className="select select-bordered rounded-soft"
                                 value={filters.readingTime}
                                 onChange={(e) => setFilters(prev => ({...prev, readingTime: e.target.value}))}
                             >
@@ -221,7 +221,7 @@ const AdvancedSearch = ({ onResults, onClose, allStories = [] }) => {
                         <button
                             onClick={handleSearch}
                             disabled={isLoading || (!searchQuery.trim() && filters.tags.length === 0)}
-                            className="btn bg-cartoon-purple text-white rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover px-8"
+                            className="btn bg-secondary text-white rounded-soft shadow-soft-lg hover:shadow-soft-hover px-8"
                         >
                             {isLoading ? (
                                 <>

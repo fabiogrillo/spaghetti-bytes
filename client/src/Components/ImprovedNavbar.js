@@ -6,10 +6,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BiShield,
-  BiCommentCheck,
-  BiEnvelope,
-  BiBarChart,
   BiBookmarkHeart,
+  BiUser,
 } from "react-icons/bi";
 import {
   IoIosLogIn,
@@ -33,6 +31,7 @@ const ImprovedNavbar = ({
   username,
   setAuthenticated,
   setUsername,
+  theme,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -131,7 +130,7 @@ const ImprovedNavbar = ({
       <div className="navbar p-4 max-w-7xl mx-auto">
         <div className="flex-1">
           <Link to="/">
-            <Logo size="normal" />
+            <Logo size="normal" theme={theme} />
           </Link>
         </div>
 
@@ -140,7 +139,7 @@ const ImprovedNavbar = ({
           <nav className="flex gap-2">
             {navItems.map((item, index) => {
               const Icon = item.icon;
-              const colors = ["cartoon-pink", "cartoon-blue", "cartoon-yellow"];
+              const colors = ["error", "primary", "warning"];
               const color = colors[index % colors.length];
 
               return (
@@ -150,8 +149,8 @@ const ImprovedNavbar = ({
                     whileTap={{ scale: 0.95 }}
                     className={
                       isActive(item.path)
-                        ? `btn rounded-cartoon shadow-cartoon btn-pop bg-${color} text-white relative`
-                        : "btn rounded-cartoon shadow-cartoon-sm btn-pop bg-white text-gray-700 hover:shadow-cartoon hover:dark:text-white relative"
+                        ? `btn rounded-soft shadow-soft-lg btn-pop bg-${color} text-white relative`
+                        : "btn rounded-soft shadow-soft btn-pop bg-white text-gray-700 hover:shadow-soft-lg hover:dark:text-white relative"
                     }
                   >
                     <div className="flex items-center gap-2">
@@ -176,69 +175,29 @@ const ImprovedNavbar = ({
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 tabIndex={0}
-                className="btn rounded-cartoon bg-cartoon-purple text-white shadow-cartoon-sm hover:shadow-cartoon btn-pop"
+                className="btn rounded-soft bg-secondary text-white shadow-soft hover:shadow-soft-lg btn-pop"
               >
-                <span className="text-xl">👨‍🍳</span>
+                <BiUser className="text-2xl" />
                 {username}
               </motion.button>
               <ul
                 tabIndex={0}
-                className="dropdown-content menu p-2 shadow-cartoon bg-base-100 rounded-cartoon w-52 mt-3 border-2 border-black"
+                className="dropdown-content menu p-2 shadow-soft-lg bg-base-100 rounded-soft w-52 mt-3 border border-base-300"
               >
                 <li>
                   <motion.button
                     whileHover={{ scale: 1.05, rotate: 2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate("/manager")}
-                    className="rounded-cartoon hover:bg-cartoon-purple hover:text-white flex items-center gap-2"
+                    className="rounded-soft hover:bg-secondary hover:text-white flex items-center gap-2"
                   >
                     <IoMdSettings /> Manager
                   </motion.button>
                 </li>
                 <li>
-                  <motion.button
-                    whileHover={{ scale: 1.05, rotate: 2 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => navigate("/moderate-comments")}
-                    className="rounded-cartoon hover:bg-cartoon-orange hover:text-white flex items-center gap-2 relative"
-                  >
-                    <BiCommentCheck size={20} />
-                    Comments
-                    {pendingCommentsCount > 0 && (
-                      <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 animate-pulse">
-                        {pendingCommentsCount}
-                      </span>
-                    )}
-                  </motion.button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => navigate("/conversations")}
-                    className="rounded-cartoon hover:bg-cartoon-blue hover:text-white"
-                  >
-                    <IoMdBook /> Conversations
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => navigate("/newsletter/campaigns")}
-                    className="rounded-cartoon hover:bg-cartoon-pink hover:text-white"
-                  >
-                    <BiEnvelope /> Newsletter Campaigns
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => navigate("/newsletter/analytics")}
-                    className="rounded-cartoon hover:bg-cartoon-yellow hover:text-black"
-                  >
-                    <BiBarChart /> Newsletter Analytics
-                  </button>
-                </li>
-                <li>
                   <button
                     onClick={handleLogout}
-                    className="rounded-cartoon hover:bg-error hover:text-white"
+                    className="rounded-soft hover:bg-error hover:text-white"
                   >
                     <IoIosLogOut /> Logout
                   </button>
@@ -250,7 +209,7 @@ const ImprovedNavbar = ({
               <motion.button
                 whileHover={{ scale: 1.05, rotate: 5 }}
                 whileTap={{ scale: 0.95 }}
-                className="btn btn-circle btn-lg bg-gradient-to-br from-cartoon-purple to-cartoon-pink text-white shadow-cartoon hover:shadow-cartoon-hover"
+                className="btn btn-circle btn-lg bg-gradient-to-br from-secondary to-error text-white shadow-soft-lg hover:shadow-soft-hover"
               >
                 <IoIosLogIn size={28} />
               </motion.button>
@@ -308,18 +267,18 @@ const ImprovedNavbar = ({
                   {navItems.map((item, index) => {
                     const Icon = item.icon;
                     const colors = [
-                      "cartoon-pink",
-                      "cartoon-blue",
-                      "cartoon-yellow",
-                      "cartoon-purple",
-                      "cartoon-orange"
+                      "error",
+                      "primary",
+                      "warning",
+                      "secondary",
+                      "accent"
                     ];
                     const hoverColors = [
-                      "hover:bg-cartoon-pink",
-                      "hover:bg-cartoon-blue", 
-                      "hover:bg-cartoon-yellow",
-                      "hover:bg-cartoon-purple",
-                      "hover:bg-cartoon-orange"
+                      "hover:bg-error",
+                      "hover:bg-primary", 
+                      "hover:bg-warning",
+                      "hover:bg-secondary",
+                      "hover:bg-accent"
                     ];
                     const color = colors[index % colors.length];
                     const hoverColor = hoverColors[index % hoverColors.length];
@@ -335,8 +294,8 @@ const ImprovedNavbar = ({
                           whileTap={{ scale: 0.95 }}
                           className={
                             isActive(item.path)
-                              ? `w-full btn justify-start rounded-cartoon shadow-cartoon bg-${color} text-white relative`
-                              : `w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost ${hoverColor} hover:text-white relative`
+                              ? `w-full btn justify-start rounded-soft shadow-soft-lg bg-${color} text-white relative`
+                              : `w-full btn justify-start rounded-soft shadow-soft btn-ghost ${hoverColor} hover:text-white relative`
                           }
                         >
                           <Icon size={20} />
@@ -351,77 +310,19 @@ const ImprovedNavbar = ({
                     );
                   })}
 
-                  {authenticated && (
-                    <>
-                      <Link
-                        to="/conversations"
-                        onClick={() => setIsSidebarOpen(false)}
-                      >
-                        <motion.button
-                          whileHover={{ x: 10 }}
-                          whileTap={{ scale: 0.95 }}
-                          className={
-                            isActive("/conversations")
-                              ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-blue text-white"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-blue hover:text-white"
-                          }
-                        >
-                          <IoMdBook size={20} />
-                          <span className="ml-3">Conversations</span>
-                        </motion.button>
-                      </Link>
-
-                      <Link
-                        to="/newsletter/campaigns"
-                        onClick={() => setIsSidebarOpen(false)}
-                      >
-                        <motion.button
-                          whileHover={{ x: 10 }}
-                          whileTap={{ scale: 0.95 }}
-                          className={
-                            isActive("/newsletter/campaigns")
-                              ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-pink text-white"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-purple hover:text-white"
-                          }
-                        >
-                          <BiEnvelope size={20} />
-                          <span className="ml-3">Newsletter</span>
-                        </motion.button>
-                      </Link>
-
-                      <Link
-                        to="/newsletter/analytics"
-                        onClick={() => setIsSidebarOpen(false)}
-                      >
-                        <motion.button
-                          whileHover={{ x: 10 }}
-                          whileTap={{ scale: 0.95 }}
-                          className={
-                            isActive("/newsletter/analytics")
-                              ? "w-full btn justify-start rounded-cartoon shadow-cartoon bg-cartoon-yellow text-black"
-                              : "w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-orange hover:text-white"
-                          }
-                        >
-                          <BiBarChart size={20} />
-                          <span className="ml-3">Analytics</span>
-                        </motion.button>
-                      </Link>
-
-                      <Link
-                        to="/privacy"
-                        onClick={() => setIsSidebarOpen(false)}
-                      >
-                        <motion.button
-                          whileHover={{ x: 10 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="w-full btn justify-start rounded-cartoon shadow-cartoon-sm btn-ghost hover:bg-cartoon-yellow hover:text-black"
-                        >
-                          <BiShield size={20} />
-                          <span className="ml-3">Privacy Policy</span>
-                        </motion.button>
-                      </Link>
-                    </>
-                  )}
+                  <Link
+                    to="/privacy"
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    <motion.button
+                      whileHover={{ x: 10 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-full btn justify-start rounded-soft shadow-soft btn-ghost hover:bg-warning hover:text-black"
+                    >
+                      <BiShield size={20} />
+                      <span className="ml-3">Privacy Policy</span>
+                    </motion.button>
+                  </Link>
                 </nav>
 
                 {/* Theme Toggle */}
@@ -433,7 +334,7 @@ const ImprovedNavbar = ({
                 <div className="mt-8">
                   {authenticated ? (
                     <div className="space-y-4">
-                      <div className="p-4 bg-cartoon-purple/20 rounded-cartoon">
+                      <div className="p-4 bg-secondary/20 rounded-soft">
                         <p className="text-sm text-gray-600">Logged in as</p>
                         <p className="font-bold">{username}</p>
                       </div>
@@ -442,7 +343,7 @@ const ImprovedNavbar = ({
                           navigate("/manager");
                           setIsSidebarOpen(false);
                         }}
-                        className="w-full btn rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
+                        className="w-full btn rounded-soft shadow-soft hover:shadow-soft-lg"
                       >
                         <IoMdSettings /> Manager
                       </button>
@@ -451,7 +352,7 @@ const ImprovedNavbar = ({
                           handleLogout();
                           setIsSidebarOpen(false);
                         }}
-                        className="w-full btn btn-error rounded-cartoon shadow-cartoon-sm hover:shadow-cartoon"
+                        className="w-full btn btn-error rounded-soft shadow-soft hover:shadow-soft-lg"
                       >
                         <IoIosLogOut /> Logout
                       </button>
@@ -461,7 +362,7 @@ const ImprovedNavbar = ({
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-full btn btn-lg bg-gradient-to-br from-cartoon-purple to-cartoon-pink text-white rounded-cartoon shadow-cartoon hover:shadow-cartoon-hover"
+                        className="w-full btn btn-lg bg-gradient-to-br from-secondary to-error text-white rounded-soft shadow-soft-lg hover:shadow-soft-hover"
                       >
                         <IoIosLogIn className="mr-2" size={24} />
                         Login
