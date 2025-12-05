@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BiShield } from 'react-icons/bi';
+import { BiShield, BiUser, BiTime, BiServer, BiWorld } from 'react-icons/bi';
 
 const Privacy = () => {
     return (
@@ -29,13 +29,43 @@ const Privacy = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="prose prose-lg max-w-none bg-white dark:bg-gray-800 p-8 rounded-soft shadow-soft-lg border border-base-300 text-gray-900 dark:text-gray-100 prose-headings:text-gray-900 dark:prose-headings:text-white prose-strong:text-gray-900 dark:prose-strong:text-gray-100 prose-li:text-gray-900 dark:prose-li:text-gray-100"
+                className="prose prose-lg max-w-none bg-base-100 dark:bg-base-200 p-8 rounded-soft shadow-soft-lg border border-base-300 text-base-content prose-headings:text-base-content prose-strong:text-base-content prose-li:text-base-content prose-p:text-base-content"
             >
                 <p className="lead">
-                    Last Update: {new Date().toLocaleDateString('it-IT')}
+                    Last Updated: December 20, 2024
                 </p>
 
-                <h2>1. Gathered informations</h2>
+                <h2 className="flex items-center gap-2">
+                    <BiUser /> Data Controller
+                </h2>
+                <p>
+                    The data controller responsible for your personal data is:
+                </p>
+                <div className="bg-base-200 p-4 rounded-lg border border-base-300">
+                    <p className="font-semibold mb-2 text-base-content">Fabio Grillo (Spaghetti Bytes)</p>
+                    <p className="text-base-content">Email: <a href="mailto:spaghettibytes.blog@gmail.com" className="text-error hover:text-secondary">spaghettibytes.blog@gmail.com</a></p>
+                    <p className="text-base-content">Website: <a href="https://spaghettibytes.blog" className="text-error hover:text-secondary">https://spaghettibytes.blog</a></p>
+                </div>
+
+                <h2>Legal Basis for Data Processing</h2>
+                <p>Under GDPR Article 6, I process your data based on:</p>
+                <ul>
+                    <li><strong>Consent (Art. 6.1.a):</strong> Newsletter subscriptions, non-essential cookies</li>
+                    <li><strong>Legitimate Interest (Art. 6.1.f):</strong> Analytics for improving user experience</li>
+                </ul>
+
+                <h2 className="flex items-center gap-2">
+                    <BiTime /> Data Retention Policy
+                </h2>
+                <p>Your data is retained for the following periods:</p>
+                <ul>
+                    <li><strong>Analytics Data:</strong> 26 months (Google Analytics default)</li>
+                    <li><strong>Comments:</strong> Indefinitely or until deletion request</li>
+                    <li><strong>Session Cookies:</strong> 30 days</li>
+                    <li><strong>Preferences:</strong> 1 year</li>
+                </ul>
+
+                <h2>Gathered Informations</h2>
                 <p>
                     I only collect the information necessary to provide and improve the service:
                 </p>
@@ -72,10 +102,56 @@ const Privacy = () => {
                     <li>Withdraw consent at any time</li>
                 </ul>
 
-                <h2>5. Contacts</h2>
+                <h2 className="flex items-center gap-2">
+                    <BiServer /> Third-party Data Processors
+                </h2>
+                <p>I use the following third-party services:</p>
+                <div className="space-y-4">
+                    <div className="bg-base-200 p-4 rounded-lg border border-base-300">
+                        <h3 className="font-semibold text-lg mb-2 text-base-content">Google Analytics</h3>
+                        <p className="text-sm text-base-content">
+                            <strong>Purpose:</strong> Website traffic analysis<br/>
+                            <strong>Data:</strong> IP address (anonymized), pages visited<br/>
+                            <strong>Privacy:</strong> <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-error hover:text-secondary">Google Privacy Policy</a>
+                        </p>
+                    </div>
+                    <div className="bg-base-200 p-4 rounded-lg border border-base-300">
+                        <h3 className="font-semibold text-lg mb-2 text-base-content">Vercel</h3>
+                        <p className="text-sm text-base-content">
+                            <strong>Purpose:</strong> Website hosting<br/>
+                            <strong>Data:</strong> Server logs, request metadata<br/>
+                            <strong>Privacy:</strong> <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-error hover:text-secondary">Vercel Privacy Policy</a>
+                        </p>
+                    </div>
+                </div>
+
+                <h2 className="flex items-center gap-2">
+                    <BiWorld /> International Data Transfers
+                </h2>
                 <p>
-                    If you have any questions about privacy, use the chat bot or write to:
-                    spaghettibytes.blog@gmail.com
+                    Your data may be transferred to countries outside the European Economic Area (EEA):
+                </p>
+                <ul>
+                    <li><strong>United States:</strong> Google Analytics, Vercel (protected by EU-US Data Privacy Framework)</li>
+                    <li>All transfers comply with GDPR requirements through Standard Contractual Clauses (SCCs)</li>
+                </ul>
+
+                <h2>How to Exercise Your Rights</h2>
+                <p>
+                    To exercise your GDPR rights (access, rectification, deletion, portability, restriction, objection),
+                    please send an email to:
+                </p>
+                <div className="bg-error/10 border border-error/30 p-4 rounded-lg">
+                    <p className="font-semibold text-error mb-2">Data Rights Request</p>
+                    <p className="text-base-content">Email: <a href="mailto:spaghettibytes.blog@gmail.com?subject=GDPR%20Data%20Rights%20Request" className="text-error hover:text-secondary font-mono">spaghettibytes.blog@gmail.com</a></p>
+                    <p className="text-sm mt-2 text-base-content">Subject: "GDPR Data Rights Request"</p>
+                    <p className="text-sm mt-2 text-base-content"><strong>Response time:</strong> Within 30 days</p>
+                </div>
+
+                <h2>Contacts</h2>
+                <p>
+                    If you have any questions about privacy, write to:
+                    <a href="mailto:spaghettibytes.blog@gmail.com" className="text-error hover:text-secondary ml-1">spaghettibytes.blog@gmail.com</a>
                 </p>
             </motion.div>
         </div>

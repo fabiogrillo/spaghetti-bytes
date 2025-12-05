@@ -331,17 +331,12 @@ const Home = () => {
                 </motion.button>
               </Link>
               <motion.button
-                onClick={() => {
-                  const chatButton = document.querySelector(
-                    '[aria-label="Open chat"]'
-                  );
-                  if (chatButton) chatButton.click();
-                }}
+                onClick={() => navigate('/contacts')}
                 className="btn btn-lg btn-outline border-2 border-white text-white hover:bg-white hover:text-secondary rounded-soft"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Let's Chat
+                Get in Touch
               </motion.button>
             </div>
           </motion.div>

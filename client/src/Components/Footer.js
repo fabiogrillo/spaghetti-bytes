@@ -12,19 +12,19 @@ const Footer = () => {
       icon: FaGithub,
       url: "https://github.com/fabiogrillo",
       label: "GitHub",
-      color: "hover:text-gray-900 dark:hover:text-white"
+      color: "hover:text-purple-600 dark:hover:text-purple-400"
     },
     {
       icon: FaLinkedin,
       url: "https://www.linkedin.com/in/fabgrillo",
       label: "LinkedIn",
-      color: "hover:text-primary"
+      color: "hover:text-blue-700 dark:hover:text-blue-300"
     },
     {
       icon: FaMedium,
       url: "https://medium.com/@fgrillo123",
       label: "Medium",
-      color: "hover:text-black dark:hover:text-white"
+      color: "hover:text-green-600 dark:hover:text-green-400"
     }
   ];
 
@@ -100,7 +100,7 @@ const Footer = () => {
                 <Link to="/privacy" className="hover:text-error transition-colors">
                   Privacy Policy
                 </Link>
-                <span className="text-gray-400">•</span>
+                <span className="text-gray-600 dark:text-gray-400">•</span>
                 <button
                   onClick={() => {
                     document.querySelector('[aria-label="Cookie settings"]')?.click();

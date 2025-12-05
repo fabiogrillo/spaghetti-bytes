@@ -5,10 +5,10 @@ import { BsArrowLeft } from "react-icons/bs";
 import { BiTime, BiBookReader } from "react-icons/bi";
 import { motion } from "framer-motion";
 import ShareButtons from "../Components/ShareButtons";
-import ArticleReactions from '../Components/ArticleReactions';
 import CommentSection from "../Components/CommentSection";
 import BookmarkButton from "../Components/BookmarkButton";
 import ReadingProgress from "../Components/ReadingProgress";
+import LikeButton from "../Components/LikeButton";
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();
@@ -161,23 +161,14 @@ const StoryVisualizer = () => {
 
         <div className="divider mt-12"></div>
 
-        {/* Reactions Section - Discrete */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="flex items-center justify-center gap-4 py-6 border-t border-base-300 mt-8"
-        >
-          <ArticleReactions articleId={storyId} compact={true} />
-        </motion.div>
-
-        {/* Share & Bookmark Buttons - After Content */}
+        {/* Like, Share & Bookmark Buttons - After Content */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 mb-12"
         >
+          <LikeButton storyId={storyId} />
           <ShareButtons
             url={window.location.href}
             title={story.title}

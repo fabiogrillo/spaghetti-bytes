@@ -54,7 +54,7 @@ const DonationButton = ({ variant = 'floating', compact = false }) => {
                                 <BiHeart className="animate-pulse" />
                                 Enjoying the content?
                             </h3>
-                            <p className="dark:text-grey mb-4">
+                            <p className="text-gray-700 dark:text-gray-300 mb-4">
                                 Support Spaghetti Bytes with a virtual coffee! ☕
                             </p>
                         </>

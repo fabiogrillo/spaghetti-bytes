@@ -26,13 +26,13 @@ const DonationModal = ({
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white rounded-soft shadow-soft-lg border border-base-300 p-6 max-w-md w-full"
+                className="bg-base-100 dark:bg-base-200 rounded-soft shadow-soft-lg border border-base-300 p-6 max-w-md w-full"
                 onClick={(e) => e.stopPropagation()}
             >
-                <h2 className="text-2xl text-black font-bold mb-2 text-center">
+                <h2 className="text-2xl text-base-content font-bold mb-2 text-center">
                     Support Spaghetti Bytes! 🍝
                 </h2>
-                <p className="text-gray-600 mb-6 text-center">
+                <p className="text-gray-700 dark:text-gray-300 mb-6 text-center">
                     Your support helps keep the blog running and motivates me to create more content!
                 </p>
 
@@ -47,20 +47,20 @@ const DonationModal = ({
                                 setCustomAmount('');
                             }}
                             className={`p-4 rounded-soft border border-base-300 ${selectedAmount === amount.value && !customAmount
-                                    ? 'bg-warning shadow-soft-lg'
-                                    : 'bg-white shadow-soft hover:shadow-soft-lg'
+                                    ? 'bg-warning text-black shadow-soft-lg'
+                                    : 'bg-base-100 dark:bg-base-200 text-base-content shadow-soft hover:shadow-soft-lg'
                                 }`}
                         >
                             <div className="text-3xl mb-1">{amount.emoji}</div>
                             <div className="font-bold">€{amount.value}</div>
-                            <div className="text-xs text-gray-600">{amount.label}</div>
+                            <div className="text-xs text-gray-700 dark:text-gray-300">{amount.label}</div>
                         </motion.button>
                     ))}
                 </div>
 
                 <div className="mb-6">
                     <label className="label">
-                        <span className="label-text">Or enter custom amount:</span>
+                        <span className="label-text text-base-content">Or enter custom amount:</span>
                     </label>
                     <div className="input-group">
                         <span className="text-accent">€</span>
@@ -69,7 +69,7 @@ const DonationModal = ({
                             value={customAmount}
                             onChange={(e) => setCustomAmount(e.target.value)}
                             placeholder="0.00"
-                            className="input input-bordered w-full rounded-r-soft"
+                            className="input input-bordered w-full rounded-r-soft bg-base-100 dark:bg-base-200 text-base-content"
                             min="1"
                             step="0.01"
                         />
@@ -94,7 +94,7 @@ const DonationModal = ({
                     </motion.button>
                 </div>
 
-                <p className="text-xs text-gray-500 text-center mt-4">
+                <p className="text-xs text-gray-600 dark:text-gray-400 text-center mt-4">
                     Secure payment via PayPal
                 </p>
             </motion.div>

@@ -151,78 +151,31 @@ const publishOnMedium = async (story) => {
   }
 };
 
-// Add a reaction to a story
-const addReaction = async (req, res) => {
+// Toggle like on a story
+const toggleLike = async (req, res) => {
   try {
     const { id } = req.params;
-    const { reaction } = req.body;
-
-    const validReactions = ['love', 'spaghetti', 'fire', 'mind_blown', 'clap'];
-    if (!validReactions.includes(reaction)) {
-      return res.status(400).json({ error: 'Invalid reaction type' });
-    }
-
-    const story = await Story.findByIdAndUpdate(
-      id,
-      { $inc: { [`reactions.${reaction}`]: 1 } },
-      { new: true }
-    );
-
-    if (!story) {
-      return res.status(404).json({ error: 'Story not found' });
-    }
-
-    res.json({ reactions: story.reactions });
-  } catch (error) {
-    console.error('Add reaction error:', error);
-    res.status(500).json({ error: 'Failed to add reaction' });
-  }
-};
-
-// Remove a reaction from a story
-const removeReaction = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { reaction } = req.body;
-
-    const validReactions = ['love', 'spaghetti', 'fire', 'mind_blown', 'clap'];
-    if (!validReactions.includes(reaction)) {
-      return res.status(400).json({ error: 'Invalid reaction type' });
-    }
-
-    // First get the story to check current reaction count
     const story = await Story.findById(id);
-    if (!story) {
-      return res.status(404).json({ error: 'Story not found' });
-    }
-
-    // Only decrement if count is greater than 0
-    if (story.reactions[reaction] > 0) {
-      story.reactions[reaction] -= 1;
-      await story.save();
-    }
-
-    res.json({ reactions: story.reactions });
-  } catch (error) {
-    console.error('Remove reaction error:', error);
-    res.status(500).json({ error: 'Failed to remove reaction' });
-  }
-};
-
-// Get reactions for a story
-const getReactions = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const story = await Story.findById(id).select('reactions');
 
     if (!story) {
       return res.status(404).json({ error: 'Story not found' });
     }
 
-    res.json({ reactions: story.reactions });
+    // Simple increment/decrement logic
+    // Frontend will track if user already liked
+    const { action } = req.body; // 'add' or 'remove'
+
+    if (action === 'add') {
+      story.likes = (story.likes || 0) + 1;
+    } else if (action === 'remove' && story.likes > 0) {
+      story.likes -= 1;
+    }
+
+    await story.save();
+    res.json({ likes: story.likes });
   } catch (error) {
-    console.error('Get reactions error:', error);
-    res.status(500).json({ error: 'Failed to get reactions' });
+    console.error('Toggle like error:', error);
+    res.status(500).json({ error: 'Failed to toggle like' });
   }
 };
 
@@ -232,9 +185,7 @@ module.exports = {
   createStory,
   updateStory,
   deleteStory,
-  getReactions,
-  addReaction,
-  removeReaction,
+  toggleLike,
   storyValidationRules,
   validateStory,
 };

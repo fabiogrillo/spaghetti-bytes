@@ -7,9 +7,7 @@ const {
   createStory,
   updateStory,
   deleteStory,
-  getReactions,
-  addReaction,
-  removeReaction,
+  toggleLike,
   storyValidationRules,
   validateStory,
 } = require("../controllers/storyController");
@@ -30,9 +28,7 @@ router.put("/:id", requireAuth, requireAdmin, storyValidationRules, validateStor
 // Route to delete a story by ID (protected - admin only)
 router.delete("/:id", requireAuth, requireAdmin, deleteStory);
 
-// Routes to manage reactions
-router.get("/:id/reactions", getReactions);
-router.post("/:id/reactions", addReaction);
-router.delete("/:id/reactions", removeReaction);
+// Route to toggle like on a story
+router.post("/:id/like", toggleLike);
 
 module.exports = router;

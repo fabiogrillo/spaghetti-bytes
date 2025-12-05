@@ -226,7 +226,7 @@ const NewsletterWidget = ({ source = 'homepage', variant = 'default' }) => {
 
             <p className="text-xs text-gray-500 text-center mt-4">
                 No spam, unsubscribe anytime.
-                <br />We respect your inbox! 💌
+                <br />I respect your inbox! 💌
             </p>
         </motion.div>
     );

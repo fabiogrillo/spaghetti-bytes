@@ -1,10 +1,19 @@
 // client/src/Pages/Contacts.js
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BiEnvelope, BiTime } from 'react-icons/bi';
+import { BiEnvelope, BiTime, BiCopy, BiCheck } from 'react-icons/bi';
 import { FaGithub, FaLinkedin, FaMedium } from 'react-icons/fa';
 
 const Contacts = () => {
+    const [copied, setCopied] = React.useState(false);
+    const email = 'spaghettibytes.blog@gmail.com';
+
+    const handleCopyEmail = () => {
+        navigator.clipboard.writeText(email);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     return (
         <div className="min-h-screen bg-base-100 py-12 px-4">
             <div className="container mx-auto max-w-6xl">
@@ -50,10 +59,31 @@ const Contacts = () => {
                                 {/* Email */}
                                 <div className="flex items-start space-x-4">
                                     <BiEnvelope className="text-3xl text-secondary mt-1" />
-                                    <div>
-                                        <h3 className="font-semibold text-lg mb-1">Email</h3>
-                                        <p className="text-gray-600 dark:text-gray-400">
-                                            For formal inquiries or collaborations, feel free to email me directly.
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-lg mb-2">Email</h3>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <a
+                                                href={`mailto:${email}`}
+                                                className="text-error hover:text-secondary font-mono text-lg transition-colors"
+                                            >
+                                                {email}
+                                            </a>
+                                            <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={handleCopyEmail}
+                                                className="btn btn-ghost btn-xs"
+                                                aria-label="Copy email"
+                                            >
+                                                {copied ? (
+                                                    <BiCheck className="text-success text-lg" />
+                                                ) : (
+                                                    <BiCopy className="text-lg" />
+                                                )}
+                                            </motion.button>
+                                        </div>
+                                        <p className="text-gray-700 dark:text-gray-300">
+                                            For formal inquiries, collaborations, or technical questions.
                                         </p>
                                     </div>
                                 </div>
@@ -111,7 +141,7 @@ const Contacts = () => {
                                     <div className="collapse-content">
                                         <p className="pt-2">
                                             I'm always open to guest posts and collaborations! Send me a message
-                                            through the chat bot with your idea, and we can discuss the details.
+                                            via email with your idea, and I can discuss the details with you.
                                         </p>
                                     </div>
                                 </details>
@@ -135,7 +165,7 @@ const Contacts = () => {
                                     <div className="collapse-content">
                                         <p className="pt-2">
                                             Yes, I'm available for consulting on web development projects.
-                                            Feel free to reach out with your requirements, and we can discuss how I can help.
+                                            Feel free to reach out with your requirements, and I can discuss how I can help you.
                                         </p>
                                     </div>
                                 </details>

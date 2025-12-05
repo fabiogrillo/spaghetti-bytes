@@ -34,7 +34,7 @@ const ChristmasBanner = ({ theme, setTheme }) => {
       <div className="flex items-center gap-4">
         <span className="text-2xl">🎄</span>
         <div>
-          <p className="font-semibold">Try our festive Christmas theme!</p>
+          <p className="font-semibold">Try my festive Christmas theme!</p>
           <p className="text-sm text-base-content/70">Available until January 15, 2026</p>
         </div>
         <motion.button

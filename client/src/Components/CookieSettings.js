@@ -112,7 +112,7 @@ const CookieSettings = () => {
                                         <div className="flex-1">
                                             <h3 className="font-semibold text-gray-900 dark:text-white">Analytics Cookies</h3>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                Help us understand how you use the website
+                                                Help me understand how you use the website
                                             </p>
                                         </div>
                                         <input
@@ -166,7 +166,7 @@ const CookieSettings = () => {
                             </div>
 
                             <p className="text-xs text-gray-600 dark:text-gray-400 mt-4 text-center">
-                                Read our <Link to="/privacy" className="underline">Privacy Policy</Link> for more information
+                                Read my <Link to="/privacy" className="underline">Privacy Policy</Link> for more information
                             </p>
                         </div>
                     </motion.div>

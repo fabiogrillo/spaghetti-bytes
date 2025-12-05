@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BiTargetLock, BiTime, BiCheckCircle, BiCircle } from "react-icons/bi";
-import { FaFire } from "react-icons/fa";
+import { FaFire, FaChartLine, FaTrophy } from "react-icons/fa";
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
@@ -164,7 +164,7 @@ const Goals = () => {
           with real progress tracking.
         </p>
 
-        {/* Animated Emoji */}
+        {/* Animated Icons */}
         <motion.div
           className="relative flex justify-center items-center mt-12"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -173,7 +173,7 @@ const Goals = () => {
         >
           <div className="relative">
             <motion.div
-              className="text-[100px] md:text-[150px] select-none"
+              className="select-none"
               animate={{
                 rotate: [-5, 5, -5],
                 y: [0, -10, 0]
@@ -184,26 +184,26 @@ const Goals = () => {
                 ease: "easeInOut"
               }}
             >
-              🎯
+              <BiTargetLock className="text-[100px] md:text-[150px] text-error" />
             </motion.div>
 
             {/* Progress indicators */}
             <motion.div
-              className="absolute -top-3 -right-5 text-5xl"
+              className="absolute -top-3 -right-5"
               animate={{
                 scale: [1, 1.0, 1],
-                rotate: [0, 180, 360]
+                rotate: [0, 10, 0]
               }}
               transition={{
                 duration: 3,
                 repeat: Infinity
               }}
             >
-              📈
+              <FaChartLine className="text-5xl text-success" />
             </motion.div>
 
             <motion.div
-              className="absolute bottom-5 -left-10 text-4xl"
+              className="absolute bottom-5 -left-10"
               animate={{
                 y: [0, -15, 0]
               }}
@@ -213,7 +213,7 @@ const Goals = () => {
                 delay: 0.5
               }}
             >
-              🏆
+              <FaTrophy className="text-4xl text-warning" />
             </motion.div>
           </div>
         </motion.div>
@@ -232,7 +232,10 @@ const Goals = () => {
           animate={{ opacity: 1 }}
         >
           <p className="text-2xl text-gray-500">No goals yet!</p>
-          <p className="mt-4">Time to set some ambitious targets! 🎯</p>
+          <p className="mt-4 flex items-center gap-2 justify-center">
+            <BiTargetLock className="text-2xl text-error" />
+            Time to set some ambitious targets!
+          </p>
         </motion.div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    FiMessageCircle, FiSend, FiHeart, FiThumbsUp,
+    FiMessageCircle, FiSend,
     FiX, FiTrash2, FiChevronDown, FiChevronUp,
     FiUser, FiMail
 } from 'react-icons/fi';
@@ -18,30 +18,12 @@ const Comment = ({
     comment,
     onReply,
     onDelete,
-    onReaction,
     depth = 0,
     isAdmin = false
 }) => {
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [replyContent, setReplyContent] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
-
-    const handleReaction = async (type) => {
-        try {
-            const sessionId = localStorage.getItem('sessionId') || Date.now().toString();
-            localStorage.setItem('sessionId', sessionId);
-
-            await api.post(`/comments/${comment._id}/reaction`, {
-                type,
-                sessionId
-            });
-
-            onReaction(comment._id, type);
-            toast.success('Reaction added!');
-        } catch (error) {
-            toast.error('Failed to add reaction');
-        }
-    };
 
     const handleDelete = async () => {
         if (!window.confirm('Are you sure you want to delete this comment? This action cannot be undone.')) {
@@ -99,8 +81,8 @@ const Comment = ({
             className={`${depth > 0 ? 'ml-8 border-l-2 border-gray-200 pl-4' : ''}`}
         >
             <div className={`
-                bg-white dark:bg-gray-800 rounded-soft shadow-soft 
-                p-4 mb-4 transition-all hover:shadow-soft-lg
+                bg-base-100 dark:bg-base-200 rounded-soft shadow-soft
+                p-4 mb-4 transition-all hover:shadow-soft-lg border border-base-300
                 ${comment.status === 'pending' ? 'opacity-75' : ''}
                 ${comment.status === 'rejected' ? 'opacity-50' : ''}
             `}>
@@ -113,10 +95,10 @@ const Comment = ({
                             </span>
                         </div>
                         <div>
-                            <p className="font-semibold text-sm">
+                            <p className="font-semibold text-sm text-base-content">
                                 {comment.author?.name || 'Anonymous'}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-base-content opacity-60">
                                 {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                             </p>
                         </div>
@@ -154,30 +136,12 @@ const Comment = ({
                 </div>
 
                 {/* Comment Content */}
-                <p className="text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">
+                <p className="mb-3 whitespace-pre-wrap text-base-content">
                     {comment.content}
                 </p>
 
                 {/* Comment Actions */}
                 <div className="flex items-center gap-4">
-                    {/* Reactions */}
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => handleReaction('like')}
-                            className="flex items-center gap-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                        >
-                            <FiThumbsUp className="w-4 h-4" />
-                            <span className="text-sm">{comment.reactions?.likes?.length || 0}</span>
-                        </button>
-                        <button
-                            onClick={() => handleReaction('heart')}
-                            className="flex items-center gap-1 px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                        >
-                            <FiHeart className="w-4 h-4" />
-                            <span className="text-sm">{comment.reactions?.hearts?.length || 0}</span>
-                        </button>
-                    </div>
-
                     {/* Reply Button */}
                     {depth < 2 && comment.status === 'approved' && (
                         <button
@@ -235,7 +199,6 @@ const Comment = ({
                                 comment={reply}
                                 onReply={onReply}
                                 onDelete={onDelete}
-                                onReaction={onReaction}
                                 depth={depth + 1}
                                 isAdmin={isAdmin}
                             />
@@ -409,11 +372,6 @@ const CommentSection = ({ storyId }) => {
         setComments(prevComments => removeComment(prevComments));
     };
 
-    const handleReaction = () => {
-        // Refresh comments to show updated reactions
-        fetchComments();
-    };
-
     return (
         <div className="max-w-4xl mx-auto py-8">
             {/* Debug info - remove in production */}
@@ -460,7 +418,6 @@ const CommentSection = ({ storyId }) => {
                                 comment={comment}
                                 onReply={handleReply}
                                 onDelete={handleDelete}
-                                onReaction={handleReaction}
                                 isAdmin={isAdmin}
                             />
                         ))}
@@ -475,8 +432,8 @@ const CommentSection = ({ storyId }) => {
                     animate={{ opacity: 1 }}
                     className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-soft mb-6"
                 >
-                    <FiMessageCircle className="mx-auto text-4xl text-gray-400 mb-3" />
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <FiMessageCircle className="mx-auto text-4xl text-gray-600 dark:text-gray-400 mb-3" />
+                    <p className="text-gray-800 dark:text-gray-300">
                         No comments yet. Be the first to share your thoughts!
                     </p>
                 </motion.div>
@@ -486,12 +443,12 @@ const CommentSection = ({ storyId }) => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg p-4"
+                className="bg-base-100 dark:bg-base-200 rounded-soft shadow-soft-lg p-4 border border-base-300"
             >
                 {/* Toggle Button for Comment Form */}
                 <button
                     onClick={() => setShowCommentForm(!showCommentForm)}
-                    className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-soft transition-colors"
+                    className="w-full flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-soft transition-colors"
                 >
                     <span className="font-semibold flex items-center gap-2 text-error">
                         <FiMessageCircle />
@@ -514,7 +471,7 @@ const CommentSection = ({ storyId }) => {
                             {!isAuthenticated && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="relative">
-                                        <FiUser className="absolute left-3 top-3 text-gray-400" />
+                                        <FiUser className="absolute left-3 top-3 text-gray-600 dark:text-gray-400" />
                                         <input
                                             type="text"
                                             placeholder="Your Name (optional)"
@@ -524,7 +481,7 @@ const CommentSection = ({ storyId }) => {
                                         />
                                     </div>
                                     <div className="relative">
-                                        <FiMail className="absolute left-3 top-3 text-gray-400" />
+                                        <FiMail className="absolute left-3 top-3 text-gray-600 dark:text-gray-400" />
                                         <input
                                             type="email"
                                             placeholder="Your Email (optional)"
@@ -538,7 +495,7 @@ const CommentSection = ({ storyId }) => {
 
                             {/* Show who's commenting if authenticated */}
                             {isAuthenticated && (
-                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                <div className="text-sm text-gray-800 dark:text-gray-300">
                                     Commenting as: <span className="font-semibold">{username}</span>
                                 </div>
                             )}
@@ -582,7 +539,7 @@ const CommentSection = ({ storyId }) => {
                             </div>
 
                             {!isAdmin && (
-                                <p className="text-xs text-gray-500 text-center">
+                                <p className="text-xs text-gray-700 dark:text-gray-400 text-center">
                                     Comments are moderated and will appear after approval.
                                 </p>
                             )}
