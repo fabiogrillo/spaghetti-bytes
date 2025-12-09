@@ -6,6 +6,7 @@ import { BiCookie, BiX } from 'react-icons/bi';
 const CookieBanner = () => {
     const [show, setShow] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
+    const [currentTheme, setCurrentTheme] = useState('modern');
 
     useEffect(() => {
         const consent = localStorage.getItem('cookieConsent');
@@ -14,6 +15,26 @@ const CookieBanner = () => {
             setTimeout(() => setShow(true), 1000);
         }
     }, []);
+
+    useEffect(() => {
+        const detectTheme = () => {
+            const theme = document.documentElement.getAttribute('data-theme');
+            setCurrentTheme(theme || 'modern');
+        };
+
+        detectTheme();
+
+        // Observer per rilevare cambio tema
+        const observer = new MutationObserver(detectTheme);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
+    const isFestive = currentTheme === 'festive';
 
     const acceptAll = () => {
         localStorage.setItem('cookieConsent', JSON.stringify({
@@ -60,11 +81,13 @@ const CookieBanner = () => {
                 className="fixed bottom-0 left-0 right-0 z-50 p-4"
             >
                 <div className="container mx-auto">
-                    <div className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg border border-base-300 p-6">
+                    <div className="bg-base-100/95 backdrop-blur-sm rounded-soft shadow-soft-lg border border-base-300 p-6 transition-all duration-300">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                                 <BiCookie className="text-4xl text-warning animate-bounce" />
-                                <h3 className="text-xl font-bold">Cookie Time! 🍪</h3>
+                                <h3 className="text-xl font-bold">
+                                    {isFestive ? '🎄 Cookie Time! 🍪 🎅' : 'Cookie Time! 🍪'}
+                                </h3>
                             </div>
                             <button
                                 onClick={() => setShow(false)}
@@ -86,28 +109,30 @@ const CookieBanner = () => {
                                 animate={{ height: "auto", opacity: 1 }}
                                 className="mb-4 space-y-2"
                             >
-                                <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <div className="p-4 rounded-soft border-l-4 border-l-primary bg-primary/10 hover:bg-primary/20 transition-colors duration-300">
                                     <strong>🔒 Essentials:</strong> Login, theme preference
                                 </div>
-                                <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <div className="p-4 rounded-soft border-l-4 border-l-accent bg-accent/10 hover:bg-accent/20 transition-colors duration-300">
                                     <strong>📊 Analytics:</strong> Understanding which articles you like
                                 </div>
-                                <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <div className="p-4 rounded-soft border-l-4 border-l-warning bg-warning/10 hover:bg-warning/20 transition-colors duration-300">
                                     <strong>🎯 Marketing:</strong> No one for now!
                                 </div>
                             </motion.div>
                         )}
 
                         <div className="flex flex-col sm:flex-row gap-2">
-                            <button
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                                 onClick={acceptAll}
-                                className="btn btn-primary rounded-soft shadow-soft hover:shadow-soft-lg"
+                                className="btn bg-gradient-to-br from-secondary to-primary text-white rounded-soft shadow-soft-lg hover:shadow-soft-hover transition-all duration-300"
                             >
                                 Accept all cookies
-                            </button>
+                            </motion.button>
                             <button
                                 onClick={acceptNecessary}
-                                className="btn btn-outline rounded-soft"
+                                className="btn bg-base-200 hover:bg-base-300 rounded-soft shadow-soft hover:shadow-soft-lg transition-all duration-300"
                             >
                                 Only essentials
                             </button>

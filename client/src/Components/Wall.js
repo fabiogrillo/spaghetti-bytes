@@ -117,7 +117,7 @@ const Wall = () => {
 
       {/* Stats Section with Pop-Cartoon Style */}
       <motion.div
-        className="flex justify-center mx-auto mb-12"
+        className="flex justify-center mx-auto mb-12 mt-16"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3 }}
@@ -125,13 +125,13 @@ const Wall = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
           <motion.div
             whileHover={{ y: -5 }}
-            className="bg-white dark:bg-gray-800 p-6 rounded-soft shadow-soft-lg border border-base-300 hover:shadow-soft-hover transform transition-all hover:translate-x-1 hover:translate-y-1"
+            className="bg-base-100/95 backdrop-blur-sm p-6 rounded-soft shadow-soft-lg border border-base-300 hover:shadow-soft-hover transform transition-all duration-300 hover:translate-x-1 hover:translate-y-1"
           >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-4xl font-bold text-error mb-2">{stories.length}</div>
-                <div className="text-lg font-semibold dark:text-white">Total Stories</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-lg font-semibold">Total Stories</div>
+                <div className="text-sm opacity-70">
                   {lastMonthStories} new this month!
                 </div>
               </div>
@@ -141,13 +141,13 @@ const Wall = () => {
 
           <motion.div
             whileHover={{ y: -5 }}
-            className="bg-white dark:bg-gray-800 p-6 rounded-soft shadow-soft-lg border border-base-300 hover:shadow-soft-hover transform transition-all hover:translate-x-1 hover:translate-y-1"
+            className="bg-base-100/95 backdrop-blur-sm p-6 rounded-soft shadow-soft-lg border border-base-300 hover:shadow-soft-hover transform transition-all duration-300 hover:translate-x-1 hover:translate-y-1"
           >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-4xl font-bold text-warning mb-2">{distinctTags}</div>
-                <div className="text-lg font-semibold dark:text-white">Topics Covered</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-lg font-semibold">Topics Covered</div>
+                <div className="text-sm opacity-70">
                   Diverse content awaits!
                 </div>
               </div>

@@ -31,7 +31,7 @@ const DonationButton = ({ variant = 'floating', compact = false }) => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setShowModal(true)}
-                    className="fixed bottom-24 left-4 z-40 btn btn-circle btn-lg bg-gradient-to-br from-accent to-error text-white shadow-soft-lg hover:shadow-soft-hover"
+                    className="fixed bottom-6 left-6 z-40 btn btn-circle btn-lg bg-gradient-to-br from-accent to-error text-white shadow-soft-lg hover:shadow-soft-hover transition-all duration-300"
                 >
                     <motion.div
                         animate={{ rotate: [0, -10, 10, -10, 0] }}
@@ -54,7 +54,7 @@ const DonationButton = ({ variant = 'floating', compact = false }) => {
                                 <BiHeart className="animate-pulse" />
                                 Enjoying the content?
                             </h3>
-                            <p className="text-gray-700 dark:text-gray-300 mb-4">
+                            <p className="text-white/90 mb-4">
                                 Support Spaghetti Bytes with a virtual coffee! ☕
                             </p>
                         </>

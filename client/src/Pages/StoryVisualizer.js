@@ -9,6 +9,7 @@ import CommentSection from "../Components/CommentSection";
 import BookmarkButton from "../Components/BookmarkButton";
 import ReadingProgress from "../Components/ReadingProgress";
 import LikeButton from "../Components/LikeButton";
+import DonationButton from "../Components/DonationButton";
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();
@@ -177,8 +178,18 @@ const StoryVisualizer = () => {
           <BookmarkButton storyId={storyId} />
         </motion.div>
 
+        {/* Donation CTA - Support the blog */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-12 mb-12"
+        >
+          <DonationButton variant="inline" compact={true} />
+        </motion.div>
+
         {/* Divider before Comments */}
-        <div className="divider mt-16 mb-8">
+        <div className="divider mt-8 mb-8">
           <span className="text-gray-400">Comments</span>
         </div>
 

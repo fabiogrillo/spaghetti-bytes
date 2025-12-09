@@ -29,10 +29,10 @@ const DonationModal = ({
                 className="bg-base-100 dark:bg-base-200 rounded-soft shadow-soft-lg border border-base-300 p-6 max-w-md w-full"
                 onClick={(e) => e.stopPropagation()}
             >
-                <h2 className="text-2xl text-base-content font-bold mb-2 text-center">
+                <h2 className="text-2xl font-bold mb-2 text-center">
                     Support Spaghetti Bytes! 🍝
                 </h2>
-                <p className="text-gray-700 dark:text-gray-300 mb-6 text-center">
+                <p className="opacity-80 mb-6 text-center">
                     Your support helps keep the blog running and motivates me to create more content!
                 </p>
 
@@ -46,30 +46,30 @@ const DonationModal = ({
                                 setSelectedAmount(amount.value);
                                 setCustomAmount('');
                             }}
-                            className={`p-4 rounded-soft border border-base-300 ${selectedAmount === amount.value && !customAmount
+                            className={`p-4 rounded-soft border border-base-300 transition-all duration-300 ${selectedAmount === amount.value && !customAmount
                                     ? 'bg-warning text-black shadow-soft-lg'
-                                    : 'bg-base-100 dark:bg-base-200 text-base-content shadow-soft hover:shadow-soft-lg'
+                                    : 'bg-base-200 hover:bg-base-300 shadow-soft hover:shadow-soft-lg'
                                 }`}
                         >
                             <div className="text-3xl mb-1">{amount.emoji}</div>
                             <div className="font-bold">€{amount.value}</div>
-                            <div className="text-xs text-gray-700 dark:text-gray-300">{amount.label}</div>
+                            <div className="text-xs opacity-70">{amount.label}</div>
                         </motion.button>
                     ))}
                 </div>
 
                 <div className="mb-6">
                     <label className="label">
-                        <span className="label-text text-base-content">Or enter custom amount:</span>
+                        <span className="label-text font-semibold">Or enter custom amount:</span>
                     </label>
                     <div className="input-group">
-                        <span className="text-accent">€</span>
+                        <span className="text-accent font-bold">€</span>
                         <input
                             type="number"
                             value={customAmount}
                             onChange={(e) => setCustomAmount(e.target.value)}
                             placeholder="0.00"
-                            className="input input-bordered w-full rounded-r-soft bg-base-100 dark:bg-base-200 text-base-content"
+                            className="input input-bordered w-full rounded-r-soft bg-base-200"
                             min="1"
                             step="0.01"
                         />
@@ -94,7 +94,7 @@ const DonationModal = ({
                     </motion.button>
                 </div>
 
-                <p className="text-xs text-gray-600 dark:text-gray-400 text-center mt-4">
+                <p className="text-xs opacity-60 text-center mt-4">
                     Secure payment via PayPal
                 </p>
             </motion.div>

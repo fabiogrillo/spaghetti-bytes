@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { BiTargetLock, BiTime, BiCheckCircle, BiCircle } from "react-icons/bi";
-import { FaFire, FaChartLine, FaTrophy } from "react-icons/fa";
+import { BiTargetLock, BiTime, BiCheckCircle, BiCircle, BiChevronDown, BiChevronUp } from "react-icons/bi";
+import { FaFire } from "react-icons/fa";
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
@@ -35,6 +35,8 @@ const Goals = () => {
   };
 
   const GoalCard = ({ goal, index }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
     const completedSteps = goal.steps.filter(step => step.completed).length;
     const totalSteps = goal.steps.length;
     const percentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
@@ -46,83 +48,97 @@ const Goals = () => {
 
     return (
       <motion.div
-        initial={{ opacity: 0, y: 50 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.1 }}
-        whileHover={{ y: -5 }}
-        className="h-full"
+        whileHover={{ scale: 1.02 }}
       >
-        <div className="bg-white dark:bg-gray-800 rounded-soft shadow-soft-lg border border-base-300 hover:shadow-soft-hover transform transition-all h-full flex flex-col">
+        <div className="bg-base-100/95 backdrop-blur-sm rounded-soft shadow-soft-lg border border-base-300 hover:shadow-soft-hover transition-all duration-300 flex flex-col">
           {/* Header */}
-          <div className={`bg-${cardColor} text-white p-6 rounded-t-soft`}>
+          <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border-b border-base-300 p-6 rounded-t-soft">
             <div className="flex items-start justify-between mb-2">
-              <BiTargetLock className="text-3xl" />
+              <BiTargetLock className={`text-3xl text-${cardColor}`} />
               <motion.div
-                className="badge badge-lg bg-white/20 backdrop-blur text-black"
-                whileHover={{ scale: 1.1 }}
+                className={`badge badge-lg bg-${cardColor}/20 text-${cardColor} font-bold`}
+                whileHover={{ scale: 1.05 }}
               >
                 {percentage}%
               </motion.div>
             </div>
             <h3 className="text-xl font-bold mb-2">{goal.title}</h3>
-            <p className="text-sm opacity-90">{goal.description}</p>
+            <p className="text-sm opacity-80">{goal.description}</p>
           </div>
 
           {/* Progress Section */}
           <div className="p-6 flex-1 flex flex-col">
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-white">Progress</span>
-                <span className="text-sm dark:text-white">
+                <span className="text-sm font-semibold">Progress</span>
+                <span className="text-sm opacity-70">
                   {completedSteps}/{totalSteps} steps
                 </span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+              <div className="w-full bg-base-300 rounded-full h-3 overflow-hidden shadow-soft">
                 <motion.div
                   className={`h-full bg-gradient-to-r ${progressColor} rounded-full`}
                   initial={{ width: 0 }}
                   animate={{ width: `${percentage}%` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
                 />
               </div>
             </div>
 
-            {/* Steps */}
+            {/* Steps - Collapsible */}
             <div className="space-y-3 flex-1">
-              <h4 className="font-semibold text-sm uppercase tracking-wide text-gray-600 dark:text-gray-300">
-                Milestones:
-              </h4>
-              <div className="space-y-2">
-                {goal.steps.map((step, stepIndex) => (
-                  <motion.div
-                    key={stepIndex}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 + stepIndex * 0.05 }}
-                    className={`
-                      flex items-center gap-3 p-3 rounded-lg transition-all
-                      ${step.completed
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-                      }
-                    `}
-                  >
-                    {step.completed ? (
-                      <BiCheckCircle className="text-xl flex-shrink-0" />
-                    ) : (
-                      <BiCircle className="text-xl flex-shrink-0" />
-                    )}
-                    <span className={`text-sm ${step.completed ? 'line-through' : ''}`}>
-                      {step.description}
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-full flex items-center justify-between p-3 bg-base-200 hover:bg-base-300 rounded-lg transition-all duration-300"
+              >
+                <h4 className="font-semibold text-sm uppercase tracking-wide">
+                  Milestones ({completedSteps}/{totalSteps})
+                </h4>
+                {isExpanded ? (
+                  <BiChevronUp className="text-xl" />
+                ) : (
+                  <BiChevronDown className="text-xl" />
+                )}
+              </button>
+
+              {isExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-2"
+                >
+                  {goal.steps.map((step, stepIndex) => (
+                    <div
+                      key={stepIndex}
+                      className={`
+                        flex items-center gap-3 p-3 rounded-lg transition-all duration-300
+                        ${step.completed
+                          ? 'bg-success/10 border-l-4 border-l-success'
+                          : 'bg-base-200 hover:bg-base-300'
+                        }
+                      `}
+                    >
+                      {step.completed ? (
+                        <BiCheckCircle className="text-xl flex-shrink-0 text-success" />
+                      ) : (
+                        <BiCircle className="text-xl flex-shrink-0 opacity-50" />
+                      )}
+                      <span className={`text-sm ${step.completed ? 'line-through opacity-70' : ''}`}>
+                        {step.description}
+                      </span>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
             </div>
 
             {/* Footer */}
-            <div className="pt-4 mt-auto border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+            <div className="pt-4 mt-auto border-t border-base-300">
+              <div className="flex items-center gap-2 text-sm opacity-70">
                 <BiTime />
                 <span>Started {new Date(goal.createdAt).toLocaleDateString('en-US', {
                   year: 'numeric',
@@ -163,61 +179,42 @@ const Goals = () => {
           and how I'm progressing. No smoke and mirrors, just real goals
           with real progress tracking.
         </p>
+      </motion.div>
 
-        {/* Animated Icons */}
+      {/* Summary Stats */}
+      {!loading && goals.length > 0 && (
         <motion.div
-          className="relative flex justify-center items-center mt-12"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
+          className="mb-12 p-8 bg-base-100/95 backdrop-blur-sm rounded-soft shadow-soft-lg border border-base-300"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          <div className="relative">
-            <motion.div
-              className="select-none"
-              animate={{
-                rotate: [-5, 5, -5],
-                y: [0, -10, 0]
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <BiTargetLock className="text-[100px] md:text-[150px] text-error" />
-            </motion.div>
-
-            {/* Progress indicators */}
-            <motion.div
-              className="absolute -top-3 -right-5"
-              animate={{
-                scale: [1, 1.0, 1],
-                rotate: [0, 10, 0]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity
-              }}
-            >
-              <FaChartLine className="text-5xl text-success" />
-            </motion.div>
-
-            <motion.div
-              className="absolute bottom-5 -left-10"
-              animate={{
-                y: [0, -15, 0]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                delay: 0.5
-              }}
-            >
-              <FaTrophy className="text-4xl text-warning" />
-            </motion.div>
+          <div className="text-center">
+            <h3 className="text-2xl font-bold mb-6 bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+              Overall Progress
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <motion.div whileHover={{ scale: 1.05 }} className="p-6 bg-base-200 rounded-soft">
+                <p className="text-4xl font-bold text-primary mb-2">{goals.length}</p>
+                <p className="text-sm font-semibold opacity-70">Active Goals</p>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} className="p-6 bg-base-200 rounded-soft">
+                <p className="text-4xl font-bold text-success mb-2">
+                  {goals.reduce((acc, goal) =>
+                    acc + goal.steps.filter(s => s.completed).length, 0
+                  )}
+                </p>
+                <p className="text-sm font-semibold opacity-70">Completed Steps</p>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} className="p-6 bg-base-200 rounded-soft">
+                <p className="text-4xl font-bold text-accent mb-2">
+                  {goals.reduce((acc, goal) => acc + goal.steps.length, 0)}
+                </p>
+                <p className="text-sm font-semibold opacity-70">Total Steps</p>
+              </motion.div>
+            </div>
           </div>
         </motion.div>
-      </motion.div>
+      )}
 
       {/* Goals Grid */}
       {loading ? (
@@ -238,45 +235,11 @@ const Goals = () => {
           </p>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {goals.map((goal, index) => (
             <GoalCard key={goal._id} goal={goal} index={index} />
           ))}
         </div>
-      )}
-
-      {/* Summary Stats */}
-      {goals.length > 0 && (
-        <motion.div
-          className="mt-12 p-8 bg-gradient-to-br from-error to-secondary text-white rounded-soft shadow-soft-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <div className="text-center">
-            <h3 className="text-2xl font-bold mb-4">Overall Progress</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <p className="text-4xl font-bold">{goals.length}</p>
-                <p className="text-sm opacity-90">Active Goals</p>
-              </div>
-              <div>
-                <p className="text-4xl font-bold">
-                  {goals.reduce((acc, goal) =>
-                    acc + goal.steps.filter(s => s.completed).length, 0
-                  )}
-                </p>
-                <p className="text-sm opacity-90">Completed Steps</p>
-              </div>
-              <div>
-                <p className="text-4xl font-bold">
-                  {goals.reduce((acc, goal) => acc + goal.steps.length, 0)}
-                </p>
-                <p className="text-sm opacity-90">Total Steps</p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       )}
     </div>
   );

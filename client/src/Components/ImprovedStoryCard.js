@@ -12,6 +12,17 @@ const ImprovedStoryCard = ({ story, index }) => {
   // Calculate if the story is new (written in the last two weeks)
   const isNew = new Date() - new Date(story.createdAt) < 14 * 24 * 60 * 60 * 1000;
 
+  // Calculate reading time based on word count (average 200 words/min)
+  const calculateReadingTime = () => {
+    if (!story.content) return 1;
+    const text = JSON.stringify(story.content);
+    const wordCount = text.split(/\s+/).length;
+    const minutes = Math.ceil(wordCount / 200);
+    return minutes;
+  };
+
+  const readingTime = calculateReadingTime();
+
   // Cartoon color palette rotation
   const colorSchemes = [
     { bg: 'bg-error', text: 'text-white', border: 'border-error' },
@@ -39,8 +50,8 @@ const ImprovedStoryCard = ({ story, index }) => {
       <div
         className={`
           h-full p-6 rounded-soft cursor-pointer
-          bg-white border border-base-300 shadow-soft-lg
-          hover:shadow-soft-hover transform transition-all duration-200
+          bg-base-100/95 backdrop-blur-sm border border-base-300 shadow-soft-lg
+          hover:shadow-soft-hover transform transition-all duration-300
           hover:translate-x-1 hover:translate-y-1
           flex flex-col justify-between
         `}
@@ -48,8 +59,8 @@ const ImprovedStoryCard = ({ story, index }) => {
       >
         {/* Title Section */}
         <div className="mb-4">
-          <h2 className="text-xl text-black font-bold mb-2 line-clamp-2">{story.title}</h2>
-          <p className="text-gray-600 line-clamp-3">{story.summary}</p>
+          <h2 className="text-xl font-bold mb-2 line-clamp-2">{story.title}</h2>
+          <p className="opacity-80 line-clamp-3">{story.summary}</p>
         </div>
 
         {/* Tags Section */}
@@ -74,11 +85,17 @@ const ImprovedStoryCard = ({ story, index }) => {
         </div>
 
         {/* Footer Section */}
-        <div className="mt-auto pt-4 border-t-2 border-dashed border-gray-300">
-          <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-            <div className="flex items-center gap-1">
-              <BiTime />
-              <span>{new Date(story.createdAt).toLocaleDateString()}</span>
+        <div className="mt-auto pt-4 border-t-2 border-dashed border-base-300">
+          <div className="flex items-center justify-between text-sm opacity-70 mb-3">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
+                <BiTime />
+                <span>{new Date(story.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center gap-1 font-semibold">
+                <BiTime />
+                <span>{readingTime} min read</span>
+              </div>
             </div>
             <div onClick={(e) => e.stopPropagation()}>
               <BookmarkButton storyId={story._id} variant="compact" />
