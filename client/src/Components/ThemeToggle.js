@@ -3,19 +3,11 @@ import { motion } from 'framer-motion';
 import { BiSun, BiMoon } from 'react-icons/bi';
 
 const ThemeToggle = ({ className = '' }) => {
-    // Simple light/dark toggle
-    const themes = [
-        { name: 'modern', icon: <BiSun size={20} />, label: 'Light' },
-        { name: 'midnight', icon: <BiMoon size={20} />, label: 'Dark' },
-    ];
-
     const getInitialTheme = () => {
-        const savedTheme = localStorage.getItem('theme');
-        // Migrate old themes
-        if (savedTheme === 'cartoon' || savedTheme === 'festive') return 'modern';
-        if (savedTheme === 'night') return 'midnight';
-        if (savedTheme === 'modern' || savedTheme === 'midnight') return savedTheme;
-        return 'modern';
+        const saved = localStorage.getItem('theme');
+        // Migrate any old theme names to light/dark
+        if (saved === 'dark' || saved === 'midnight' || saved === 'night') return 'dark';
+        return 'light';
     };
 
     const [theme, setTheme] = useState(getInitialTheme);
@@ -26,11 +18,10 @@ const ThemeToggle = ({ className = '' }) => {
     }, [theme]);
 
     const toggleTheme = () => {
-        setTheme(prev => prev === 'modern' ? 'midnight' : 'modern');
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
     };
 
-    const currentIcon = theme === 'modern' ? <BiSun size={20} /> : <BiMoon size={20} />;
-    const nextLabel = theme === 'modern' ? 'Dark' : 'Light';
+    const isDark = theme === 'dark';
 
     return (
         <motion.button
@@ -38,7 +29,7 @@ const ThemeToggle = ({ className = '' }) => {
             whileTap={{ scale: 0.95 }}
             onClick={toggleTheme}
             className={`btn btn-ghost btn-circle ${className}`}
-            title={`Switch to ${nextLabel} Theme`}
+            title={`Switch to ${isDark ? 'Light' : 'Dark'} mode`}
         >
             <motion.div
                 key={theme}
@@ -46,7 +37,7 @@ const ThemeToggle = ({ className = '' }) => {
                 animate={{ rotate: 0, opacity: 1 }}
                 transition={{ duration: 0.3 }}
             >
-                {currentIcon}
+                {isDark ? <BiMoon size={20} /> : <BiSun size={20} />}
             </motion.div>
         </motion.button>
     );

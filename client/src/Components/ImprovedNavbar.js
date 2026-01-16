@@ -28,7 +28,6 @@ const ImprovedNavbar = ({
   username,
   setAuthenticated,
   setUsername,
-  theme,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,7 +88,7 @@ const ImprovedNavbar = ({
       <div className="navbar p-4 max-w-7xl mx-auto">
         <div className="flex-1">
           <Link to="/">
-            <Logo size="normal" theme={theme} />
+            <Logo size="normal" />
           </Link>
         </div>
 

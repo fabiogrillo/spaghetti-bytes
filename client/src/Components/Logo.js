@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
-const Logo = ({ size = 'normal', theme }) => {
+const Logo = ({ size = 'normal' }) => {
   const sizes = {
     small: {
       emoji: 'text-2xl',
@@ -22,14 +22,6 @@ const Logo = ({ size = 'normal', theme }) => {
 
   const currentSize = sizes[size] || sizes.normal;
 
-  const isChristmasSeason = useMemo(() => {
-    const now = new Date();
-    const endDate = new Date('2026-01-15');
-    return now < endDate;
-  }, []);
-
-  const showChristmasDecoration = theme === 'festive' && isChristmasSeason;
-
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
@@ -43,15 +35,6 @@ const Logo = ({ size = 'normal', theme }) => {
         >
           🍝
         </motion.span>
-        {showChristmasDecoration && (
-          <motion.span
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            className={`text-lg`}
-          >
-            🎄
-          </motion.span>
-        )}
       </div>
       <div className="flex flex-col items-start">
         <div className={`${currentSize.text} logo-font leading-tight`}>

@@ -46,7 +46,7 @@ const ProtectedRoute = ({ children, isAuthenticated, checkingAuth }) => {
 };
 
 // App Content Component
-const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, checkingAuth, theme }) => {
+const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, checkingAuth }) => {
   useAnalytics();
 
   return (
@@ -56,7 +56,6 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
         username={username}
         setAuthenticated={setAuthenticated}
         setUsername={setUsername}
-        theme={theme}
       />
 
       <main className="flex-grow">
@@ -166,9 +165,6 @@ const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [theme] = useState(
-    localStorage.getItem('theme') || 'modern'
-  );
 
   // Check if user is already authenticated on app load
   useEffect(() => {
@@ -189,12 +185,6 @@ const App = () => {
     checkAuth();
   }, []);
 
-  // Set initial theme
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <ToastProvider>
       <Router>
@@ -205,7 +195,6 @@ const App = () => {
             username={username}
             setUsername={setUsername}
             checkingAuth={checkingAuth}
-            theme={theme}
           />
         </div>
       </Router>

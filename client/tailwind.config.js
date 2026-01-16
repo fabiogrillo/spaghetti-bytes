@@ -1,4 +1,4 @@
-// tailwind.config.js aggiornato
+// tailwind.config.js - Simple light/dark theme system
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
@@ -26,39 +26,7 @@ module.exports = {
     },
   },
   daisyui: {
-    themes: [
-      {
-        // Tema "modern" - Light professionale
-        modern: {
-          "primary": "#2563eb",      // Blue 600
-          "secondary": "#7c3aed",    // Violet 600
-          "accent": "#0891b2",       // Cyan 600
-          "neutral": "#1f2937",      // Gray 800
-          "base-100": "#ffffff",
-          "base-200": "#f9fafb",     // Gray 50
-          "base-300": "#e5e7eb",     // Gray 200
-          "info": "#3b82f6",
-          "success": "#10b981",
-          "warning": "#f59e0b",
-          "error": "#ef4444",
-        },
-
-        // Tema "midnight" - Dark ad alto contrasto
-        midnight: {
-          "primary": "#60a5fa",      // Blue 400
-          "secondary": "#a78bfa",    // Violet 400
-          "accent": "#22d3ee",       // Cyan 400
-          "neutral": "#e5e7eb",      // Gray 200
-          "base-100": "#0f172a",     // Slate 900
-          "base-200": "#1e293b",     // Slate 800
-          "base-300": "#334155",     // Slate 700
-          "info": "#3b82f6",
-          "success": "#10b981",
-          "warning": "#f59e0b",
-          "error": "#ef4444",
-        }
-      }
-    ],
+    themes: ["light", "dark"],
   },
   plugins: [require("daisyui")],
 };
