@@ -5,10 +5,7 @@ import { BsArrowLeft } from "react-icons/bs";
 import { BiTime, BiBookReader } from "react-icons/bi";
 import { motion } from "framer-motion";
 import ShareButtons from "../Components/ShareButtons";
-import CommentSection from "../Components/CommentSection";
-import BookmarkButton from "../Components/BookmarkButton";
 import ReadingProgress from "../Components/ReadingProgress";
-import LikeButton from "../Components/LikeButton";
 import DonationButton from "../Components/DonationButton";
 
 const StoryVisualizer = () => {
@@ -162,20 +159,18 @@ const StoryVisualizer = () => {
 
         <div className="divider mt-12"></div>
 
-        {/* Like, Share & Bookmark Buttons - After Content */}
+        {/* Share Buttons - After Content */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 mb-12"
         >
-          <LikeButton storyId={storyId} />
           <ShareButtons
             url={window.location.href}
             title={story.title}
             summary={story.summary}
           />
-          <BookmarkButton storyId={storyId} />
         </motion.div>
 
         {/* Donation CTA - Support the blog */}
@@ -186,20 +181,6 @@ const StoryVisualizer = () => {
           className="mt-12 mb-12"
         >
           <DonationButton variant="inline" compact={true} />
-        </motion.div>
-
-        {/* Divider before Comments */}
-        <div className="divider mt-8 mb-8">
-          <span className="text-gray-400">Comments</span>
-        </div>
-
-        {/* Comments Section - NEW */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <CommentSection storyId={story._id} />
         </motion.div>
 
         {/* Footer */}

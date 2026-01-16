@@ -11,8 +11,6 @@ import ImprovedNavbar from "./Components/ImprovedNavbar";
 import Footer from "./Components/Footer";
 import LoadingSpinner from "./Components/LoadingSpinner";
 import ToastProvider from "./Components/ToastProvider";
-import ChristmasDecorations from "./Components/ChristmasDecorations";
-import ChristmasBanner from "./Components/ChristmasBanner";
 import api from "./Api";
 
 // Regular imports (no lazy loading for simplicity on Vercel)
@@ -31,8 +29,6 @@ import CookieBanner from "./Components/CookieBanner";
 import CookieSettings from "./Components/CookieSettings";
 import Privacy from "./Pages/Privacy";
 import Contacts from "./Pages/Contacts";
-import CommentReaction from "./Pages/CommentReaction";
-import Bookmarks from "./Pages/Bookmarks";
 
 // Import analytics hook
 import { useAnalytics } from "./hooks/useAnalytics";
@@ -69,7 +65,6 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
           <Route path="/" element={<Home />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/blog" element={<Blog />} />
-          <Route path="/bookmarks" element={<Bookmarks />} />
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/visualizer/:storyId" element={<StoryVisualizer />} />
@@ -140,15 +135,6 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/moderate-comments"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated} checkingAuth={checkingAuth}>
-                <CommentReaction />
-              </ProtectedRoute>
-            }
-          />
-
           {/* 404 Page */}
           <Route
             path="*"
@@ -180,16 +166,9 @@ const App = () => {
   const [isAuthenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [theme, setThemeState] = useState(
+  const [theme] = useState(
     localStorage.getItem('theme') || 'modern'
   );
-
-  // Theme setter function
-  const setTheme = (newTheme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-  };
 
   // Check if user is already authenticated on app load
   useEffect(() => {
@@ -219,11 +198,7 @@ const App = () => {
   return (
     <ToastProvider>
       <Router>
-        <ChristmasDecorations />
         <div className="App min-h-screen flex flex-col relative z-10">
-          <div className="container mx-auto px-4">
-            <ChristmasBanner theme={theme} setTheme={setTheme} />
-          </div>
           <AppContent
             isAuthenticated={isAuthenticated}
             setAuthenticated={setAuthenticated}

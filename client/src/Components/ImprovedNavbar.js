@@ -1,12 +1,10 @@
 // client/src/Components/ImprovedNavbar.js
-// Complete navbar component with comment notifications
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BiShield,
-  BiBookmarkHeart,
   BiUser,
 } from "react-icons/bi";
 import {
@@ -18,11 +16,10 @@ import {
   IoMdClose,
   IoMdSettings,
 } from "react-icons/io";
-import { FaComments, FaBullseye } from "react-icons/fa";
+import { FaBullseye } from "react-icons/fa";
 import { GrContact } from "react-icons/gr";
 import { doLogout } from "../Api";
 import Logo from "./Logo";
-import api from "../Api";
 import ThemeToggle from "./ThemeToggle";
 
 // Improved Navbar Component
@@ -37,7 +34,6 @@ const ImprovedNavbar = ({
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [pendingCommentsCount, setPendingCommentsCount] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -63,26 +59,6 @@ const ImprovedNavbar = ({
     }
   }, [isSidebarOpen]);
 
-  // Fetch pending comments count for admin
-  useEffect(() => {
-    if (authenticated) {
-      fetchPendingCommentsCount();
-      // Refresh count every 30 seconds
-      const interval = setInterval(fetchPendingCommentsCount, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [authenticated]);
-
-  const fetchPendingCommentsCount = async () => {
-    try {
-      const response = await api.get("/comments/pending-count");
-      setPendingCommentsCount(response.data.count);
-    } catch (error) {
-      console.error("Error fetching pending comments count:", error);
-      setPendingCommentsCount(0);
-    }
-  };
-
   const handleLogout = async () => {
     try {
       await doLogout();
@@ -94,29 +70,12 @@ const ImprovedNavbar = ({
     }
   };
 
-  // Base navigation items
-  const baseNavItems = [
+  // Navigation items
+  const navItems = [
     { path: "/", label: "Home", icon: IoMdHome },
     { path: "/blog", label: "Blog", icon: IoMdBook },
     { path: "/goals", label: "Goals", icon: FaBullseye },
-    { path: "/bookmarks", label: "Bookmarks", icon: BiBookmarkHeart },
     { path: "/contacts", label: "Contacts", icon: GrContact },
-  ];
-
-  // Add Comments with badge if authenticated
-  const navItems = [
-    ...baseNavItems,
-    ...(authenticated
-      ? [
-          {
-            path: "/moderate-comments",
-            label: "Comments",
-            icon: FaComments,
-            hasBadge: pendingCommentsCount > 0,
-            badgeCount: pendingCommentsCount,
-          },
-        ]
-      : []),
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -156,11 +115,6 @@ const ImprovedNavbar = ({
                     <div className="flex items-center gap-2">
                       <Icon size={20} />
                       <span>{item.label}</span>
-                      {item.hasBadge && (
-                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                          {item.badgeCount > 9 ? "9+" : item.badgeCount}
-                        </span>
-                      )}
                     </div>
                   </motion.button>
                 </Link>
@@ -300,11 +254,6 @@ const ImprovedNavbar = ({
                         >
                           <Icon size={20} />
                           <span className="ml-3">{item.label}</span>
-                          {item.hasBadge && (
-                            <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 animate-pulse">
-                              {item.badgeCount}
-                            </span>
-                          )}
                         </motion.button>
                       </Link>
                     );

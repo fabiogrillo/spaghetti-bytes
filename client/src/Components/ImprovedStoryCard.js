@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { GoBook } from "react-icons/go";
 import { BiTime } from "react-icons/bi";
 import { motion } from "framer-motion";
-import BookmarkButton from "./BookmarkButton";
 import { minimal } from "../utils/minimalAnimations";
 
 const ImprovedStoryCard = ({ story, index }) => {
@@ -86,19 +85,14 @@ const ImprovedStoryCard = ({ story, index }) => {
 
         {/* Footer Section */}
         <div className="mt-auto pt-4 border-t-2 border-dashed border-base-300">
-          <div className="flex items-center justify-between text-sm opacity-70 mb-3">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
-                <BiTime />
-                <span>{new Date(story.createdAt).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center gap-1 font-semibold">
-                <BiTime />
-                <span>{readingTime} min read</span>
-              </div>
+          <div className="flex items-center text-sm opacity-70 mb-3 gap-3">
+            <div className="flex items-center gap-1">
+              <BiTime />
+              <span>{new Date(story.createdAt).toLocaleDateString()}</span>
             </div>
-            <div onClick={(e) => e.stopPropagation()}>
-              <BookmarkButton storyId={story._id} variant="compact" />
+            <div className="flex items-center gap-1 font-semibold">
+              <BiTime />
+              <span>{readingTime} min read</span>
             </div>
           </div>
           <motion.button

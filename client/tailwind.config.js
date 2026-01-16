@@ -56,21 +56,6 @@ module.exports = {
           "success": "#10b981",
           "warning": "#f59e0b",
           "error": "#ef4444",
-        },
-
-        // Tema "festive" - Christmas (temporaneo fino al 15 gen)
-        festive: {
-          "primary": "#dc2626",      // Red 600 - rosso natalizio
-          "secondary": "#059669",    // Emerald 600 - verde natalizio
-          "accent": "#f59e0b",       // Amber 500 - oro
-          "neutral": "#1f2937",
-          "base-100": "#fef2f2",     // Red 50 - sfondo caldo
-          "base-200": "#fee2e2",     // Red 100
-          "base-300": "#fecaca",     // Red 200
-          "info": "#3b82f6",
-          "success": "#059669",
-          "warning": "#f59e0b",
-          "error": "#dc2626",
         }
       }
     ],

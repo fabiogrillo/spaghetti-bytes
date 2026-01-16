@@ -26,7 +26,6 @@ const goalRoutes = require("./routes/goalRoute");
 const conversationRoutes = require("./routes/conversationRoute");
 const newsletterRoutes = require("./routes/newsletterRoute");
 const analyticsRoutes = require("./routes/analyticsRoute");
-const commentRoutes = require("./routes/commentRoute");
 
 // Middleware
 const { apiLimiter, authLimiter } = require("./middleware/rateLimiter");
@@ -274,7 +273,6 @@ app.use("/api/goals", goalRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/analytics", analyticsRoutes);
-app.use("/api/comments", commentRoutes);
 
 // Cache admin routes
 cacheAdminRoutes(app);
