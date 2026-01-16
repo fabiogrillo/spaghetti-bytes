@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Wall from "../Components/Wall";
 import { useLocation } from "react-router-dom";
+import SEO from "../Components/SEO";
 
 const Blog = () => {
   const location = useLocation();
@@ -18,6 +19,10 @@ const Blog = () => {
 
   return (
     <div className="p-4">
+      <SEO
+        title="Blog"
+        description="Technical articles about software engineering, system design, machine learning, and practical coding solutions. Deep dives into real-world problems."
+      />
       {showAlert && (
         <div
           role="alert"

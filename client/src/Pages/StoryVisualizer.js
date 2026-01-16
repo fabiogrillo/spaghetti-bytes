@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import ShareButtons from "../Components/ShareButtons";
 import ReadingProgress from "../Components/ReadingProgress";
 import DonationButton from "../Components/DonationButton";
+import SEO from "../Components/SEO";
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();
@@ -67,8 +68,18 @@ const StoryVisualizer = () => {
 
   return (
     <>
-      <ReadingProgress 
-        contentRef={{ current: contentRef }} 
+      <SEO
+        title={story.title}
+        description={story.summary}
+        url={`https://spaghettibytes.blog/visualizer/${story._id}`}
+        type="article"
+        article={{
+          publishedAt: story.createdAt,
+          tags: story.tags,
+        }}
+      />
+      <ReadingProgress
+        contentRef={{ current: contentRef }}
         onProgressChange={handleProgressChange}
       />
 

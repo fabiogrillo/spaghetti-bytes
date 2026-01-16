@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BiTargetLock, BiTime, BiCheckCircle, BiCircle, BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { FaFire } from "react-icons/fa";
+import SEO from "../Components/SEO";
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
@@ -155,6 +156,10 @@ const Goals = () => {
 
   return (
     <div className="container mx-auto p-8">
+      <SEO
+        title="Goals"
+        description="Follow my professional journey and personal milestones. Transparent tracking of learning goals, projects, and career objectives in software engineering."
+      />
       {/* Header Section */}
       <motion.div
         className="flex flex-col items-center text-center mb-12"

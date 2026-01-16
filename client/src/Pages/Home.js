@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import SEO from "../Components/SEO";
 import { GrArticle } from "react-icons/gr";
 import { GoGoal } from "react-icons/go";
 import {
@@ -26,6 +27,10 @@ const Home = () => {
 
   return (
     <div className="overflow-hidden">
+      <SEO
+        title="Home"
+        description="A tech blog about software engineering, machine learning, and system design. Exploring complex problems and sharing practical solutions."
+      />
       {/* Hero Section */}
       <motion.section
         className="min-h-[90vh] flex items-center py-12 px-6 md:px-12"

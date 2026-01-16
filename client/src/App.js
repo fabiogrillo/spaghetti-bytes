@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 
 // Core components (always loaded)
 import ImprovedNavbar from "./Components/ImprovedNavbar";
@@ -186,19 +187,21 @@ const App = () => {
   }, []);
 
   return (
-    <ToastProvider>
-      <Router>
-        <div className="App min-h-screen flex flex-col relative z-10">
-          <AppContent
-            isAuthenticated={isAuthenticated}
-            setAuthenticated={setAuthenticated}
-            username={username}
-            setUsername={setUsername}
-            checkingAuth={checkingAuth}
-          />
-        </div>
-      </Router>
-    </ToastProvider>
+    <HelmetProvider>
+      <ToastProvider>
+        <Router>
+          <div className="App min-h-screen flex flex-col relative z-10">
+            <AppContent
+              isAuthenticated={isAuthenticated}
+              setAuthenticated={setAuthenticated}
+              username={username}
+              setUsername={setUsername}
+              checkingAuth={checkingAuth}
+            />
+          </div>
+        </Router>
+      </ToastProvider>
+    </HelmetProvider>
   );
 };
 
