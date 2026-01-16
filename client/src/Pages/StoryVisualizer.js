@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TipTapEditor from "../Components/TipTapEditor";
 import { BsArrowLeft } from "react-icons/bs";
@@ -8,6 +8,8 @@ import ShareButtons from "../Components/ShareButtons";
 import ReadingProgress from "../Components/ReadingProgress";
 import DonationButton from "../Components/DonationButton";
 import SEO from "../Components/SEO";
+import TableOfContents from "../Components/TableOfContents";
+import useCopyCodeButton from "../hooks/useCopyCodeButton";
 
 const StoryVisualizer = () => {
   const navigate = useNavigate();
@@ -16,10 +18,14 @@ const StoryVisualizer = () => {
   const [loading, setLoading] = useState(true);
   const [contentRef, setContentRef] = useState(null);
   const [readingProgress, setReadingProgress] = useState(0);
+  const articleContentRef = useRef(null);
 
   const handleProgressChange = useCallback((progress) => {
     setReadingProgress(progress);
   }, []);
+
+  // Add copy button to code blocks
+  useCopyCodeButton(articleContentRef, story?.content);
 
   useEffect(() => {
     // Scroll to top when story changes
@@ -141,10 +147,14 @@ const StoryVisualizer = () => {
           <p className="text-lg text-base-content/80 leading-relaxed italic">{story.summary}</p>
         </motion.div>
 
+        {/* Table of Contents - Mobile */}
+        <TableOfContents content={story.content} />
+
         <div className="divider"></div>
 
         {/* Content */}
         <motion.div
+          ref={articleContentRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}

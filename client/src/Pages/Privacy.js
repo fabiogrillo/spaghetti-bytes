@@ -60,7 +60,6 @@ const Privacy = () => {
                 <p>Your data is retained for the following periods:</p>
                 <ul>
                     <li><strong>Analytics Data:</strong> 26 months (Google Analytics default)</li>
-                    <li><strong>Comments:</strong> Indefinitely or until deletion request</li>
                     <li><strong>Session Cookies:</strong> 30 days</li>
                     <li><strong>Preferences:</strong> 1 year</li>
                 </ul>

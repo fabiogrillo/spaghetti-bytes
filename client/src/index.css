@@ -4,7 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global Styles */
+/* ===================================
+   GLOBAL STYLES
+   =================================== */
+
 html,
 body,
 #root,
@@ -35,11 +38,15 @@ html {
   }
 }
 
-/* Base font and smooth scrolling */
+/* Base font - colors handled by DaisyUI themes */
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-weight: 400;
 }
+
+/* ===================================
+   TYPOGRAPHY
+   =================================== */
 
 /* Logo font and display headings */
 .logo-font,
@@ -47,17 +54,13 @@ body {
   font-family: 'Playfair Display', serif;
 }
 
-/* Professional utility classes */
-.shadow-soft {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-}
-
-.shadow-soft-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.rounded-soft {
-  border-radius: 0.5rem;
+/* Gradient text for branding - Blue theme */
+.gradient-text {
+  background-image: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  @apply font-bold;
 }
 
 .text-emphasis {
@@ -67,21 +70,58 @@ body {
   background-clip: text;
 }
 
-/* Pop-cartoon button styles */
+/* ===================================
+   UTILITY CLASSES
+   =================================== */
+
+.shadow-soft {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.shadow-soft-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-soft-hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.rounded-soft {
+  border-radius: 0.5rem;
+}
+
+/* Button animation */
 .btn-pop {
   @apply transform transition-all duration-200 hover:translate-x-1 hover:translate-y-1;
 }
 
-/* Dark mode fixes - updated for new themes */
-[data-theme="midnight"] {
-  --tw-prose-body: #e5e7eb;
-  --tw-prose-headings: #f3f4f6;
-  --tw-prose-links: #60a5fa;
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 hover:scale-105;
 }
 
-[data-theme="night"] {
-  --tw-prose-body: #e5e7eb;
-  --tw-prose-headings: #f3f4f6;
+/* Float animation for logo */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ===================================
+   DARK THEME OVERRIDES (blue-dark)
+   =================================== */
+
+/* Prose styles for dark theme */
+[data-theme="blue-dark"] {
+  --tw-prose-body: #e2e8f0;
+  --tw-prose-headings: #f1f5f9;
   --tw-prose-links: #60a5fa;
 }
 
@@ -90,106 +130,88 @@ body {
   @apply outline-none;
 }
 
-[data-theme="midnight"] .ProseMirror,
-[data-theme="night"] .ProseMirror {
-  @apply text-gray-100;
+[data-theme="blue-dark"] .ProseMirror {
+  @apply text-slate-100;
 }
 
-[data-theme="midnight"] .ProseMirror h1,
-[data-theme="midnight"] .ProseMirror h2,
-[data-theme="midnight"] .ProseMirror h3,
-[data-theme="midnight"] .ProseMirror h4,
-[data-theme="night"] .ProseMirror h1,
-[data-theme="night"] .ProseMirror h2,
-[data-theme="night"] .ProseMirror h3,
-[data-theme="night"] .ProseMirror h4 {
-  @apply text-white;
+[data-theme="blue-dark"] .ProseMirror h1,
+[data-theme="blue-dark"] .ProseMirror h2,
+[data-theme="blue-dark"] .ProseMirror h3,
+[data-theme="blue-dark"] .ProseMirror h4 {
+  @apply text-slate-50;
 }
 
-[data-theme="midnight"] .ProseMirror p,
-[data-theme="night"] .ProseMirror p {
-  @apply text-gray-200;
+[data-theme="blue-dark"] .ProseMirror p {
+  @apply text-slate-200;
 }
 
-[data-theme="midnight"] .ProseMirror code,
-[data-theme="night"] .ProseMirror code {
-  @apply bg-gray-800 text-gray-300;
+[data-theme="blue-dark"] .ProseMirror code {
+  @apply bg-slate-800 text-slate-300;
 }
 
-[data-theme="midnight"] .ProseMirror pre,
-[data-theme="night"] .ProseMirror pre {
-  @apply bg-gray-900 text-gray-100;
+[data-theme="blue-dark"] .ProseMirror pre {
+  @apply bg-slate-900 text-slate-100;
 }
 
-/* Commented out old cartoon animations - no longer used
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
+/* ===================================
+   SCROLLBAR STYLES
+   =================================== */
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.gradient-text {
-  background-image: linear-gradient(90deg, #ff80ab 10%, #b388ff 40%, #3399cc 90%);
-  @apply bg-clip-text text-transparent font-bold;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-*/
-
-/* Card hover effects */
-.card-hover {
-  @apply transition-all duration-300 hover:scale-105;
-}
-
-/* Progress bar custom styles */
-.progress-modern {
-  @apply rounded-full overflow-hidden bg-gray-200;
-}
-
-.progress-modern::-webkit-progress-bar {
-  @apply bg-gray-200;
-}
-
-.progress-modern::-webkit-progress-value {
-  background: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
-}
-
-/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 rounded-full;
+  background: #f1f5f9;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2563eb;
-  @apply rounded-full;
+  background: #3b82f6;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7c3aed;
+  background: #2563eb;
 }
 
-[data-theme="midnight"] ::-webkit-scrollbar-track,
-[data-theme="night"] ::-webkit-scrollbar-track {
-  @apply bg-gray-800;
+[data-theme="blue-dark"] ::-webkit-scrollbar-track {
+  background: #1e293b;
 }
 
-[data-theme="midnight"] ::-webkit-scrollbar-thumb,
-[data-theme="night"] ::-webkit-scrollbar-thumb {
+[data-theme="blue-dark"] ::-webkit-scrollbar-thumb {
   background: #60a5fa;
 }
+
+[data-theme="blue-dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+/* ===================================
+   PROGRESS BAR
+   =================================== */
+
+.progress-modern {
+  @apply rounded-full overflow-hidden;
+  background: #e2e8f0;
+}
+
+.progress-modern::-webkit-progress-bar {
+  background: #e2e8f0;
+}
+
+.progress-modern::-webkit-progress-value {
+  background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+}
+
+[data-theme="blue-dark"] .progress-modern,
+[data-theme="blue-dark"] .progress-modern::-webkit-progress-bar {
+  background: #334155;
+}
+
+/* ===================================
+   MOBILE FIXES
+   =================================== */
 
 /* Steps component fixes for mobile */
 @media (max-width: 768px) {
@@ -209,7 +231,6 @@ body {
     @apply ml-3;
   }
 
-  /* Alternating text position for mobile steps */
   .steps-vertical .step:nth-child(odd) {
     @apply flex-row-reverse;
   }
@@ -228,263 +249,82 @@ body {
   left: 0 !important;
 }
 
+/* ===================================
+   TABLE FIXES
+   =================================== */
+
 .zebra-fix tbody tr:nth-child(even) {
-  color: #1f2937;
-  /* text-gray-800 */
+  color: #1e293b;
 }
 
-[data-theme="night"] .zebra-fix tbody tr:nth-child(even) {
-  color: #d1d5db;
-  /* text-gray-300 */
+[data-theme="blue-dark"] .zebra-fix tbody tr:nth-child(even) {
+  color: #e2e8f0;
 }
 
-.dark {
-  /* Primary text should be light in dark mode */
-  --tw-text-opacity: 1;
+/* ===================================
+   COPY CODE BUTTON
+   =================================== */
+
+.copy-code-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #94a3b8;
+  background-color: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0;
+  backdrop-filter: blur(4px);
 }
 
-/* Fix for all components with dark backgrounds */
-.dark .bg-blue-900,
-.dark .bg-blue-800,
-.dark .bg-blue-700,
-.dark .bg-indigo-900,
-.dark .bg-indigo-800,
-.dark .bg-purple-900,
-.dark .bg-purple-800,
-.dark .bg-gray-900,
-.dark .bg-gray-800 {
-  /* Ensure text inside these backgrounds is always light */
-  color: rgb(229 231 235);
-  /* gray-200 */
+pre:hover .copy-code-btn {
+  opacity: 1;
 }
 
-/* Specific fixes for common components */
-
-/* Cards and containers */
-.dark .card {
-  background-color: rgb(31 41 55);
-  /* gray-800 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-  border-color: rgb(75 85 99);
-  /* gray-600 */
+.copy-code-btn:hover {
+  color: #e2e8f0;
+  background-color: rgba(30, 41, 59, 0.95);
+  border-color: rgba(148, 163, 184, 0.4);
 }
 
-/* Commented out - no longer using cartoon shadows
-.dark .shadow-cartoon,
-.dark .shadow-cartoon-sm,
-.dark .shadow-cartoon-hover {
-  background-color: rgb(31 41 55);
-  color: rgb(229 231 235);
-  border-color: rgb(75 85 99);
-}
-*/
-
-/* Buttons in dark mode */
-.dark .btn {
-  color: rgb(229 231 235);
-  /* gray-200 */
+.copy-code-btn.copied {
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.4);
 }
 
-.dark .btn-primary {
-  background-color: rgb(59 130 246);
-  /* blue-500 */
-  color: rgb(255 255 255);
-  /* white */
+.copy-code-btn svg {
+  width: 14px;
+  height: 14px;
 }
 
-.dark .btn-secondary {
-  background-color: rgb(107 114 128);
-  /* gray-500 */
-  color: rgb(255 255 255);
-  /* white */
+/* Light theme adjustments */
+[data-theme="blue-light"] .copy-code-btn {
+  color: #64748b;
+  background-color: rgba(241, 245, 249, 0.9);
+  border-color: rgba(148, 163, 184, 0.3);
 }
 
-/* Headers and titles */
-.dark h1,
-.dark h2,
-.dark h3,
-.dark h4,
-.dark h5,
-.dark h6 {
-  color: rgb(243 244 246);
-  /* gray-100 */
+[data-theme="blue-light"] .copy-code-btn:hover {
+  color: #334155;
+  background-color: rgba(241, 245, 249, 0.98);
 }
 
-/* Paragraphs and body text */
-.dark p,
-.dark span:not(.emoji),
-.dark div:not(.has-custom-color) {
-  color: rgb(209 213 219);
-  /* gray-300 */
+[data-theme="blue-light"] .copy-code-btn.copied {
+  color: #16a34a;
+  border-color: rgba(22, 163, 74, 0.4);
 }
 
-/* Links */
-.dark a {
-  color: rgb(96 165 250);
-  /* blue-400 */
-}
-
-.dark a:hover {
-  color: rgb(147 197 253);
-  /* blue-300 */
-}
-
-/* Input fields and forms */
-.dark input,
-.dark textarea,
-.dark select {
-  background-color: rgb(55 65 81);
-  /* gray-700 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-  border-color: rgb(75 85 99);
-  /* gray-600 */
-}
-
-.dark input::placeholder,
-.dark textarea::placeholder {
-  color: rgb(156 163 175);
-  /* gray-400 */
-}
-
-/* Tables */
-.dark table {
-  background-color: rgb(31 41 55);
-  /* gray-800 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-.dark th {
-  background-color: rgb(17 24 39);
-  /* gray-900 */
-  color: rgb(243 244 246);
-  /* gray-100 */
-}
-
-.dark td {
-  border-color: rgb(75 85 99);
-  /* gray-600 */
-}
-
-/* Modals and overlays */
-.dark .modal-box {
-  background-color: rgb(31 41 55);
-  /* gray-800 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-/* Tooltips */
-.dark .tooltip {
-  background-color: rgb(17 24 39);
-  /* gray-900 */
-  color: rgb(243 244 246);
-  /* gray-100 */
-}
-
-/* Badges and tags */
-.dark .badge,
-.dark .tag {
-  background-color: rgb(55 65 81);
-  /* gray-700 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-/* Navigation */
-.dark .navbar {
-  background-color: rgb(17 24 39);
-  /* gray-900 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-.dark .navbar a {
-  color: rgb(209 213 219);
-  /* gray-300 */
-}
-
-.dark .navbar a:hover {
-  color: rgb(243 244 246);
-  /* gray-100 */
-}
-
-/* Footer */
-.dark footer {
-  background-color: rgb(17 24 39);
-  /* gray-900 */
-  color: rgb(209 213 219);
-  /* gray-300 */
-}
-
-/* Special case for reaction components */
-.dark .reaction-counter {
-  background: linear-gradient(to right, rgb(31 41 55), rgb(55 65 81));
-  /* gray-800 to gray-700 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-/* Chat bot in dark mode */
-.dark .chat-bubble {
-  background-color: rgb(55 65 81);
-  /* gray-700 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-/* Story cards */
-.dark .story-card {
-  background-color: rgb(31 41 55);
-  /* gray-800 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-/* Code blocks */
-.dark pre,
-.dark code {
-  background-color: rgb(17 24 39);
-  /* gray-900 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-/* Alerts and notifications */
-.dark .alert {
-  background-color: rgb(55 65 81);
-  /* gray-700 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-/* Dropdown menus */
-.dark .dropdown-content {
-  background-color: rgb(31 41 55);
-  /* gray-800 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-  border-color: rgb(75 85 99);
-  /* gray-600 */
-}
-
-/* Progress bars */
-.dark .progress {
-  background-color: rgb(55 65 81);
-  /* gray-700 */
-}
-
-/* Pagination */
-.dark .pagination button {
-  background-color: rgb(55 65 81);
-  /* gray-700 */
-  color: rgb(229 231 235);
-  /* gray-200 */
-}
-
-.dark .pagination button:hover {
-  background-color: rgb(75 85 99);
-  /* gray-600 */
+/* Mobile: always show button */
+@media (max-width: 768px) {
+  .copy-code-btn {
+    opacity: 1;
+  }
 }

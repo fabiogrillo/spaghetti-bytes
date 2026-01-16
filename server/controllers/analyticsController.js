@@ -2,7 +2,6 @@
 // Analytics controller for dashboard statistics
 
 const Story = require('../models/Story');
-const Comment = require('../models/Comment');
 const Goal = require('../models/Goal');
 const User = require('../models/User');
 const Conversation = require('../models/Conversation');
@@ -21,21 +20,13 @@ exports.getDashboardStats = async (req, res) => {
             createdAt: { $gte: lastMonth }
         });
 
-        // Get comment statistics
-        const totalComments = await Comment.countDocuments();
-        const approvedComments = await Comment.countDocuments({ status: 'approved' });
-        const pendingComments = await Comment.countDocuments({ status: 'pending' });
-
         // Get goals count
         const totalGoals = await Goal.countDocuments();
         const completedGoals = await Goal.countDocuments({ completed: true });
 
         // Get user/visitor statistics
-        // For now, we'll count registered users + estimate visitors from conversations
         const registeredUsers = await User.countDocuments();
         const uniqueConversations = await Conversation.countDocuments();
-
-        // Estimate total visitors (registered users + unique chat sessions)
         const estimatedVisitors = registeredUsers + uniqueConversations;
 
         // Get recent activity metrics
@@ -47,23 +38,10 @@ exports.getDashboardStats = async (req, res) => {
                 published: true,
                 createdAt: { $gte: last7Days }
             }),
-            comments: await Comment.countDocuments({
-                createdAt: { $gte: last7Days }
-            }),
             goals: await Goal.countDocuments({
                 createdAt: { $gte: last7Days }
             })
         };
-
-        // Calculate engagement metrics
-        const storiesWithComments = await Story.countDocuments({
-            published: true,
-            commentsCount: { $gt: 0 }
-        });
-
-        const engagementRate = totalStories > 0
-            ? Math.round((storiesWithComments / totalStories) * 100)
-            : 0;
 
         res.json({
             stats: {
@@ -71,12 +49,6 @@ exports.getDashboardStats = async (req, res) => {
                     total: totalStories,
                     lastMonth: lastMonthStories,
                     recent: recentActivity.stories
-                },
-                comments: {
-                    total: totalComments,
-                    approved: approvedComments,
-                    pending: pendingComments,
-                    recent: recentActivity.comments
                 },
                 goals: {
                     total: totalGoals,
@@ -87,10 +59,6 @@ exports.getDashboardStats = async (req, res) => {
                     total: estimatedVisitors,
                     registered: registeredUsers,
                     anonymous: uniqueConversations
-                },
-                engagement: {
-                    rate: engagementRate,
-                    storiesWithComments
                 }
             }
         });
@@ -103,21 +71,17 @@ exports.getDashboardStats = async (req, res) => {
 // Get quick stats (lighter version for components)
 exports.getQuickStats = async (req, res) => {
     try {
-        const [stories, comments, goals, users] = await Promise.all([
+        const [stories, goals, users] = await Promise.all([
             Story.countDocuments(),
-            Comment.countDocuments(),
             Goal.countDocuments(),
             User.countDocuments()
         ]);
 
-        // Get unique visitors from localStorage data if available
-        // In production, you'd track this with analytics
         const conversations = await Conversation.countDocuments();
         const visitors = users + conversations;
 
         res.json({
             stories,
-            comments,
             goals,
             visitors
         });
@@ -130,28 +94,13 @@ exports.getQuickStats = async (req, res) => {
 // Get trending content
 exports.getTrendingContent = async (req, res) => {
     try {
-        // Get most viewed stories (assuming you track views)
         const trendingStories = await Story.find({ published: true })
-            .sort({ views: -1, commentsCount: -1 })
+            .sort({ views: -1 })
             .limit(5)
-            .select('title slug views commentsCount');
-
-        // Get most active commenters
-        const activeCommenters = await Comment.aggregate([
-            { $match: { status: 'approved' } },
-            {
-                $group: {
-                    _id: '$author.name',
-                    count: { $sum: 1 }
-                }
-            },
-            { $sort: { count: -1 } },
-            { $limit: 5 }
-        ]);
+            .select('title slug views');
 
         res.json({
-            trendingStories,
-            activeCommenters
+            trendingStories
         });
     } catch (error) {
         console.error('Error fetching trending content:', error);

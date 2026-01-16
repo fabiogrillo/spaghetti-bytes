@@ -26,6 +26,7 @@ const goalRoutes = require("./routes/goalRoute");
 const conversationRoutes = require("./routes/conversationRoute");
 const newsletterRoutes = require("./routes/newsletterRoute");
 const analyticsRoutes = require("./routes/analyticsRoute");
+const sitemapRoutes = require("./routes/sitemapRoute");
 
 // Middleware
 const { apiLimiter, authLimiter } = require("./middleware/rateLimiter");
@@ -276,6 +277,9 @@ app.use("/api/analytics", analyticsRoutes);
 
 // Cache admin routes
 cacheAdminRoutes(app);
+
+// Sitemap and robots.txt (no /api prefix)
+app.use("/", sitemapRoutes);
 
 // ====================================
 // STATIC FILES (for production)

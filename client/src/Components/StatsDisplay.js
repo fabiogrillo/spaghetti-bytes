@@ -3,13 +3,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaNewspaper, FaComments, FaBullseye, FaUsers } from 'react-icons/fa';
+import { FaNewspaper, FaBullseye, FaUsers } from 'react-icons/fa';
 import api from '../Api';
 
 const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }) => {
     const [stats, setStats] = useState({
         stories: 0,
-        comments: 0,
         goals: 0,
         visitors: 0
     });
@@ -28,7 +27,6 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
             // Fallback to default values if API fails
             setStats({
                 stories: 0,
-                comments: 0,
                 goals: 0,
                 visitors: 0
             });
@@ -45,14 +43,6 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
             color: "text-accent",
             bgGradient: "from-accent to-orange-600",
             emoji: "📚"
-        },
-        {
-            label: "Comments",
-            value: stats.comments,
-            icon: <FaComments />,
-            color: "text-primary",
-            bgGradient: "from-primary to-blue-600",
-            emoji: "💬"
         },
         {
             label: "Goals",
@@ -73,6 +63,7 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
     ];
 
     const formatNumber = (num) => {
+        if (num === undefined || num === null) return '0';
         if (num >= 1000) {
             return `${(num / 1000).toFixed(1)}k`;
         }
@@ -103,8 +94,8 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
 
     if (loading) {
         return (
-            <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${className}`}>
-                {[1, 2, 3, 4].map((i) => (
+            <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${className}`}>
+                {[1, 2, 3].map((i) => (
                     <div key={i} className="bg-gray-200 dark:bg-gray-700 rounded-soft h-24 animate-pulse" />
                 ))}
             </div>
@@ -118,7 +109,7 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
                 variants={containerVariants}
                 initial={showAnimation ? "hidden" : "visible"}
                 animate="visible"
-                className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${className}`}
+                className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${className}`}
             >
                 {statItems.map((stat, index) => (
                     <motion.div

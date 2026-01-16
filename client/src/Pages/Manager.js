@@ -8,7 +8,7 @@ import {
   FaEdit, FaBullseye
 } from "react-icons/fa";
 import {
-  BiMessageSquareAdd, BiCommentCheck,
+  BiMessageSquareAdd,
   BiTargetLock
 } from "react-icons/bi";
 import StatsDisplay from "../Components/StatsDisplay";
@@ -45,7 +45,7 @@ const Manager = () => {
     {
       title: "✍️ Content Management",
       description: "Create and manage your blog content",
-      gridCols: 3,
+      gridCols: 2,
       buttons: [
         {
           label: "Write Story",
@@ -62,14 +62,6 @@ const Manager = () => {
           emoji: "📚",
           color: "bg-gradient-to-br from-primary to-blue-600",
           action: () => navigate("/storyTable")
-        },
-        {
-          label: "Moderate Comments",
-          description: "Review and approve comments",
-          icon: <BiCommentCheck size={24} />,
-          emoji: "💬",
-          color: "bg-gradient-to-br from-secondary to-purple-600",
-          action: () => navigate("/moderate-comments")
         }
       ]
     },
