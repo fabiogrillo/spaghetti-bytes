@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import SEO from "../Components/SEO";
@@ -15,10 +15,32 @@ import { BiCodeAlt, BiHeart, BiBook, BiTargetLock } from "react-icons/bi";
 import { BsStars } from "react-icons/bs";
 import { GiSoccerBall, GiMusicalNotes } from "react-icons/gi";
 import StatsDisplay from "../Components/StatsDisplay";
+import ImprovedStoryCard from "../Components/ImprovedStoryCard";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [latestStories, setLatestStories] = useState([]);
+  const [storiesLoading, setStoriesLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        const res = await fetch('/api/stories');
+        const data = await res.json();
+        const sorted = (data.stories || [])
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 3);
+        setLatestStories(sorted);
+      } catch (e) {
+        console.error('Error fetching latest stories:', e);
+      } finally {
+        setStoriesLoading(false);
+      }
+    };
+    fetchLatest();
+  }, []);
+
   const fadeInUp = {
     initial: { opacity: 0, y: 60 },
     animate: { opacity: 1, y: 0 },
@@ -130,6 +152,55 @@ const Home = () => {
               </motion.button>
             </motion.div>
           </div>
+        </div>
+      </motion.section>
+
+      {/* Latest Posts Section */}
+      <motion.section
+        className="py-20 px-6 md:px-12"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <div className="container mx-auto">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl md:text-5xl font-bold flex items-center justify-center gap-3">
+              <GrArticle className="text-error" />
+              Latest Posts
+            </h2>
+            <p className="text-lg mt-4 opacity-70">Fresh bytes from the kitchen</p>
+          </motion.div>
+
+          {storiesLoading ? (
+            <div className="flex justify-center">
+              <span className="loading loading-spinner loading-lg text-error"></span>
+            </div>
+          ) : latestStories.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {latestStories.map((story, index) => (
+                  <ImprovedStoryCard key={story._id} story={story} index={index} />
+                ))}
+              </div>
+              <div className="text-center mt-10">
+                <Link to="/blog">
+                  <motion.button
+                    className="btn btn-lg bg-error text-white rounded-soft shadow-soft-lg hover:shadow-soft-hover btn-pop"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <GrArticle className="mr-2" /> View All Stories
+                  </motion.button>
+                </Link>
+              </div>
+            </>
+          ) : null}
         </div>
       </motion.section>
 

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import ImprovedStoryCard from "../Components/ImprovedStoryCard";
 import TipTapEditor from "../Components/TipTapEditor";
 import { BsArrowLeft } from "react-icons/bs";
 import { BiTime, BiBookReader } from "react-icons/bi";
@@ -19,6 +20,8 @@ const StoryVisualizer = () => {
   const [contentRef, setContentRef] = useState(null);
   const [readingProgress, setReadingProgress] = useState(0);
   const articleContentRef = useRef(null);
+  const [relatedStories, setRelatedStories] = useState([]);
+  const [relatedLoading, setRelatedLoading] = useState(false);
 
   const handleProgressChange = useCallback((progress) => {
     setReadingProgress(progress);
@@ -26,6 +29,34 @@ const StoryVisualizer = () => {
 
   // Add copy button to code blocks
   useCopyCodeButton(articleContentRef, story?.content);
+
+  // Fetch related stories once the current story is loaded
+  useEffect(() => {
+    if (!story) return;
+    const fetchRelated = async () => {
+      setRelatedLoading(true);
+      try {
+        const response = await fetch('/api/stories');
+        const data = await response.json();
+        const all = data.stories || [];
+        const filtered = all
+          .filter(s => s._id !== story._id)
+          .filter(s => s.tags.some(tag => story.tags.includes(tag)))
+          .sort((a, b) => {
+            const aShared = a.tags.filter(t => story.tags.includes(t)).length;
+            const bShared = b.tags.filter(t => story.tags.includes(t)).length;
+            return bShared - aShared;
+          })
+          .slice(0, 3);
+        setRelatedStories(filtered);
+      } catch (e) {
+        console.error('Error fetching related stories:', e);
+      } finally {
+        setRelatedLoading(false);
+      }
+    };
+    fetchRelated();
+  }, [story]);
 
   useEffect(() => {
     // Scroll to top when story changes
@@ -88,6 +119,17 @@ const StoryVisualizer = () => {
         contentRef={{ current: contentRef }}
         onProgressChange={handleProgressChange}
       />
+
+      {/* Breadcrumb */}
+      <div className="container mx-auto px-4 md:px-8 max-w-4xl pt-4">
+        <div className="text-sm breadcrumbs">
+          <ul>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/blog">Blog</Link></li>
+            <li className="text-base-content/60 truncate max-w-[200px]">{story.title}</li>
+          </ul>
+        </div>
+      </div>
 
       {/* Main Content */}
       <motion.div
@@ -203,6 +245,29 @@ const StoryVisualizer = () => {
         >
           <DonationButton variant="inline" compact={true} />
         </motion.div>
+
+        {/* Related Articles */}
+        {relatedStories.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55 }}
+            className="mt-12 mb-12"
+          >
+            <h2 className="text-2xl font-bold mb-6 text-center">Related Articles</h2>
+            {relatedLoading ? (
+              <div className="flex justify-center">
+                <span className="loading loading-spinner loading-md text-error"></span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {relatedStories.map((s, i) => (
+                  <ImprovedStoryCard key={s._id} story={s} index={i} />
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* Footer */}
         <motion.div

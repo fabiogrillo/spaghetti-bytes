@@ -4,7 +4,9 @@ import {
   Routes,
   Route,
   Navigate,
+  Link,
 } from "react-router-dom";
+import { motion } from "framer-motion";
 import { HelmetProvider } from "react-helmet-async";
 
 // Core components (always loaded)
@@ -33,6 +35,8 @@ import Contacts from "./Pages/Contacts";
 
 // Import analytics hook
 import { useAnalytics } from "./hooks/useAnalytics";
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, isAuthenticated, checkingAuth }) => {
@@ -139,14 +143,94 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
           <Route
             path="*"
             element={
-              <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                  <h1 className="text-6xl font-bold text-error">404</h1>
-                  <p className="text-xl mt-4">Page not found</p>
-                  <a href="/" className="btn bg-secondary text-white mt-8 shadow-soft-lg">
-                    Go Home
-                  </a>
-                </div>
+              <div className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
+                <motion.div
+                  initial={{ opacity: 0, y: -30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-center max-w-lg"
+                >
+                  {/* Big 404 */}
+                  <motion.h1
+                    initial={{ scale: 0.5 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", bounce: 0.5, duration: 0.8 }}
+                    className="text-[10rem] font-bold leading-none gradient-text"
+                  >
+                    404
+                  </motion.h1>
+
+                  {/* Badge */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="inline-block mb-6"
+                  >
+                    <span className="badge badge-lg bg-warning text-black shadow-soft px-6 py-3">
+                      🍝 Looks like this byte got lost in the spaghetti!
+                    </span>
+                  </motion.div>
+
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-lg text-base-content/70 mb-10"
+                  >
+                    The page you're looking for doesn't exist — or maybe it was
+                    untangled and moved somewhere else.
+                  </motion.p>
+
+                  {/* Navigation suggestions */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+                  >
+                    <Link to="/">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="btn btn-lg bg-error text-white rounded-soft shadow-soft-lg hover:shadow-soft-hover btn-pop w-full sm:w-auto"
+                      >
+                        🏠 Go Home
+                      </motion.button>
+                    </Link>
+                    <Link to="/blog">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="btn btn-lg btn-outline border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-soft shadow-soft w-full sm:w-auto"
+                      >
+                        📖 Read the Blog
+                      </motion.button>
+                    </Link>
+                    <Link to="/goals">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="btn btn-lg btn-outline border-2 border-warning text-warning hover:bg-warning hover:text-black rounded-soft shadow-soft w-full sm:w-auto"
+                      >
+                        🎯 See Goals
+                      </motion.button>
+                    </Link>
+                  </motion.div>
+
+                  {/* Fun code block */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="mockup-code text-left text-sm"
+                  >
+                    <pre data-prefix="$"><code>find / -name "page-you-wanted"</code></pre>
+                    <pre data-prefix=">" className="text-warning"><code>searching spaghetti... 🍝</code></pre>
+                    <pre data-prefix=">" className="text-error"><code>Error: page not found in this universe</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>Suggestion: try /blog or /goals</code></pre>
+                  </motion.div>
+                </motion.div>
               </div>
             }
           />
@@ -157,6 +241,8 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
       <CookieBanner />
       <CookieSettings />
       <DonationButton variant="floating" />
+      <Analytics />
+      <SpeedInsights />
     </>
   );
 };

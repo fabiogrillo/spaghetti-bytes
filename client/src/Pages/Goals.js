@@ -67,6 +67,14 @@ const Goals = () => {
     }));
   };
 
+  const expandAll = () => {
+    setExpandedYears(years.reduce((acc, y) => ({ ...acc, [y]: true }), {}));
+  };
+
+  const collapseAll = () => {
+    setExpandedYears({});
+  };
+
   const getProgressColor = (percentage) => {
     if (percentage >= 75) return "from-green-400 to-green-600";
     if (percentage >= 50) return "from-yellow-400 to-yellow-600";
@@ -376,6 +384,26 @@ const Goals = () => {
         </motion.div>
       ) : (
         <div>
+          {/* Expand / Collapse Controls */}
+          <div className="flex justify-end gap-3 mb-4">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={expandAll}
+              className="btn btn-sm btn-outline border-primary text-primary rounded-soft shadow-soft hover:bg-primary hover:text-white"
+            >
+              <BiChevronDown className="text-lg" /> Expand All
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={collapseAll}
+              className="btn btn-sm btn-outline border-base-300 rounded-soft shadow-soft"
+            >
+              <BiChevronUp className="text-lg" /> Collapse All
+            </motion.button>
+          </div>
+
           {years.map((year, index) => (
             <YearSection
               key={year}

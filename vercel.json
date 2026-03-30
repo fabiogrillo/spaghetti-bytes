@@ -14,18 +14,15 @@
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/server/server.js"
-    },
-    {
-      "src": "/rss",
-      "dest": "/server/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/client/$1"
-    }
+    { "src": "/api/(.*)", "dest": "/server/server.js" },
+    { "src": "/rss", "dest": "/server/server.js" },
+    { "src": "/rss\\.xml", "dest": "/server/server.js" },
+    { "src": "/atom\\.xml", "dest": "/server/server.js" },
+    { "src": "/feed\\.json", "dest": "/server/server.js" },
+    { "src": "/sitemap\\.xml", "dest": "/server/server.js" },
+    { "src": "/robots\\.txt", "dest": "/server/server.js" },
+    { "src": "/static/(.*)", "dest": "/client/static/$1" },
+    { "src": "/(.*)", "dest": "/client/index.html" }
   ],
   "env": {
     "NODE_ENV": "production"

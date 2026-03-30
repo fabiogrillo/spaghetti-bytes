@@ -53,6 +53,44 @@ const SEO = ({
           ))}
         </>
       )}
+
+      {/* JSON-LD Structured Data */}
+      <script type="application/ld+json">
+        {JSON.stringify(
+          article
+            ? {
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                "headline": seo.title,
+                "description": seo.description,
+                "image": seo.image,
+                "url": seo.url,
+                "datePublished": article.publishedAt,
+                "author": {
+                  "@type": "Person",
+                  "name": article.author || "Fabio Grillo"
+                },
+                "publisher": {
+                  "@type": "Organization",
+                  "name": siteName,
+                  "url": siteUrl
+                },
+                "keywords": article.tags?.join(", ")
+              }
+            : {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": siteName,
+                "url": siteUrl,
+                "description": seo.description,
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": `${siteUrl}/blog?q={search_term_string}`,
+                  "query-input": "required name=search_term_string"
+                }
+              }
+        )}
+      </script>
     </Helmet>
   );
 };
