@@ -298,7 +298,7 @@ const StoryVisualizer = () => {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-8 right-8 btn btn-circle bg-secondary text-white shadow-soft-lg hover:shadow-soft-hover z-40"
+          className="fixed bottom-20 right-6 btn btn-circle bg-secondary text-white shadow-soft-lg hover:shadow-soft-hover z-40"
         >
           ↑
         </motion.button>
