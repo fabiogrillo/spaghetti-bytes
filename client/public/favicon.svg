@@ -1,62 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Background circle -->
-  <circle cx="256" cy="256" r="256" fill="#FF6B6B"/>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
 
-  <!-- Plate -->
-  <ellipse cx="256" cy="320" rx="180" ry="30" fill="#FFFFFF" opacity="0.3"/>
-  <ellipse cx="256" cy="316" rx="170" ry="25" fill="#F0F0F0"/>
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
 
-  <!-- Spaghetti strands (curved paths) -->
-  <g opacity="0.9">
-    <!-- Strand 1 -->
-    <path d="M 180 280 Q 200 240 220 280 T 260 280"
-          stroke="#FFD93D" stroke-width="12" fill="none"
-          stroke-linecap="round"/>
+  <!-- Stylized "S" — a single noodle-strand / data-flow curve.
+       Thick stroke, round caps, no fill — reads clearly at 16 px. -->
+  <path
+    d="M 310 130
+       C 310 130, 355 150, 355 205
+       C 355 260, 256 260, 256 260
+       C 256 260, 157 260, 157 310
+       C 157 365, 202 385, 202 385"
+    fill="none"
+    stroke="white"
+    stroke-width="52"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
 
-    <!-- Strand 2 -->
-    <path d="M 200 290 Q 230 250 260 290 T 320 290"
-          stroke="#FFC107" stroke-width="12" fill="none"
-          stroke-linecap="round"/>
-
-    <!-- Strand 3 -->
-    <path d="M 220 300 Q 240 270 270 300 T 330 300"
-          stroke="#FFD93D" stroke-width="12" fill="none"
-          stroke-linecap="round"/>
-
-    <!-- Strand 4 -->
-    <path d="M 170 270 Q 210 230 250 270 T 310 270"
-          stroke="#FFC107" stroke-width="12" fill="none"
-          stroke-linecap="round"/>
-
-    <!-- Strand 5 -->
-    <path d="M 240 285 Q 260 260 290 285 T 340 285"
-          stroke="#FFD93D" stroke-width="12" fill="none"
-          stroke-linecap="round"/>
-  </g>
-
-  <!-- Binary code particles (bytes) -->
-  <g fill="#4ECDC4" font-family="monospace" font-size="24" font-weight="bold">
-    <text x="160" y="200" opacity="0.8">01</text>
-    <text x="300" y="210" opacity="0.8">10</text>
-    <text x="220" y="180" opacity="0.8">11</text>
-    <text x="280" y="240" opacity="0.8">00</text>
-  </g>
-
-  <!-- Code brackets -->
-  <g fill="#3B3B98" font-size="48" font-weight="bold" opacity="0.7">
-    <text x="140" y="260">&lt;</text>
-    <text x="340" y="260">/&gt;</text>
-  </g>
-
-  <!-- Fork on top -->
-  <g transform="translate(256, 160)">
-    <!-- Fork handle -->
-    <rect x="-8" y="0" width="16" height="80" fill="#C0C0C0" rx="4"/>
-
-    <!-- Fork prongs -->
-    <rect x="-20" y="-30" width="6" height="35" fill="#C0C0C0" rx="3"/>
-    <rect x="-7" y="-35" width="6" height="40" fill="#C0C0C0" rx="3"/>
-    <rect x="6" y="-35" width="6" height="40" fill="#C0C0C0" rx="3"/>
-    <rect x="19" y="-30" width="6" height="35" fill="#C0C0C0" rx="3"/>
-  </g>
+  <!-- Two tiny accent dots — like data packets travelling the noodle -->
+  <circle cx="326" cy="152" r="16" fill="white" opacity="0.55"/>
+  <circle cx="186" cy="364" r="16" fill="white" opacity="0.55"/>
 </svg>
