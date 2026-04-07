@@ -12,19 +12,19 @@ const Footer = () => {
       icon: FaGithub,
       url: "https://github.com/fabiogrillo",
       label: "GitHub",
-      color: "hover:text-purple-600 dark:hover:text-purple-400"
+      color: "hover:text-secondary"
     },
     {
       icon: FaLinkedin,
       url: "https://www.linkedin.com/in/fabgrillo",
       label: "LinkedIn",
-      color: "hover:text-blue-700 dark:hover:text-blue-300"
+      color: "hover:text-primary"
     },
     {
       icon: FaMedium,
       url: "https://medium.com/@fgrillo123",
       label: "Medium",
-      color: "hover:text-green-600 dark:hover:text-green-400"
+      color: "hover:text-accent"
     }
   ];
 
@@ -42,7 +42,7 @@ const Footer = () => {
               <h3 className="text-xl sm:text-2xl font-bold mb-2">
                 <span className="gradient-text">Spaghetti Bytes</span> 🍝
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-base-content/60">
                 Untangling code, one byte at a time
               </p>
             </motion.div>
@@ -67,7 +67,7 @@ const Footer = () => {
                       whileHover={{ scale: 1.2, rotate: 5 }}
                       whileTap={{ scale: 0.9 }}
                       className={`
-                        text-2xl sm:text-3xl text-gray-600 dark:text-gray-400
+                        text-2xl sm:text-3xl text-base-content/60
                         transition-colors duration-300
                         ${social.color}
                       `}
@@ -91,7 +91,7 @@ const Footer = () => {
               transition={{ delay: 0.6 }}
               className="text-center space-y-3"
             >
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2">
+              <p className="text-xs sm:text-sm text-base-content/60 flex items-center justify-center gap-2">
                 Made with <BiHeart className="text-error animate-pulse" /> and lots of 🍝
               </p>
 
@@ -100,7 +100,7 @@ const Footer = () => {
                 <Link to="/privacy" className="hover:text-error transition-colors">
                   Privacy Policy
                 </Link>
-                <span className="text-gray-600 dark:text-gray-400">•</span>
+                <span className="text-base-content/60">•</span>
                 <button
                   onClick={() => {
                     document.querySelector('[aria-label="Cookie settings"]')?.click();
@@ -111,7 +111,7 @@ const Footer = () => {
                 </button>
               </div>
 
-              <p className="text-xs text-gray-500 dark:text-gray-500">
+              <p className="text-xs text-base-content/50">
                 © {currentYear} Spaghetti Bytes. All rights reserved.
               </p>
             </motion.div>
@@ -121,7 +121,7 @@ const Footer = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               transition={{ delay: 1 }}
-              className="text-xs text-gray-400 dark:text-gray-600 italic text-center px-4"
+              className="text-xs text-base-content/40 italic text-center px-4"
             >
               {"// TODO: Fix all the spaghetti code... eventually 😅"}
             </motion.div>

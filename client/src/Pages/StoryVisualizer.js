@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import ShareButtons from "../Components/ShareButtons";
 import ReadingProgress from "../Components/ReadingProgress";
 import DonationButton from "../Components/DonationButton";
+import NewsletterWidget from "../Components/NewsletterWidget";
 import SEO from "../Components/SEO";
 import TableOfContents from "../Components/TableOfContents";
 import useCopyCodeButton from "../hooks/useCopyCodeButton";
@@ -244,6 +245,16 @@ const StoryVisualizer = () => {
           className="mt-12 mb-12"
         >
           <DonationButton variant="inline" compact={true} />
+        </motion.div>
+
+        {/* Newsletter */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.52 }}
+          className="mb-12"
+        >
+          <NewsletterWidget variant="inline" />
         </motion.div>
 
         {/* Related Articles */}

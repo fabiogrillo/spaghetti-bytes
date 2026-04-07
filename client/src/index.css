@@ -54,9 +54,9 @@ body {
   font-family: 'Playfair Display', serif;
 }
 
-/* Gradient text for branding - Blue theme */
+/* Gradient text for branding - Spaghetti Bytes theme */
 .gradient-text {
-  background-image: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #0ea5e9 100%);
+  background-image: linear-gradient(135deg, #E85D04 0%, #6D28D9 50%, #0891B2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -115,11 +115,11 @@ body {
 }
 
 /* ===================================
-   DARK THEME OVERRIDES (blue-dark)
+   DARK THEME OVERRIDES
    =================================== */
 
 /* Prose styles for dark theme */
-[data-theme="blue-dark"] {
+[data-theme="dark"] {
   --tw-prose-body: #e2e8f0;
   --tw-prose-headings: #f1f5f9;
   --tw-prose-links: #60a5fa;
@@ -130,26 +130,26 @@ body {
   @apply outline-none;
 }
 
-[data-theme="blue-dark"] .ProseMirror {
+[data-theme="dark"] .ProseMirror {
   @apply text-slate-100;
 }
 
-[data-theme="blue-dark"] .ProseMirror h1,
-[data-theme="blue-dark"] .ProseMirror h2,
-[data-theme="blue-dark"] .ProseMirror h3,
-[data-theme="blue-dark"] .ProseMirror h4 {
+[data-theme="dark"] .ProseMirror h1,
+[data-theme="dark"] .ProseMirror h2,
+[data-theme="dark"] .ProseMirror h3,
+[data-theme="dark"] .ProseMirror h4 {
   @apply text-slate-50;
 }
 
-[data-theme="blue-dark"] .ProseMirror p {
+[data-theme="dark"] .ProseMirror p {
   @apply text-slate-200;
 }
 
-[data-theme="blue-dark"] .ProseMirror code {
+[data-theme="dark"] .ProseMirror code {
   @apply bg-slate-800 text-slate-300;
 }
 
-[data-theme="blue-dark"] .ProseMirror pre {
+[data-theme="dark"] .ProseMirror pre {
   @apply bg-slate-900 text-slate-100;
 }
 
@@ -162,29 +162,29 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #FFF3E0;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3b82f6;
+  background: #E85D04;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2563eb;
+  background: #C2410C;
 }
 
-[data-theme="blue-dark"] ::-webkit-scrollbar-track {
-  background: #1e293b;
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #16213E;
 }
 
-[data-theme="blue-dark"] ::-webkit-scrollbar-thumb {
-  background: #60a5fa;
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #FB923C;
 }
 
-[data-theme="blue-dark"] ::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6;
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #F97316;
 }
 
 /* ===================================
@@ -201,11 +201,11 @@ body {
 }
 
 .progress-modern::-webkit-progress-value {
-  background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+  background: linear-gradient(90deg, #E85D04 0%, #6D28D9 100%);
 }
 
-[data-theme="blue-dark"] .progress-modern,
-[data-theme="blue-dark"] .progress-modern::-webkit-progress-bar {
+[data-theme="dark"] .progress-modern,
+[data-theme="dark"] .progress-modern::-webkit-progress-bar {
   background: #334155;
 }
 
@@ -257,7 +257,7 @@ body {
   color: #1e293b;
 }
 
-[data-theme="blue-dark"] .zebra-fix tbody tr:nth-child(even) {
+[data-theme="dark"] .zebra-fix tbody tr:nth-child(even) {
   color: #e2e8f0;
 }
 
@@ -306,18 +306,18 @@ pre:hover .copy-code-btn {
 }
 
 /* Light theme adjustments */
-[data-theme="blue-light"] .copy-code-btn {
+[data-theme="light"] .copy-code-btn {
   color: #64748b;
   background-color: rgba(241, 245, 249, 0.9);
   border-color: rgba(148, 163, 184, 0.3);
 }
 
-[data-theme="blue-light"] .copy-code-btn:hover {
+[data-theme="light"] .copy-code-btn:hover {
   color: #334155;
   background-color: rgba(241, 245, 249, 0.98);
 }
 
-[data-theme="blue-light"] .copy-code-btn.copied {
+[data-theme="light"] .copy-code-btn.copied {
   color: #16a34a;
   border-color: rgba(22, 163, 74, 0.4);
 }

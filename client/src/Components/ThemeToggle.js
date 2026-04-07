@@ -30,6 +30,7 @@ const ThemeToggle = ({ className = '' }) => {
             onClick={toggleTheme}
             className={`btn btn-ghost btn-circle ${className}`}
             title={`Switch to ${isDark ? 'Light' : 'Dark'} mode`}
+            aria-label={`Switch to ${isDark ? 'Light' : 'Dark'} mode`}
         >
             <motion.div
                 key={theme}

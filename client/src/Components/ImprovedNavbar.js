@@ -108,7 +108,7 @@ const ImprovedNavbar = ({
                     className={
                       isActive(item.path)
                         ? `btn rounded-soft shadow-soft-lg btn-pop bg-${color} text-white relative`
-                        : "btn rounded-soft shadow-soft btn-pop bg-white text-gray-700 hover:shadow-soft-lg hover:dark:text-white relative"
+                        : "btn rounded-soft shadow-soft btn-pop bg-base-100 text-base-content hover:shadow-soft-lg relative"
                     }
                   >
                     <div className="flex items-center gap-2">
@@ -176,6 +176,7 @@ const ImprovedNavbar = ({
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsSidebarOpen(true)}
             className="btn btn-square btn-ghost"
+            aria-label="Open menu"
           >
             <IoMdMenu size={28} />
           </motion.button>
@@ -210,6 +211,7 @@ const ImprovedNavbar = ({
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setIsSidebarOpen(false)}
                     className="btn btn-circle btn-ghost"
+                    aria-label="Close menu"
                   >
                     <IoMdClose size={24} />
                   </motion.button>
@@ -283,7 +285,7 @@ const ImprovedNavbar = ({
                   {authenticated ? (
                     <div className="space-y-4">
                       <div className="p-4 bg-secondary/20 rounded-soft">
-                        <p className="text-sm text-gray-600">Logged in as</p>
+                        <p className="text-sm text-base-content/60">Logged in as</p>
                         <p className="font-bold">{username}</p>
                       </div>
                       <button

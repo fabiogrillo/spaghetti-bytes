@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
@@ -24,10 +24,74 @@ import {
   FaLink,
   FaUndo,
   FaRedo,
-  FaHeading
+  FaHeading,
+  FaTimes,
+  FaCheck
 } from 'react-icons/fa';
 import { BiCodeBlock } from 'react-icons/bi';
 import ImageUploadModal from './ImageUploadModal';
+
+const LinkInputModal = ({ isOpen, onClose, onSubmit, initialUrl = '' }) => {
+  const [url, setUrl] = useState(initialUrl);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setUrl(initialUrl);
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen, initialUrl]);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(url);
+    onClose();
+  };
+
+  const handleRemove = () => {
+    onSubmit('');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative bg-base-100 rounded-soft shadow-soft-lg border border-base-300 p-6 w-full max-w-md mx-4">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-bold">Insert Link</h3>
+          <button onClick={onClose} className="btn btn-ghost btn-sm btn-circle" aria-label="Close">
+            <FaTimes />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <input
+            ref={inputRef}
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://example.com"
+            className="input input-bordered w-full mb-4"
+          />
+          <div className="flex justify-end gap-2">
+            {initialUrl && (
+              <button type="button" onClick={handleRemove} className="btn btn-error btn-sm">
+                Remove Link
+              </button>
+            )}
+            <button type="button" onClick={onClose} className="btn btn-ghost btn-sm">
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary btn-sm">
+              <FaCheck /> Apply
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 const lowlight = createLowlight();
 lowlight.register('javascript', javascript);
@@ -36,7 +100,7 @@ lowlight.register('html', html);
 lowlight.register('css', css);
 lowlight.register('python', python);
 
-const MenuBar = ({ editor, onImageClick }) => {
+const MenuBar = ({ editor, onImageClick, onLinkClick }) => {
   if (!editor) return null;
 
   const addImage = () => {
@@ -44,16 +108,7 @@ const MenuBar = ({ editor, onImageClick }) => {
   };
 
   const setLink = () => {
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
-
-    if (url === null) return;
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
-    }
-
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    onLinkClick();
   };
 
   return (
@@ -65,6 +120,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           disabled={!editor.can().chain().focus().toggleBold().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('bold') ? 'btn-active' : ''}`}
           title="Bold"
+          aria-label="Bold"
         >
           <FaBold />
         </button>
@@ -74,6 +130,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           disabled={!editor.can().chain().focus().toggleItalic().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('italic') ? 'btn-active' : ''}`}
           title="Italic"
+          aria-label="Italic"
         >
           <FaItalic />
         </button>
@@ -83,6 +140,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           disabled={!editor.can().chain().focus().toggleStrike().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('strike') ? 'btn-active' : ''}`}
           title="Strikethrough"
+          aria-label="Strikethrough"
         >
           <FaStrikethrough />
         </button>
@@ -92,6 +150,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           disabled={!editor.can().chain().focus().toggleCode().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('code') ? 'btn-active' : ''}`}
           title="Inline Code"
+          aria-label="Inline Code"
         >
           <FaCode />
         </button>
@@ -105,6 +164,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('heading', { level: 2 }) ? 'btn-active' : ''}`}
           title="Heading 2"
+          aria-label="Heading 2"
         >
           <FaHeading />
         </button>
@@ -113,6 +173,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('bulletList') ? 'btn-active' : ''}`}
           title="Bullet List"
+          aria-label="Bullet List"
         >
           <FaListUl />
         </button>
@@ -121,6 +182,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('orderedList') ? 'btn-active' : ''}`}
           title="Numbered List"
+          aria-label="Numbered List"
         >
           <FaListOl />
         </button>
@@ -129,6 +191,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('codeBlock') ? 'btn-active' : ''}`}
           title="Code Block"
+          aria-label="Code Block"
         >
           <BiCodeBlock />
         </button>
@@ -137,6 +200,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('blockquote') ? 'btn-active' : ''}`}
           title="Quote"
+          aria-label="Quote"
         >
           <FaQuoteLeft />
         </button>
@@ -150,6 +214,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           onClick={setLink}
           className={`btn btn-ghost btn-sm ${editor.isActive('link') ? 'btn-active' : ''}`}
           title="Add Link"
+          aria-label="Add Link"
         >
           <FaLink />
         </button>
@@ -158,6 +223,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           onClick={addImage}
           className="btn btn-ghost btn-sm"
           title="Add Image"
+          aria-label="Add Image"
         >
           <FaImage />
         </button>
@@ -172,6 +238,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           disabled={!editor.can().chain().focus().undo().run()}
           className="btn btn-ghost btn-sm"
           title="Undo"
+          aria-label="Undo"
         >
           <FaUndo />
         </button>
@@ -181,6 +248,7 @@ const MenuBar = ({ editor, onImageClick }) => {
           disabled={!editor.can().chain().focus().redo().run()}
           className="btn btn-ghost btn-sm"
           title="Redo"
+          aria-label="Redo"
         >
           <FaRedo />
         </button>
@@ -191,6 +259,8 @@ const MenuBar = ({ editor, onImageClick }) => {
 
 const TipTapEditor = ({ value, onChange, readOnly = false }) => {
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkInitialUrl, setLinkInitialUrl] = useState('');
 
   const editor = useEditor({
     extensions: [
@@ -222,15 +292,30 @@ const TipTapEditor = ({ value, onChange, readOnly = false }) => {
     }
   };
 
+  const handleLinkClick = () => {
+    const previousUrl = editor?.getAttributes('link').href || '';
+    setLinkInitialUrl(previousUrl);
+    setShowLinkModal(true);
+  };
+
+  const handleLinkSubmit = (url) => {
+    if (!editor) return;
+    if (url === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else {
+      editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    }
+  };
+
   return (
     <>
       <div className={`${!readOnly ? 'shadow-soft-lg rounded-soft' : ''}`}>
-        {!readOnly && <MenuBar editor={editor} onImageClick={() => setShowImageModal(true)} />}
+        {!readOnly && <MenuBar editor={editor} onImageClick={() => setShowImageModal(true)} onLinkClick={handleLinkClick} />}
         <EditorContent
           editor={editor}
           className={`
             prose prose-lg max-w-none
-            ${!readOnly ? 'min-h-[400px] p-6 bg-white dark:bg-gray-800 rounded-b-soft border border-t-0 border-base-300' : ''}
+            ${!readOnly ? 'min-h-[400px] p-6 bg-base-100 rounded-b-soft border border-t-0 border-base-300' : ''}
             dark:prose-invert
             [&_.ProseMirror]:outline-none
             [&_.ProseMirror]:min-h-[380px]
@@ -260,11 +345,19 @@ const TipTapEditor = ({ value, onChange, readOnly = false }) => {
       </div>
 
       {!readOnly && (
-        <ImageUploadModal
-          isOpen={showImageModal}
-          onClose={() => setShowImageModal(false)}
-          onImageSelect={handleImageSelect}
-        />
+        <>
+          <ImageUploadModal
+            isOpen={showImageModal}
+            onClose={() => setShowImageModal(false)}
+            onImageSelect={handleImageSelect}
+          />
+          <LinkInputModal
+            isOpen={showLinkModal}
+            onClose={() => setShowLinkModal(false)}
+            onSubmit={handleLinkSubmit}
+            initialUrl={linkInitialUrl}
+          />
+        </>
       )}
     </>
   );
