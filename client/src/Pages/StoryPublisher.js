@@ -118,22 +118,24 @@ const StoryPublisher = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify(storyData),
         }
       );
       if (response.ok) {
-        console.log("Story published/updated successfully");
         localStorage.removeItem('draft');
         navigate("/blog", { state: { success: true } });
       } else {
         const errorData = await response.json();
-        console.error("Error publishing/updating story:", errorData);
-        navigate("/blog", { state: { success: false } });
+        const message = errorData.errors
+          ? errorData.errors.map(e => e.msg || e.message).join(', ')
+          : errorData.message || 'Unknown error';
+        setErrors({ submit: `Failed to save story: ${message}` });
+        setLoading(false);
       }
     } catch (error) {
       console.error("Network error:", error);
-      navigate("/blog", { state: { success: false } });
-    } finally {
+      setErrors({ submit: 'Network error — please try again.' });
       setLoading(false);
     }
   };
@@ -441,6 +443,12 @@ const StoryPublisher = () => {
                   </div>
                 </label>
               </div>
+
+              {errors.submit && (
+                <div className="alert alert-error">
+                  <span>{errors.submit}</span>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

@@ -77,12 +77,12 @@ app.use(compression({
   threshold: 1024
 }));
 
-// MongoDB sanitization
-app.use(mongoSanitize());
-
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// MongoDB sanitization (must run after body parsing so req.body is populated)
+app.use(mongoSanitize());
 
 // Rate limiting
 app.use('/api/', apiLimiter);

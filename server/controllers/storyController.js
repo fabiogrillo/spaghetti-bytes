@@ -1,5 +1,6 @@
 const Story = require("../models/Story");
 const { notifyNewArticle } = require("./newsletterController");
+const { invalidateStoryCache } = require("../middleware/cacheRoutes");
 const axios = require("axios");
 const dotenv = require("dotenv");
 const { body, validationResult } = require('express-validator');
@@ -17,7 +18,7 @@ const storyValidationRules = [
   body('summary')
     .trim()
     .notEmpty().withMessage('Summary is required')
-    .isLength({ min: 10, max: 500 }).withMessage('Summary must be between 10 and 500 characters'),
+    .isLength({ min: 10, max: 1000 }).withMessage('Summary must be between 10 and 1000 characters'),
   body('content')
     .trim()
     .notEmpty().withMessage('Content is required')
@@ -111,6 +112,7 @@ const updateStory = async (req, res) => {
     if (!updatedStory) {
       return res.status(404).json({ message: "Story not found" });
     }
+    invalidateStoryCache(req.params.id);
     res.json(updatedStory);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -124,6 +126,7 @@ const deleteStory = async (req, res) => {
     if (!deletedStory) {
       return res.status(404).json({ message: "Story not found" });
     }
+    invalidateStoryCache(req.params.id);
     res.json({ message: "Story deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
