@@ -1,4 +1,5 @@
 const Story = require("../models/Story");
+const { notifyNewArticle } = require("./newsletterController");
 const axios = require("axios");
 const dotenv = require("dotenv");
 const { body, validationResult } = require('express-validator');
@@ -87,6 +88,11 @@ const createStory = async (req, res) => {
     if (req.body.shareOnMedium) {
       await publishOnMedium(savedStory);
     }
+
+    // Notify subscribers — fire-and-forget, errors don't affect the response
+    notifyNewArticle(savedStory).catch(err =>
+      console.error('Newsletter notification failed:', err.message)
+    );
 
     res.status(201).json(savedStory);
   } catch (error) {

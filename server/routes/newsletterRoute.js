@@ -1,8 +1,6 @@
-// server/routes/newsletterRoute.js
 const express = require("express");
 const router = express.Router();
 
-// Import controllers
 const {
     subscribe,
     confirmSubscription,
@@ -13,89 +11,28 @@ const {
     getSubscriberStats
 } = require("../controllers/newsletterController");
 
-// Import middleware
 const { requireAuth, requireAdmin } = require("../middleware/auth");
-const {
-    newsletterLimiter,
-    apiLimiter,
-    contentLimiter
-} = require("../middleware/rateLimiter");
-const {
-    newsletterValidation,
-    campaignValidation,
-    queryValidation,
-    sanitizeMongo
-} = require("../middleware/validation");
+const { newsletterLimiter, apiLimiter } = require("../middleware/rateLimiter");
+const { newsletterValidation, queryValidation, sanitizeMongo } = require("../middleware/validation");
 
-// Apply MongoDB sanitization to all routes
 router.use(sanitizeMongo);
 
-// ====================================
-// PUBLIC ROUTES - No authentication required
-// ====================================
+// ── Public routes ─────────────────────────────────────────────────────────────
 
-// Subscribe to newsletter - with rate limiting and validation
-router.post(
-    "/subscribe",
-    newsletterLimiter, // Prevent spam subscriptions
-    newsletterValidation.subscribe, // Validate email format
-    subscribe
-);
+router.post("/subscribe", newsletterLimiter, newsletterValidation.subscribe, subscribe);
 
-// Confirm subscription via email token
-router.get(
-    "/confirm/:token",
-    apiLimiter, // Basic rate limiting
-    newsletterValidation.confirmSubscription, // Validate token
-    confirmSubscription
-);
+router.get("/confirm/:token", apiLimiter, newsletterValidation.confirmSubscription, confirmSubscription);
 
-// Unsubscribe via email token
-router.get(
-    "/unsubscribe/:token",
-    apiLimiter,
-    newsletterValidation.unsubscribe,
-    unsubscribe
-);
+router.get("/unsubscribe/:token", apiLimiter, newsletterValidation.unsubscribe, unsubscribe);
 
-// Self-service unsubscribe: user provides email, receives a link
-router.post(
-    "/unsubscribe/request",
-    newsletterLimiter,
-    requestUnsubscribe
-);
+router.post("/unsubscribe/request", newsletterLimiter, requestUnsubscribe);
 
-// ====================================
-// ADMIN ROUTES - Authentication required
-// ====================================
+// ── Admin routes ──────────────────────────────────────────────────────────────
 
-// Get all subscribers - Admin only
-router.get(
-    "/subscribers",
-    requireAuth, // Check authentication
-    requireAdmin, // Check admin role
-    queryValidation.pagination, // Validate pagination params
-    getSubscribers
-);
+router.get("/subscribers", requireAuth, requireAdmin, queryValidation.pagination, getSubscribers);
 
-// Delete a specific subscriber - Admin only
-router.delete(
-    "/subscribers/:id",
-    requireAuth, // Check authentication
-    requireAdmin, // Check admin role
-    deleteSubscriber
-);
+router.delete("/subscribers/:id", requireAuth, requireAdmin, deleteSubscriber);
 
-// ====================================
-// STATISTICS ROUTES - Admin only
-// ====================================
-
-// Get subscriber statistics
-router.get(
-    "/stats",
-    requireAuth, // Check authentication
-    requireAdmin, // Check admin role
-    getSubscriberStats
-);
+router.get("/stats", requireAuth, requireAdmin, getSubscriberStats);
 
 module.exports = router;

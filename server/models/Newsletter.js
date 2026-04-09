@@ -16,7 +16,7 @@ const subscriberSchema = new mongoose.Schema({
     },
 
     metadata: {
-        source: String, // 'homepage', 'article', 'popup'
+        source: String,
         referrer: String,
         ipAddress: String,
         userAgent: String
@@ -28,7 +28,7 @@ const subscriberSchema = new mongoose.Schema({
             enum: ['instant', 'daily', 'weekly', 'monthly'],
             default: 'weekly'
         },
-        topics: [String] // ['react', 'nodejs', 'mongodb']
+        topics: [String]
     },
 
     engagement: {
@@ -50,11 +50,9 @@ const subscriberSchema = new mongoose.Schema({
     }
 });
 
-// Indexes
 subscriberSchema.index({ status: 1 });
 subscriberSchema.index({ 'tokens.unsubscribeToken': 1 });
 
-// Methods
 subscriberSchema.methods.generateTokens = function () {
     this.tokens.confirmToken = require('crypto').randomBytes(32).toString('hex');
     this.tokens.unsubscribeToken = require('crypto').randomBytes(32).toString('hex');
@@ -62,45 +60,4 @@ subscriberSchema.methods.generateTokens = function () {
 
 const Subscriber = mongoose.model("Subscriber", subscriberSchema);
 
-// Newsletter Campaign Schema
-const campaignSchema = new mongoose.Schema({
-    subject: { type: String, required: true },
-    preheader: String,
-    content: {
-        html: String,
-        text: String,
-        articles: [{
-            title: String,
-            summary: String,
-            url: String,
-            imageUrl: String
-        }]
-    },
-
-    status: {
-        type: String,
-        enum: ['draft', 'scheduled', 'sending', 'sent'],
-        default: 'draft'
-    },
-
-    schedule: {
-        sendAt: Date,
-        timezone: String
-    },
-
-    recipients: {
-        total: Number,
-        sent: Number,
-        opened: Number,
-        clicked: Number,
-        unsubscribed: Number
-    },
-
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    sentAt: Date,
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Campaign = mongoose.model("Campaign", campaignSchema);
-
-module.exports = { Subscriber, Campaign };
+module.exports = { Subscriber };

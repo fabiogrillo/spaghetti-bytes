@@ -61,58 +61,6 @@ const newsletterValidation = {
 };
 
 /**
- * Campaign validation rules
- */
-const campaignValidation = {
-    create: [
-        body('name')
-            .trim()
-            .notEmpty()
-            .withMessage('Campaign name is required')
-            .isLength({ min: 3, max: 100 })
-            .withMessage('Campaign name must be between 3 and 100 characters'),
-        body('subject')
-            .trim()
-            .notEmpty()
-            .withMessage('Email subject is required')
-            .isLength({ min: 5, max: 200 })
-            .withMessage('Subject must be between 5 and 200 characters'),
-        body('content')
-            .notEmpty()
-            .withMessage('Email content is required')
-            .isLength({ max: 50000 })
-            .withMessage('Content too long (max 50,000 characters)'),
-        body('scheduledFor')
-            .optional()
-            .isISO8601()
-            .withMessage('Invalid date format')
-            .custom((value) => {
-                if (new Date(value) < new Date()) {
-                    throw new Error('Scheduled date must be in the future');
-                }
-                return true;
-            }),
-        body('segments')
-            .optional()
-            .isArray()
-            .withMessage('Segments must be an array'),
-        handleValidationErrors
-    ],
-
-    send: [
-        param('campaignId')
-            .isMongoId()
-            .withMessage('Invalid campaign ID'),
-        body('testEmail')
-            .optional()
-            .isEmail()
-            .normalizeEmail()
-            .withMessage('Invalid test email address'),
-        handleValidationErrors
-    ]
-};
-
-/**
  * Authentication validation rules
  */
 const authValidation = {
@@ -318,7 +266,6 @@ const customValidators = {
 module.exports = {
     handleValidationErrors,
     newsletterValidation,
-    campaignValidation,
     authValidation,
     contentValidation,
     queryValidation,
