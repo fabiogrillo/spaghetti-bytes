@@ -34,7 +34,7 @@ const newsletterValidation = {
             .withMessage('Email address too long'),
         body('source')
             .optional()
-            .isIn(['website', 'blog', 'social', 'referral', 'other'])
+            .isIn(['website', 'blog', 'social', 'referral', 'other', 'homepage', 'article'])
             .withMessage('Invalid source'),
         body('referrer')
             .optional()

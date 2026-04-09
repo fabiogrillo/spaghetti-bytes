@@ -32,6 +32,7 @@ import CookieBanner from "./Components/CookieBanner";
 import CookieSettings from "./Components/CookieSettings";
 import Privacy from "./Pages/Privacy";
 import Contacts from "./Pages/Contacts";
+import Unsubscribe from "./Pages/Unsubscribe";
 
 // Import analytics hook
 import { useAnalytics } from "./hooks/useAnalytics";
@@ -71,6 +72,7 @@ const AppContent = ({ isAuthenticated, setAuthenticated, username, setUsername, 
           <Route path="/blog" element={<Blog />} />
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="/visualizer/:storyId" element={<StoryVisualizer />} />
           <Route
             path="/login"

@@ -7,6 +7,7 @@ const {
     subscribe,
     confirmSubscription,
     unsubscribe,
+    requestUnsubscribe,
     getSubscribers,
     deleteSubscriber,
     getSubscriberStats
@@ -52,9 +53,16 @@ router.get(
 // Unsubscribe via email token
 router.get(
     "/unsubscribe/:token",
-    apiLimiter, // Basic rate limiting
-    newsletterValidation.unsubscribe, // Validate token
+    apiLimiter,
+    newsletterValidation.unsubscribe,
     unsubscribe
+);
+
+// Self-service unsubscribe: user provides email, receives a link
+router.post(
+    "/unsubscribe/request",
+    newsletterLimiter,
+    requestUnsubscribe
 );
 
 // ====================================

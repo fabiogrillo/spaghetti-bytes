@@ -118,7 +118,7 @@ const sendCampaignEmail = async (campaign, subscriber) => {
         const baseUrl = process.env.NODE_ENV === 'production' 
             ? (process.env.SITE_URL || 'https://www.spaghettibytes.blog')
             : 'http://localhost:3000';
-        const unsubscribeLink = `${baseUrl}/api/newsletter/unsubscribe/${subscriber.tokens.unsubscribeToken}`;
+        const unsubscribeLink = `${baseUrl}/unsubscribe?token=${subscriber.tokens.unsubscribeToken}`;
 
         htmlContent = htmlContent
             .replace(/{{email}}/g, subscriber.email)
@@ -311,43 +311,24 @@ const confirmSubscription = async (req, res) => {
     }
 };
 
-// Unsubscribe
+// Unsubscribe — deletes the subscriber document entirely
 const unsubscribe = async (req, res) => {
     try {
         const { token } = req.params;
 
-        const subscriber = await Subscriber.findOne({
+        const subscriber = await Subscriber.findOneAndDelete({
             'tokens.unsubscribeToken': token
         });
 
         if (!subscriber) {
-            return res.status(404).send('Invalid unsubscribe link');
+            return res.status(404).json({ error: 'Invalid or already-used unsubscribe link' });
         }
 
-        subscriber.status = 'unsubscribed';
-        subscriber.dates.unsubscribedAt = new Date();
-        await subscriber.save();
-
-        res.send(`
-            <html>
-            <head>
-                <title>Unsubscribed</title>
-                <style>
-                    body { font-family: Arial; text-align: center; padding: 50px; }
-                    h1 { color: #666; }
-                </style>
-            </head>
-            <body>
-                <h1>You've been unsubscribed</h1>
-                <p>We're sorry to see you go!</p>
-                <p>You won't receive any more emails from us.</p>
-            </body>
-            </html>
-        `);
+        res.status(200).json({ success: true, message: "You've been unsubscribed successfully." });
 
     } catch (error) {
         console.error("Unsubscribe error:", error);
-        res.status(500).send("An error occurred");
+        res.status(500).json({ error: "An error occurred. Please try again." });
     }
 };
 
@@ -561,117 +542,212 @@ const getSubscriberStats = async (req, res) => {
     }
 };
 
-// Email templates
+// ─── Shared email wrapper ────────────────────────────────────────────────────
+const emailWrapper = (content) => `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background-color:#f5f0ff;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f0ff;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="100%" style="max-width:580px;background:#fff;border-radius:16px;border:3px solid #1a1a2e;box-shadow:6px 6px 0 #1a1a2e;overflow:hidden;">
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#FF6B9D,#A855F7);padding:32px 40px;text-align:center;border-bottom:3px solid #1a1a2e;">
+            <span style="font-size:36px;">🍝</span>
+            <h1 style="margin:8px 0 0;color:#fff;font-size:24px;font-weight:800;letter-spacing:-0.5px;">Spaghetti Bytes</h1>
+            <p style="margin:4px 0 0;color:rgba(255,255,255,0.85);font-size:13px;">where code meets flavor</p>
+          </td>
+        </tr>
+        <!-- Body -->
+        <tr><td style="padding:36px 40px;">${content}</td></tr>
+        <!-- Footer -->
+        <tr>
+          <td style="background:#f9f6ff;padding:20px 40px;text-align:center;border-top:2px solid #e9e3ff;">
+            <p style="margin:0;color:#888;font-size:12px;">
+              © ${new Date().getFullYear()} Spaghetti Bytes ·
+              <a href="${process.env.SITE_URL || 'https://www.spaghettibytes.blog'}" style="color:#A855F7;text-decoration:none;">spaghettibytes.blog</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+// ─── Email templates ──────────────────────────────────────────────────────────
 const sendConfirmationEmail = async (subscriber) => {
-    const baseUrl = process.env.NODE_ENV === 'production' 
+    const baseUrl = process.env.NODE_ENV === 'production'
         ? (process.env.SITE_URL || 'https://www.spaghettibytes.blog')
         : 'http://localhost:3000';
     const confirmUrl = `${baseUrl}/api/newsletter/confirm/${subscriber.tokens.confirmToken}`;
 
-    const mailOptions = {
+    await transporter.sendMail({
         from: `Spaghetti Bytes <${process.env.EMAIL_USER}>`,
         to: subscriber.email,
         subject: "🍝 Confirm your subscription to Spaghetti Bytes",
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h1 style="color: #FF6B9D; text-align: center;">Almost there!</h1>
-                
-                <p>Hi there!</p>
-                
-                <p>Thanks for subscribing to Spaghetti Bytes newsletter. 
-                Just one more step - please confirm your email address by clicking the button below:</p>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="${confirmUrl}" 
-                       style="background-color: #FF6B9D; color: white; padding: 15px 30px; 
-                              text-decoration: none; border-radius: 25px; display: inline-block;">
-                        Confirm Subscription
-                    </a>
-                </div>
-                
-                <p style="color: #666; font-size: 14px;">
-                    Or copy and paste this link: ${confirmUrl}
-                </p>
-                
-                <hr style="border: 1px solid #eee; margin: 30px 0;">
-                
-                <p style="color: #999; font-size: 12px; text-align: center;">
-                    If you didn't subscribe to our newsletter, you can safely ignore this email.
-                </p>
+        html: emailWrapper(`
+            <h2 style="margin:0 0 8px;color:#1a1a2e;font-size:22px;font-weight:800;">Almost there! 🎉</h2>
+            <p style="color:#555;line-height:1.6;margin:0 0 24px;">
+                Thanks for subscribing! Just one click to confirm your email and join the Spaghetti Club.
+            </p>
+            <div style="text-align:center;margin:32px 0;">
+                <a href="${confirmUrl}"
+                   style="display:inline-block;background:linear-gradient(135deg,#FF6B9D,#A855F7);color:#fff;
+                          padding:14px 36px;border-radius:50px;font-weight:700;font-size:16px;
+                          text-decoration:none;border:2px solid #1a1a2e;box-shadow:3px 3px 0 #1a1a2e;">
+                    ✅ Confirm Subscription
+                </a>
             </div>
-        `
-    };
-
-    await transporter.sendMail(mailOptions);
+            <p style="color:#999;font-size:12px;text-align:center;margin:24px 0 0;">
+                Or copy this link: <a href="${confirmUrl}" style="color:#A855F7;word-break:break-all;">${confirmUrl}</a>
+            </p>
+            <hr style="border:none;border-top:2px solid #f0ebff;margin:28px 0;">
+            <p style="color:#aaa;font-size:12px;text-align:center;margin:0;">
+                Didn't subscribe? You can safely ignore this email.
+            </p>
+        `)
+    });
 };
 
 const sendWelcomeEmail = async (subscriber) => {
-    const mailOptions = {
+    const siteUrl = process.env.SITE_URL || 'https://www.spaghettibytes.blog';
+
+    await transporter.sendMail({
         from: `Spaghetti Bytes <${process.env.EMAIL_USER}>`,
         to: subscriber.email,
-        subject: "🎉 Welcome to Spaghetti Bytes!",
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h1 style="color: #4ECDC4; text-align: center;">Welcome to the family!</h1>
-                
-                <p>Hi there!</p>
-                
-                <p>Your subscription is confirmed! You're now part of the Spaghetti Bytes community.</p>
-                
-                <p>Here's what you can expect:</p>
-                <ul>
-                    <li>📚 Weekly technical articles and tutorials</li>
-                    <li>💡 Tips and tricks for better coding</li>
-                    <li>🚀 Updates on new technologies</li>
-                    <li>🍝 A dash of humor with your tech</li>
-                </ul>
-                
-                <p>Stay tuned for our next newsletter!</p>
-                
-                <hr style="border: 1px solid #eee; margin: 30px 0;">
-                
-                <p style="text-align: center;">
-                    <a href="${process.env.SITE_URL || 'https://www.spaghettibytes.blog'}" 
-                       style="color: #FF6B9D;">Visit Spaghetti Bytes</a>
-                </p>
+        subject: "🎉 Welcome to the Spaghetti Club!",
+        html: emailWrapper(`
+            <h2 style="margin:0 0 8px;color:#1a1a2e;font-size:22px;font-weight:800;">Welcome to the family! 🍝</h2>
+            <p style="color:#555;line-height:1.6;margin:0 0 20px;">
+                You're officially part of the <strong>Spaghetti Bytes</strong> community. Here's what's coming your way:
+            </p>
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                <tr>
+                    <td style="padding:10px 14px;background:#f9f6ff;border-radius:10px;border:2px solid #e9e3ff;margin-bottom:8px;">
+                        <span style="font-size:20px;">📚</span>
+                        <span style="color:#444;font-size:14px;margin-left:8px;">Weekly articles and tutorials</span>
+                    </td>
+                </tr>
+                <tr><td style="height:8px;"></td></tr>
+                <tr>
+                    <td style="padding:10px 14px;background:#f9f6ff;border-radius:10px;border:2px solid #e9e3ff;">
+                        <span style="font-size:20px;">💡</span>
+                        <span style="color:#444;font-size:14px;margin-left:8px;">Tips, tricks and deep dives</span>
+                    </td>
+                </tr>
+                <tr><td style="height:8px;"></td></tr>
+                <tr>
+                    <td style="padding:10px 14px;background:#f9f6ff;border-radius:10px;border:2px solid #e9e3ff;">
+                        <span style="font-size:20px;">🚀</span>
+                        <span style="color:#444;font-size:14px;margin-left:8px;">Updates on new technologies</span>
+                    </td>
+                </tr>
+            </table>
+            <div style="text-align:center;margin:28px 0 0;">
+                <a href="${siteUrl}"
+                   style="display:inline-block;background:#4ECDC4;color:#1a1a2e;
+                          padding:14px 36px;border-radius:50px;font-weight:700;font-size:15px;
+                          text-decoration:none;border:2px solid #1a1a2e;box-shadow:3px 3px 0 #1a1a2e;">
+                    🍝 Read the latest articles
+                </a>
             </div>
-        `
-    };
-
-    await transporter.sendMail(mailOptions);
+        `)
+    });
 };
 
 const sendAdminNotification = async (subscriber) => {
-    const mailOptions = {
-        from: `Spaghetti Bytes <${process.env.EMAIL_USER}>`,
-        to: process.env.ADMIN_EMAIL,
-        subject: "🎉 New Newsletter Subscriber!",
-        html: `
-            <div style="font-family: Arial, sans-serif;">
-                <h2>New Subscriber Alert!</h2>
-                <p>A new user has subscribed to the newsletter:</p>
-                <table style="border-collapse: collapse;">
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Email:</strong></td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${subscriber.email}</td>
+    try {
+        await transporter.sendMail({
+            from: `Spaghetti Bytes <${process.env.EMAIL_USER}>`,
+            to: process.env.ADMIN_EMAIL,
+            subject: "🎉 New Newsletter Subscriber!",
+            html: emailWrapper(`
+                <h2 style="margin:0 0 16px;color:#1a1a2e;font-size:20px;font-weight:800;">New subscriber! 🎊</h2>
+                <table width="100%" cellpadding="0" cellspacing="0" style="border:2px solid #e9e3ff;border-radius:10px;overflow:hidden;">
+                    <tr style="background:#f9f6ff;">
+                        <td style="padding:10px 14px;color:#888;font-size:13px;font-weight:600;width:100px;border-bottom:1px solid #e9e3ff;">Email</td>
+                        <td style="padding:10px 14px;color:#1a1a2e;font-size:13px;border-bottom:1px solid #e9e3ff;">${subscriber.email}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Source:</strong></td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${subscriber.metadata?.source || 'Unknown'}</td>
+                        <td style="padding:10px 14px;color:#888;font-size:13px;font-weight:600;border-bottom:1px solid #e9e3ff;">Source</td>
+                        <td style="padding:10px 14px;color:#1a1a2e;font-size:13px;border-bottom:1px solid #e9e3ff;">${subscriber.metadata?.source || 'Unknown'}</td>
                     </tr>
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Date:</strong></td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${new Date().toLocaleString()}</td>
+                    <tr style="background:#f9f6ff;">
+                        <td style="padding:10px 14px;color:#888;font-size:13px;font-weight:600;">Date</td>
+                        <td style="padding:10px 14px;color:#1a1a2e;font-size:13px;">${new Date().toLocaleString('it-IT')}</td>
                     </tr>
                 </table>
-            </div>
-        `
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
+            `)
+        });
     } catch (error) {
         console.error('Failed to send admin notification:', error);
+    }
+};
+
+// Request unsubscribe link via email (self-service)
+const requestUnsubscribe = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            return res.status(400).json({ error: "Please provide a valid email address" });
+        }
+
+        const subscriber = await Subscriber.findOne({ email: email.toLowerCase().trim() });
+
+        // Always respond the same way to prevent email enumeration
+        const genericResponse = {
+            success: true,
+            message: "If that email is subscribed, you'll receive an unsubscribe link shortly."
+        };
+
+        if (!subscriber || subscriber.status === 'unsubscribed') {
+            return res.status(200).json(genericResponse);
+        }
+
+        // Ensure subscriber has an unsubscribe token
+        if (!subscriber.tokens.unsubscribeToken) {
+            subscriber.generateTokens();
+            await subscriber.save();
+        }
+
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? (process.env.SITE_URL || 'https://www.spaghettibytes.blog')
+            : 'http://localhost:3000';
+        const unsubscribeLink = `${baseUrl}/unsubscribe?token=${subscriber.tokens.unsubscribeToken}`;
+
+        await transporter.sendMail({
+            from: `Spaghetti Bytes <${process.env.EMAIL_USER}>`,
+            to: subscriber.email,
+            subject: "Unsubscribe from Spaghetti Bytes",
+            html: emailWrapper(`
+                <h2 style="margin:0 0 8px;color:#1a1a2e;font-size:22px;font-weight:800;">Unsubscribe request 👋</h2>
+                <p style="color:#555;line-height:1.6;margin:0 0 24px;">
+                    We received a request to remove this email from Spaghetti Bytes.<br>
+                    Click the button below to confirm. If you didn't ask for this, just ignore it.
+                </p>
+                <div style="text-align:center;margin:32px 0;">
+                    <a href="${unsubscribeLink}"
+                       style="display:inline-block;background:#888;color:#fff;
+                              padding:14px 36px;border-radius:50px;font-weight:700;font-size:15px;
+                              text-decoration:none;border:2px solid #1a1a2e;box-shadow:3px 3px 0 #1a1a2e;">
+                        Confirm Unsubscribe
+                    </a>
+                </div>
+                <p style="color:#aaa;font-size:12px;text-align:center;margin:24px 0 0;">
+                    Didn't request this? No action needed — your subscription stays active.
+                </p>
+            `)
+        });
+
+        res.status(200).json(genericResponse);
+
+    } catch (error) {
+        console.error("Request unsubscribe error:", error);
+        res.status(500).json({ error: "Failed to process request. Please try again." });
     }
 };
 
@@ -682,9 +758,8 @@ module.exports = {
     subscribe,
     confirmSubscription,
     unsubscribe,
+    requestUnsubscribe,
     getSubscribers,
     deleteSubscriber,
     getSubscriberStats
-    // Campaign functions removed as part of simplification
-    // createCampaign, getCampaigns, sendCampaign, deleteCampaign
 };
