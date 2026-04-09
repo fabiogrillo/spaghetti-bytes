@@ -15,6 +15,10 @@ const transporter = nodemailer.createTransport({
 // Store scheduled tasks
 const scheduledTasks = new Map();
 
+// Site URL helper — strips trailing slash from SITE_URL env var
+const getSiteUrl = () =>
+    (process.env.SITE_URL || 'https://www.spaghettibytes.blog').replace(/\/$/, '');
+
 // Initialize scheduler for campaigns
 const initializeScheduler = async () => {
     try {
@@ -115,8 +119,8 @@ const sendCampaignEmail = async (campaign, subscriber) => {
         let textContent = campaign.content.text || '';
 
         // Replace placeholders  
-        const baseUrl = process.env.NODE_ENV === 'production' 
-            ? (process.env.SITE_URL || 'https://www.spaghettibytes.blog')
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? getSiteUrl()
             : 'http://localhost:3000';
         const unsubscribeLink = `${baseUrl}/unsubscribe?token=${subscriber.tokens.unsubscribeToken}`;
 
@@ -265,7 +269,7 @@ const confirmSubscription = async (req, res) => {
                 <body>
                     <h1>Invalid or Expired Link</h1>
                     <p>This confirmation link is invalid or has expired.</p>
-                    <a href="${process.env.SITE_URL || 'https://www.spaghettibytes.blog'}">Go to Spaghetti Bytes</a>
+                    <a href="${getSiteUrl()}">Go to Spaghetti Bytes</a>
                 </body>
                 </html>
             `);
@@ -300,7 +304,7 @@ const confirmSubscription = async (req, res) => {
                 <h1>🎉 Welcome to Spaghetti Bytes!</h1>
                 <p>Your subscription has been confirmed.</p>
                 <p>You'll receive our next newsletter in your inbox.</p>
-                <a href="${process.env.SITE_URL || 'https://www.spaghettibytes.blog'}">Visit Spaghetti Bytes</a>
+                <a href="${getSiteUrl()}">Visit Spaghetti Bytes</a>
             </body>
             </html>
         `);
@@ -566,7 +570,7 @@ const emailWrapper = (content) => `
           <td style="background:#f9f6ff;padding:20px 40px;text-align:center;border-top:2px solid #e9e3ff;">
             <p style="margin:0;color:#888;font-size:12px;">
               © ${new Date().getFullYear()} Spaghetti Bytes ·
-              <a href="${process.env.SITE_URL || 'https://www.spaghettibytes.blog'}" style="color:#A855F7;text-decoration:none;">spaghettibytes.blog</a>
+              <a href="${getSiteUrl()}" style="color:#A855F7;text-decoration:none;">spaghettibytes.blog</a>
             </p>
           </td>
         </tr>
@@ -579,7 +583,7 @@ const emailWrapper = (content) => `
 // ─── Email templates ──────────────────────────────────────────────────────────
 const sendConfirmationEmail = async (subscriber) => {
     const baseUrl = process.env.NODE_ENV === 'production'
-        ? (process.env.SITE_URL || 'https://www.spaghettibytes.blog')
+        ? getSiteUrl()
         : 'http://localhost:3000';
     const confirmUrl = `${baseUrl}/api/newsletter/confirm/${subscriber.tokens.confirmToken}`;
 
@@ -612,7 +616,7 @@ const sendConfirmationEmail = async (subscriber) => {
 };
 
 const sendWelcomeEmail = async (subscriber) => {
-    const siteUrl = process.env.SITE_URL || 'https://www.spaghettibytes.blog';
+    const siteUrl = getSiteUrl();
 
     await transporter.sendMail({
         from: `Spaghetti Bytes <${process.env.EMAIL_USER}>`,
@@ -715,7 +719,7 @@ const requestUnsubscribe = async (req, res) => {
         }
 
         const baseUrl = process.env.NODE_ENV === 'production'
-            ? (process.env.SITE_URL || 'https://www.spaghettibytes.blog')
+            ? getSiteUrl()
             : 'http://localhost:3000';
         const unsubscribeLink = `${baseUrl}/unsubscribe?token=${subscriber.tokens.unsubscribeToken}`;
 
