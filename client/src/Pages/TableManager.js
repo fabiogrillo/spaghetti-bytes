@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 const TableManager = () => {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [mediumStatus, setMediumStatus] = useState({}); // { [storyId]: 'loading' | 'done' | 'error' }
+  const [mediumStatus, setMediumStatus] = useState({}); // { [storyId]: 'copied' }
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,29 +50,14 @@ const TableManager = () => {
     navigate(`/story-publisher/${id}`);
   };
 
-  const publishToMedium = async (id) => {
-    setMediumStatus((prev) => ({ ...prev, [id]: "loading" }));
-    try {
-      const response = await fetch(`/api/stories/${id}/publish-medium`, {
-        method: "POST",
-        credentials: "include",
-      });
-      if (response.ok) {
-        setMediumStatus((prev) => ({ ...prev, [id]: "done" }));
-        setStories((prev) =>
-          prev.map((s) => (s._id === id ? { ...s, sharedOnMedium: true } : s))
-        );
-      } else {
-        const data = await response.json();
-        console.error("Medium publish error:", data);
-        setMediumStatus((prev) => ({ ...prev, [id]: "error" }));
-        setTimeout(() => setMediumStatus((prev) => ({ ...prev, [id]: undefined })), 3000);
-      }
-    } catch (error) {
-      console.error("Network error:", error);
-      setMediumStatus((prev) => ({ ...prev, [id]: "error" }));
-      setTimeout(() => setMediumStatus((prev) => ({ ...prev, [id]: undefined })), 3000);
-    }
+  // Medium's server API is blocked by Cloudflare — use their "Import a story" UI instead.
+  // This copies the blog post URL and opens Medium's import page in one click.
+  const importOnMedium = (storyId) => {
+    const storyUrl = `https://spaghettibytes.blog/visualizer/${storyId}`;
+    navigator.clipboard.writeText(storyUrl).catch(() => {});
+    window.open("https://medium.com/p/import", "_blank", "noopener,noreferrer");
+    setMediumStatus((prev) => ({ ...prev, [storyId]: "copied" }));
+    setTimeout(() => setMediumStatus((prev) => ({ ...prev, [storyId]: undefined })), 4000);
   };
 
   // Define columns for ResponsiveTable
@@ -125,33 +110,30 @@ const TableManager = () => {
       label: "Medium",
       render: (story) => {
         const status = mediumStatus[story._id];
-        if (story.sharedOnMedium || status === "done") {
+        if (story.sharedOnMedium) {
           return (
             <span className="badge badge-success badge-sm gap-1">
               <FaMedium /> Published
             </span>
           );
         }
+        if (status === "copied") {
+          return (
+            <div className="flex flex-col items-start gap-0.5">
+              <span className="badge badge-info badge-sm">URL copied!</span>
+              <span className="text-xs text-gray-400">Paste on Medium</span>
+            </div>
+          );
+        }
         return (
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => publishToMedium(story._id)}
-            disabled={status === "loading"}
-            className={`btn btn-xs gap-1 ${
-              status === "error"
-                ? "btn-error"
-                : "btn-outline border-gray-400 hover:bg-black hover:text-white hover:border-black"
-            }`}
-            title="Publish to Medium"
+            onClick={() => importOnMedium(story._id)}
+            className="btn btn-xs gap-1 btn-outline border-gray-400 hover:bg-black hover:text-white hover:border-black"
+            title="Copy URL and open Medium import"
           >
-            {status === "loading" ? (
-              <span className="loading loading-spinner loading-xs" />
-            ) : status === "error" ? (
-              "Error"
-            ) : (
-              <><FaMedium /> Publish</>
-            )}
+            <FaMedium /> Import
           </motion.button>
         );
       }
