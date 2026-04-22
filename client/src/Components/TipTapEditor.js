@@ -29,7 +29,7 @@ import {
   FaRemoveFormat,
   FaRulerHorizontal,
 } from 'react-icons/fa';
-import { BiCodeBlock, BiHeading } from 'react-icons/bi';
+import { BiCodeBlock } from 'react-icons/bi';
 import ImageUploadModal from './ImageUploadModal';
 
 const LinkInputModal = ({ isOpen, onClose, onSubmit, initialUrl = '' }) => {
