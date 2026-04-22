@@ -3,14 +3,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaNewspaper, FaBullseye, FaUsers } from 'react-icons/fa';
+import { FaNewspaper, FaBullseye } from 'react-icons/fa';
 import api from '../Api';
 
 const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }) => {
     const [stats, setStats] = useState({
         stories: 0,
         goals: 0,
-        visitors: 0
     });
     const [loading, setLoading] = useState(true);
 
@@ -28,7 +27,6 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
             setStats({
                 stories: 0,
                 goals: 0,
-                visitors: 0
             });
         } finally {
             setLoading(false);
@@ -51,14 +49,6 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
             color: "text-warning",
             bgGradient: "from-warning to-yellow-600",
             emoji: "🎯"
-        },
-        {
-            label: "Visitors",
-            value: stats.visitors,
-            icon: <FaUsers />,
-            color: "text-secondary",
-            bgGradient: "from-secondary to-purple-600",
-            emoji: "👥"
         }
     ];
 
@@ -94,8 +84,8 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
 
     if (loading) {
         return (
-            <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${className}`}>
-                {[1, 2, 3].map((i) => (
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${className}`}>
+                {[1, 2].map((i) => (
                     <div key={i} className="bg-gray-200 dark:bg-gray-700 rounded-soft h-24 animate-pulse" />
                 ))}
             </div>
@@ -109,7 +99,7 @@ const StatsDisplay = ({ variant = 'grid', showAnimation = true, className = '' }
                 variants={containerVariants}
                 initial={showAnimation ? "hidden" : "visible"}
                 animate="visible"
-                className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${className}`}
+                className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${className}`}
             >
                 {statItems.map((stat, index) => (
                     <motion.div

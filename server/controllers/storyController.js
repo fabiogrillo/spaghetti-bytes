@@ -87,7 +87,13 @@ const createStory = async (req, res) => {
     const savedStory = await newStory.save();
 
     if (req.body.shareOnMedium) {
-      await publishOnMedium(savedStory);
+      const mediumResult = await publishOnMedium(savedStory);
+      if (mediumResult.success) {
+        savedStory.sharedOnMedium = true;
+        await savedStory.save();
+      } else {
+        console.warn("Medium publish failed for story:", savedStory._id, mediumResult.error);
+      }
     }
 
     // Notify subscribers — fire-and-forget, errors don't affect the response
@@ -133,8 +139,20 @@ const deleteStory = async (req, res) => {
   }
 };
 
-// Publish a story on Medium
+// Strip base64 images from HTML content before sending to Medium.
+// Medium's API cannot process data: URIs — replace them with a text placeholder.
+const stripBase64Images = (html) => {
+  if (typeof html !== "string") return html;
+  return html.replace(/<img[^>]+src="data:[^"]*"[^>]*\/?>/gi, "<p><em>[Image]</em></p>");
+};
+
+// Publish a story on Medium. Returns { success, url?, error? }
 const publishOnMedium = async (story) => {
+  if (!MEDIUM_ACCESS_TOKEN || !MEDIUM_AUTHOR_ID) {
+    console.error("Medium credentials not configured.");
+    return { success: false, error: "Medium credentials not configured" };
+  }
+
   const url = `https://api.medium.com/v1/users/${MEDIUM_AUTHOR_ID}/posts`;
   const headers = {
     Authorization: `Bearer ${MEDIUM_ACCESS_TOKEN}`,
@@ -143,7 +161,7 @@ const publishOnMedium = async (story) => {
   const data = {
     title: story.title,
     contentFormat: "html",
-    content: story.content,
+    content: stripBase64Images(story.content),
     tags: story.tags,
     publishStatus: "public",
     notifyFollowers: true,
@@ -152,11 +170,34 @@ const publishOnMedium = async (story) => {
   try {
     const response = await axios.post(url, data, { headers });
     console.log("Story published on Medium:", response.data);
+    return { success: true, url: response.data?.data?.url };
   } catch (error) {
-    console.error(
-      "Error publishing story on Medium:",
-      error.response?.data || error.message
-    );
+    const detail = error.response?.data || error.message;
+    console.error("Error publishing story on Medium:", detail);
+    return { success: false, error: typeof detail === "object" ? JSON.stringify(detail) : detail };
+  }
+};
+
+// Re-publish an existing story to Medium (admin endpoint)
+const republishOnMedium = async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id);
+    if (!story) {
+      return res.status(404).json({ message: "Story not found" });
+    }
+
+    const result = await publishOnMedium(story);
+    if (!result.success) {
+      return res.status(502).json({ message: "Failed to publish on Medium", error: result.error });
+    }
+
+    // Mark as shared
+    story.sharedOnMedium = true;
+    await story.save();
+
+    res.json({ message: "Story published on Medium successfully", url: result.url });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
 };
 
@@ -195,6 +236,7 @@ module.exports = {
   updateStory,
   deleteStory,
   toggleLike,
+  republishOnMedium,
   storyValidationRules,
   validateStory,
 };

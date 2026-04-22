@@ -24,11 +24,12 @@ import {
   FaLink,
   FaUndo,
   FaRedo,
-  FaHeading,
   FaTimes,
-  FaCheck
+  FaCheck,
+  FaRemoveFormat,
+  FaRulerHorizontal,
 } from 'react-icons/fa';
-import { BiCodeBlock } from 'react-icons/bi';
+import { BiCodeBlock, BiHeading } from 'react-icons/bi';
 import ImageUploadModal from './ImageUploadModal';
 
 const LinkInputModal = ({ isOpen, onClose, onSubmit, initialUrl = '' }) => {
@@ -154,6 +155,47 @@ const MenuBar = ({ editor, onImageClick, onLinkClick }) => {
         >
           <FaCode />
         </button>
+
+        <button
+          onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
+          className="btn btn-ghost btn-sm"
+          title="Clear Formatting"
+          aria-label="Clear Formatting"
+        >
+          <FaRemoveFormat />
+        </button>
+      </div>
+
+      <div className="divider divider-horizontal mx-0 w-px bg-base-300 h-6"></div>
+
+      {/* Headings group */}
+      <div className="flex gap-1">
+        <button
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          className={`btn btn-ghost btn-sm text-xs font-bold ${editor.isActive('heading', { level: 1 }) ? 'btn-active' : ''}`}
+          title="Heading 1"
+          aria-label="Heading 1"
+        >
+          H1
+        </button>
+
+        <button
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          className={`btn btn-ghost btn-sm text-xs font-bold ${editor.isActive('heading', { level: 2 }) ? 'btn-active' : ''}`}
+          title="Heading 2"
+          aria-label="Heading 2"
+        >
+          H2
+        </button>
+
+        <button
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          className={`btn btn-ghost btn-sm text-xs font-bold ${editor.isActive('heading', { level: 3 }) ? 'btn-active' : ''}`}
+          title="Heading 3"
+          aria-label="Heading 3"
+        >
+          H3
+        </button>
       </div>
 
       <div className="divider divider-horizontal mx-0 w-px bg-base-300 h-6"></div>
@@ -161,16 +203,8 @@ const MenuBar = ({ editor, onImageClick, onLinkClick }) => {
       {/* Block formatting group */}
       <div className="flex gap-1">
         <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`btn btn-ghost btn-sm ${editor.isActive('heading', { level: 2 }) ? 'btn-active' : ''}`}
-          title="Heading 2"
-          aria-label="Heading 2"
-        >
-          <FaHeading />
-        </button>
-
-        <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
+          disabled={!editor.can().chain().focus().toggleBulletList().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('bulletList') ? 'btn-active' : ''}`}
           title="Bullet List"
           aria-label="Bullet List"
@@ -180,6 +214,7 @@ const MenuBar = ({ editor, onImageClick, onLinkClick }) => {
 
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          disabled={!editor.can().chain().focus().toggleOrderedList().run()}
           className={`btn btn-ghost btn-sm ${editor.isActive('orderedList') ? 'btn-active' : ''}`}
           title="Numbered List"
           aria-label="Numbered List"
@@ -203,6 +238,15 @@ const MenuBar = ({ editor, onImageClick, onLinkClick }) => {
           aria-label="Quote"
         >
           <FaQuoteLeft />
+        </button>
+
+        <button
+          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+          className="btn btn-ghost btn-sm"
+          title="Horizontal Rule"
+          aria-label="Horizontal Rule"
+        >
+          <FaRulerHorizontal />
         </button>
       </div>
 
@@ -272,7 +316,7 @@ const TipTapEditor = ({ value, onChange, readOnly = false }) => {
       Link.configure({
         openOnClick: false,
       }),
-      Image,
+      Image.configure({ allowBase64: true }),
       CodeBlockLowlight.configure({
         lowlight,
       }),

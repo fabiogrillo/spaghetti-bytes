@@ -8,6 +8,7 @@ const {
   updateStory,
   deleteStory,
   toggleLike,
+  republishOnMedium,
   storyValidationRules,
   validateStory,
 } = require("../controllers/storyController");
@@ -30,5 +31,8 @@ router.delete("/:id", requireAuth, requireAdmin, deleteStory);
 
 // Route to toggle like on a story
 router.post("/:id/like", toggleLike);
+
+// Route to re-publish an existing story to Medium (admin only)
+router.post("/:id/publish-medium", requireAuth, requireAdmin, republishOnMedium);
 
 module.exports = router;

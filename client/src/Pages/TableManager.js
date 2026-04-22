@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BsArrowLeft } from "react-icons/bs";
+import { FaMedium } from "react-icons/fa";
 import ResponsiveTable from "../Components/ResponsiveTable";
 import { motion } from "framer-motion";
 
 const TableManager = () => {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mediumStatus, setMediumStatus] = useState({}); // { [storyId]: 'loading' | 'done' | 'error' }
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,6 +50,31 @@ const TableManager = () => {
     navigate(`/story-publisher/${id}`);
   };
 
+  const publishToMedium = async (id) => {
+    setMediumStatus((prev) => ({ ...prev, [id]: "loading" }));
+    try {
+      const response = await fetch(`/api/stories/${id}/publish-medium`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        setMediumStatus((prev) => ({ ...prev, [id]: "done" }));
+        setStories((prev) =>
+          prev.map((s) => (s._id === id ? { ...s, sharedOnMedium: true } : s))
+        );
+      } else {
+        const data = await response.json();
+        console.error("Medium publish error:", data);
+        setMediumStatus((prev) => ({ ...prev, [id]: "error" }));
+        setTimeout(() => setMediumStatus((prev) => ({ ...prev, [id]: undefined })), 3000);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      setMediumStatus((prev) => ({ ...prev, [id]: "error" }));
+      setTimeout(() => setMediumStatus((prev) => ({ ...prev, [id]: undefined })), 3000);
+    }
+  };
+
   // Define columns for ResponsiveTable
   const storyColumns = [
     { 
@@ -84,14 +111,50 @@ const TableManager = () => {
         </div>
       )
     },
-    { 
-      key: "createdAt", 
-      label: "Created", 
+    {
+      key: "createdAt",
+      label: "Created",
       render: (story) => (
         <span className="text-sm">
           {new Date(story.createdAt).toLocaleDateString()}
         </span>
       )
+    },
+    {
+      key: "medium",
+      label: "Medium",
+      render: (story) => {
+        const status = mediumStatus[story._id];
+        if (story.sharedOnMedium || status === "done") {
+          return (
+            <span className="badge badge-success badge-sm gap-1">
+              <FaMedium /> Published
+            </span>
+          );
+        }
+        return (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => publishToMedium(story._id)}
+            disabled={status === "loading"}
+            className={`btn btn-xs gap-1 ${
+              status === "error"
+                ? "btn-error"
+                : "btn-outline border-gray-400 hover:bg-black hover:text-white hover:border-black"
+            }`}
+            title="Publish to Medium"
+          >
+            {status === "loading" ? (
+              <span className="loading loading-spinner loading-xs" />
+            ) : status === "error" ? (
+              "Error"
+            ) : (
+              <><FaMedium /> Publish</>
+            )}
+          </motion.button>
+        );
+      }
     }
   ];
 
