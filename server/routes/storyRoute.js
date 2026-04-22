@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   getStories,
   getStoryById,
+  getStoryPreview,
   createStory,
   updateStory,
   deleteStory,
@@ -16,6 +17,9 @@ const { requireAuth, requireAdmin } = require("../middleware/auth");
 
 // Route to get all stories
 router.get("/", getStories);
+
+// Server-side rendered HTML preview — used by Medium's "Import a story" scraper
+router.get("/:id/preview", getStoryPreview);
 
 // Route to get a single story by ID
 router.get("/:id", getStoryById);

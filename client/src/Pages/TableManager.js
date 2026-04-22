@@ -52,9 +52,11 @@ const TableManager = () => {
 
   // Medium's server API is blocked by Cloudflare — use their "Import a story" UI instead.
   // This copies the blog post URL and opens Medium's import page in one click.
+  // The visualizer is a React SPA — Medium's scraper can't execute JS.
+  // /api/stories/:id/preview returns a static HTML page that Medium can import.
   const importOnMedium = (storyId) => {
-    const storyUrl = `https://spaghettibytes.blog/visualizer/${storyId}`;
-    navigator.clipboard.writeText(storyUrl).catch(() => {});
+    const previewUrl = `https://spaghettibytes.blog/api/stories/${storyId}/preview`;
+    navigator.clipboard.writeText(previewUrl).catch(() => {});
     window.open("https://medium.com/p/import", "_blank", "noopener,noreferrer");
     setMediumStatus((prev) => ({ ...prev, [storyId]: "copied" }));
     setTimeout(() => setMediumStatus((prev) => ({ ...prev, [storyId]: undefined })), 4000);
