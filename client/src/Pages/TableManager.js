@@ -52,14 +52,20 @@ const TableManager = () => {
 
   // Medium's server API is blocked by Cloudflare — use their "Import a story" UI instead.
   // This copies the blog post URL and opens Medium's import page in one click.
-  // The visualizer is a React SPA — Medium's scraper can't execute JS.
-  // /api/stories/:id/preview returns a static HTML page that Medium can import.
+  // Medium's import feature only works with known platforms (WordPress, Ghost, etc.)
+  // and rejects unknown domains. The reliable workflow is:
+  //   1. Open the server-rendered preview (readable HTML, no JS needed)
+  //   2. Select All → Copy
+  //   3. Paste into Medium's editor (preserves headings, bold, lists)
   const importOnMedium = (storyId) => {
     const previewUrl = `https://spaghettibytes.blog/api/stories/${storyId}/preview`;
-    navigator.clipboard.writeText(previewUrl).catch(() => {});
-    window.open("https://medium.com/p/import", "_blank", "noopener,noreferrer");
-    setMediumStatus((prev) => ({ ...prev, [storyId]: "copied" }));
-    setTimeout(() => setMediumStatus((prev) => ({ ...prev, [storyId]: undefined })), 4000);
+    // Open preview first so it gets focus, then open Medium editor
+    window.open(previewUrl, "_blank", "noopener,noreferrer");
+    setTimeout(() => {
+      window.open("https://medium.com/new-story", "_blank", "noopener,noreferrer");
+    }, 400);
+    setMediumStatus((prev) => ({ ...prev, [storyId]: "opened" }));
+    setTimeout(() => setMediumStatus((prev) => ({ ...prev, [storyId]: undefined })), 6000);
   };
 
   // Define columns for ResponsiveTable
@@ -119,11 +125,11 @@ const TableManager = () => {
             </span>
           );
         }
-        if (status === "copied") {
+        if (status === "opened") {
           return (
             <div className="flex flex-col items-start gap-0.5">
-              <span className="badge badge-info badge-sm">URL copied!</span>
-              <span className="text-xs text-gray-400">Paste on Medium</span>
+              <span className="badge badge-info badge-sm">2 tabs opened!</span>
+              <span className="text-xs text-gray-400">Ctrl+A → Copy → Paste</span>
             </div>
           );
         }
