@@ -294,9 +294,14 @@ const StoryVisualizer = () => {
             <BsArrowLeft /> Back to Blog
           </button>
 
-          {story.sharedOnMedium && (
-            <div className="badge badge-lg bg-black text-white">
-              Also on Medium
+          {story.sharedOnDevTo && (
+            <div className="badge badge-lg bg-black text-white gap-1">
+              Also on Dev.to
+            </div>
+          )}
+          {story.sharedOnHashnode && (
+            <div className="badge badge-lg bg-blue-600 text-white gap-1">
+              Also on Hashnode
             </div>
           )}
         </motion.div>

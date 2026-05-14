@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BsArrowLeft } from "react-icons/bs";
-import { FaMedium } from "react-icons/fa";
+import { SiDevdotto, SiHashnode } from "react-icons/si";
 import ResponsiveTable from "../Components/ResponsiveTable";
 import { motion } from "framer-motion";
 
 const TableManager = () => {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [mediumStatus, setMediumStatus] = useState({}); // { [storyId]: 'copied' }
+  const [crosspostLoading, setCrosspostLoading] = useState({}); // { [storyId-platform]: true }
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,22 +50,26 @@ const TableManager = () => {
     navigate(`/story-publisher/${id}`);
   };
 
-  // Medium's server API is blocked by Cloudflare — use their "Import a story" UI instead.
-  // This copies the blog post URL and opens Medium's import page in one click.
-  // Medium's import feature only works with known platforms (WordPress, Ghost, etc.)
-  // and rejects unknown domains. The reliable workflow is:
-  //   1. Open the server-rendered preview (readable HTML, no JS needed)
-  //   2. Select All → Copy
-  //   3. Paste into Medium's editor (preserves headings, bold, lists)
-  const importOnMedium = (storyId) => {
-    const previewUrl = `https://spaghettibytes.blog/api/stories/${storyId}/preview`;
-    // Open preview first so it gets focus, then open Medium editor
-    window.open(previewUrl, "_blank", "noopener,noreferrer");
-    setTimeout(() => {
-      window.open("https://medium.com/new-story", "_blank", "noopener,noreferrer");
-    }, 400);
-    setMediumStatus((prev) => ({ ...prev, [storyId]: "opened" }));
-    setTimeout(() => setMediumStatus((prev) => ({ ...prev, [storyId]: undefined })), 6000);
+  const handleCrosspost = async (storyId, platforms) => {
+    const key = `${storyId}-${platforms.join(',')}`;
+    setCrosspostLoading((prev) => ({ ...prev, [key]: true }));
+    try {
+      const res = await fetch(`/api/stories/${storyId}/crosspost`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ platforms }),
+      });
+      if (res.ok) {
+        await fetchStories();
+      } else {
+        console.error('Crosspost failed', await res.text());
+      }
+    } catch (err) {
+      console.error('Crosspost error:', err);
+    } finally {
+      setCrosspostLoading((prev) => ({ ...prev, [key]: false }));
+    }
   };
 
   // Define columns for ResponsiveTable
@@ -114,37 +118,42 @@ const TableManager = () => {
       )
     },
     {
-      key: "medium",
-      label: "Medium",
-      render: (story) => {
-        const status = mediumStatus[story._id];
-        if (story.sharedOnMedium) {
-          return (
-            <span className="badge badge-success badge-sm gap-1">
-              <FaMedium /> Published
-            </span>
-          );
-        }
-        if (status === "opened") {
-          return (
-            <div className="flex flex-col items-start gap-0.5">
-              <span className="badge badge-info badge-sm">2 tabs opened!</span>
-              <span className="text-xs text-gray-400">Ctrl+A → Copy → Paste</span>
-            </div>
-          );
-        }
-        return (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => importOnMedium(story._id)}
-            className="btn btn-xs gap-1 btn-outline border-gray-400 hover:bg-black hover:text-white hover:border-black"
-            title="Copy URL and open Medium import"
-          >
-            <FaMedium /> Import
-          </motion.button>
-        );
-      }
+      key: "crosspost",
+      label: "Cross-post",
+      render: (story) => (
+        <div className="flex flex-col gap-1.5">
+          {story.sharedOnDevTo ? (
+            <span className="badge badge-success badge-sm gap-1"><SiDevdotto /> Dev.to</span>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleCrosspost(story._id, ['devto'])}
+              disabled={crosspostLoading[`${story._id}-devto`]}
+              className="btn btn-xs gap-1 btn-outline hover:bg-black hover:text-white hover:border-black"
+            >
+              {crosspostLoading[`${story._id}-devto`]
+                ? <span className="loading loading-spinner loading-xs" />
+                : <><SiDevdotto /> Dev.to</>}
+            </motion.button>
+          )}
+          {story.sharedOnHashnode ? (
+            <span className="badge badge-success badge-sm gap-1"><SiHashnode /> Hashnode</span>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleCrosspost(story._id, ['hashnode'])}
+              disabled={crosspostLoading[`${story._id}-hashnode`]}
+              className="btn btn-xs gap-1 btn-outline hover:bg-blue-600 hover:text-white hover:border-blue-600"
+            >
+              {crosspostLoading[`${story._id}-hashnode`]
+                ? <span className="loading loading-spinner loading-xs" />
+                : <><SiHashnode /> Hashnode</>}
+            </motion.button>
+          )}
+        </div>
+      )
     }
   ];
 

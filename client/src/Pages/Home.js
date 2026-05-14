@@ -24,6 +24,8 @@ const Home = () => {
   const navigate = useNavigate();
   const [latestStories, setLatestStories] = useState([]);
   const [storiesLoading, setStoriesLoading] = useState(true);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState('idle');
 
   useEffect(() => {
     const fetchLatest = async () => {
@@ -43,6 +45,23 @@ const Home = () => {
     fetchLatest();
   }, []);
 
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    if (!newsletterEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail)) return;
+    setNewsletterStatus('loading');
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail, source: 'homepage', referrer: window.location.href }),
+        credentials: 'include',
+      });
+      setNewsletterStatus(res.ok ? 'success' : 'error');
+    } catch {
+      setNewsletterStatus('error');
+    }
+  };
+
   const fadeInUp = {
     initial: { opacity: 0, y: 60 },
     animate: { opacity: 1, y: 0 },
@@ -61,7 +80,7 @@ const Home = () => {
         {...fadeInUp}
       >
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Text Content - Left */}
             <motion.div
               className="text-center lg:text-left space-y-6"
@@ -249,8 +268,10 @@ const Home = () => {
           </motion.div>
 
           {storiesLoading ? (
-            <div className="flex justify-center">
-              <span className="loading loading-spinner loading-lg text-error"></span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-64 rounded-soft bg-base-200 animate-pulse" />
+              ))}
             </div>
           ) : latestStories.length > 0 ? (
             <>
@@ -430,16 +451,18 @@ const Home = () => {
                   my GitHub for the latest recipes!
                 </p>
 
-                <div className="mockup-code bg-neutral text-neutral-content text-left">
-                  <pre data-prefix="$">
-                    <code>git clone happiness</code>
-                  </pre>
-                  <pre data-prefix=">" className="text-warning">
-                    <code>building future...</code>
-                  </pre>
-                  <pre data-prefix=">" className="text-success">
-                    <code>Success! 🚀</code>
-                  </pre>
+                <div className="overflow-x-auto">
+                  <div className="mockup-code bg-neutral text-neutral-content text-left">
+                    <pre data-prefix="$">
+                      <code>git clone happiness</code>
+                    </pre>
+                    <pre data-prefix=">" className="text-warning">
+                      <code>building future...</code>
+                    </pre>
+                    <pre data-prefix=">" className="text-success">
+                      <code>Success! 🚀</code>
+                    </pre>
+                  </div>
                 </div>
               </div>
 
@@ -457,6 +480,56 @@ const Home = () => {
               </div>
             </motion.div>
           </div>
+        </div>
+      </motion.section>
+
+      {/* Newsletter Section */}
+      <motion.section
+        className="py-16 px-6 md:px-12 bg-gradient-to-r from-secondary to-accent text-white"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="container mx-auto text-center max-w-2xl">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+            📬 Stay in the Loop
+          </h2>
+          <p className="text-lg opacity-85 mb-8">
+            Weekly coding recipes, project updates, and new articles delivered straight to your inbox.
+          </p>
+
+          {newsletterStatus === 'success' ? (
+            <p className="text-xl font-semibold">✓ Check your email to confirm!</p>
+          ) : (
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 justify-center">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                required
+                className="input input-bordered bg-white/95 text-base-content rounded-soft flex-1 max-w-sm"
+              />
+              <motion.button
+                type="submit"
+                disabled={newsletterStatus === 'loading'}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn bg-white text-secondary font-bold rounded-soft hover:bg-white/90 border-0"
+              >
+                {newsletterStatus === 'loading' ? (
+                  <span className="loading loading-spinner loading-sm" />
+                ) : 'Iscriviti →'}
+              </motion.button>
+            </form>
+          )}
+
+          {newsletterStatus === 'error' && (
+            <p className="mt-3 text-sm text-red-200">Something went wrong. Try again!</p>
+          )}
+
+          <p className="mt-4 text-sm opacity-60">No spam. Unsubscribe anytime.</p>
         </div>
       </motion.section>
 

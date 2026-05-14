@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import TipTapEditor from "../Components/TipTapEditor";
 import { IoMdAdd } from "react-icons/io";
-import { FaTimes, FaMedium } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
+import { SiDevdotto, SiHashnode } from "react-icons/si";
 import { useNavigate, useParams } from "react-router-dom";
 import { BsArrowLeft, BsArrowRight, BsCheck2All } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,7 +15,8 @@ const StoryPublisher = () => {
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
   const [content, setContent] = useState("");
-  const [shareOnMedium, setShareOnMedium] = useState(false);
+  const [shareOnDevTo, setShareOnDevTo] = useState(false);
+  const [shareOnHashnode, setShareOnHashnode] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
@@ -68,7 +70,8 @@ const StoryPublisher = () => {
       setSummary(data.summary);
       setTags(data.tags);
       setContent(data.content);
-      setShareOnMedium(data.sharedOnMedium);
+      setShareOnDevTo(data.sharedOnDevTo || false);
+      setShareOnHashnode(data.sharedOnHashnode || false);
     } catch (error) {
       console.error("Error fetching story:", error);
     } finally {
@@ -106,7 +109,8 @@ const StoryPublisher = () => {
       summary,
       tags,
       content,
-      shareOnMedium,
+      shareOnDevTo,
+      shareOnHashnode,
     };
 
     try {
@@ -425,20 +429,38 @@ const StoryPublisher = () => {
 
               <div className="divider"></div>
 
-              {/* Medium Sharing */}
-              <div className="form-control">
+              {/* Cross-posting */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold text-base-content/60">CROSS-POST</h3>
+
                 <label className="label cursor-pointer justify-start gap-4">
                   <input
                     type="checkbox"
                     className="toggle toggle-primary toggle-lg"
-                    checked={shareOnMedium}
-                    onChange={(e) => setShareOnMedium(e.target.checked)}
+                    checked={shareOnDevTo}
+                    onChange={(e) => setShareOnDevTo(e.target.checked)}
                   />
                   <div className="flex items-center gap-3">
-                    <FaMedium className="text-3xl text-primary" />
+                    <SiDevdotto className="text-3xl" />
                     <div>
-                      <span className="label-text font-bold text-base-content">Share on Medium</span>
-                      <p className="text-xs text-base-content/60">Automatically publish to your Medium account</p>
+                      <span className="label-text font-bold text-base-content">Publish on Dev.to</span>
+                      <p className="text-xs text-base-content/60">Cross-post with canonical URL to your blog</p>
+                    </div>
+                  </div>
+                </label>
+
+                <label className="label cursor-pointer justify-start gap-4">
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-primary toggle-lg"
+                    checked={shareOnHashnode}
+                    onChange={(e) => setShareOnHashnode(e.target.checked)}
+                  />
+                  <div className="flex items-center gap-3">
+                    <SiHashnode className="text-3xl text-blue-600" />
+                    <div>
+                      <span className="label-text font-bold text-base-content">Publish on Hashnode</span>
+                      <p className="text-xs text-base-content/60">Cross-post with canonical URL to your blog</p>
                     </div>
                   </div>
                 </label>

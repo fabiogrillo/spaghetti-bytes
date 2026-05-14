@@ -5,7 +5,8 @@ const storySchema = new mongoose.Schema({
   summary: { type: String, required: true },
   tags: { type: [String], required: true },
   content: { type: Object, required: true },
-  sharedOnMedium: { type: Boolean, default: false },
+  sharedOnDevTo:    { type: Boolean, default: false },
+  sharedOnHashnode: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 }
 });

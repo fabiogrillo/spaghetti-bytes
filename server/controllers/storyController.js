@@ -5,9 +5,9 @@ const axios = require("axios");
 const dotenv = require("dotenv");
 const { body, validationResult } = require('express-validator');
 
-dotenv.config();
+const TurndownService = require('turndown');
 
-const { MEDIUM_ACCESS_TOKEN, MEDIUM_AUTHOR_ID } = process.env;
+dotenv.config();
 
 // Validation rules for story creation/update
 const storyValidationRules = [
@@ -86,14 +86,16 @@ const createStory = async (req, res) => {
     const newStory = new Story(req.body);
     const savedStory = await newStory.save();
 
-    if (req.body.shareOnMedium) {
-      const mediumResult = await publishOnMedium(savedStory);
-      if (mediumResult.success) {
-        savedStory.sharedOnMedium = true;
-        await savedStory.save();
-      } else {
-        console.warn("Medium publish failed for story:", savedStory._id, mediumResult.error);
-      }
+    if (req.body.shareOnDevTo) {
+      const result = await publishOnDevTo(savedStory).catch(e => ({ success: false, error: e.message }));
+      if (result.success) await Story.findByIdAndUpdate(savedStory._id, { sharedOnDevTo: true });
+      else console.warn('Dev.to publish failed for story:', savedStory._id, result.error);
+    }
+
+    if (req.body.shareOnHashnode) {
+      const result = await publishOnHashnode(savedStory).catch(e => ({ success: false, error: e.message }));
+      if (result.success) await Story.findByIdAndUpdate(savedStory._id, { sharedOnHashnode: true });
+      else console.warn('Hashnode publish failed for story:', savedStory._id, result.error);
     }
 
     // Notify subscribers — fire-and-forget, errors don't affect the response
@@ -140,7 +142,7 @@ const deleteStory = async (req, res) => {
 };
 
 // Return a server-side rendered HTML page for a story.
-// Used by Medium's "Import a story" scraper — the React SPA cannot be scraped.
+// Used by scrapers and bots that cannot execute client-side React.
 const getStoryPreview = async (req, res) => {
   try {
     const story = await Story.findById(req.params.id).lean();
@@ -193,65 +195,113 @@ const getStoryPreview = async (req, res) => {
   }
 };
 
-// Strip base64 images from HTML content before sending to Medium.
-// Medium's API cannot process data: URIs — replace them with a text placeholder.
+// Strip base64 images from HTML content — external platforms cannot process data: URIs.
 const stripBase64Images = (html) => {
   if (typeof html !== "string") return html;
   return html.replace(/<img[^>]+src="data:[^"]*"[^>]*\/?>/gi, "<p><em>[Image]</em></p>");
 };
 
-// Publish a story on Medium. Returns { success, url?, error? }
-const publishOnMedium = async (story) => {
-  if (!MEDIUM_ACCESS_TOKEN || !MEDIUM_AUTHOR_ID) {
-    console.error("Medium credentials not configured.");
-    return { success: false, error: "Medium credentials not configured" };
+const toMarkdown = (html) => {
+  const td = new TurndownService({ codeBlockStyle: 'fenced', headingStyle: 'atx' });
+  return td.turndown(stripBase64Images(html));
+};
+
+const canonicalUrl = (story) =>
+  `${process.env.FRONTEND_URL || 'https://spaghettibytes.blog'}/visualizer/${story._id}`;
+
+// Publish a story on Dev.to. Returns { success, url?, error? }
+const publishOnDevTo = async (story) => {
+  const apiKey = process.env.DEVTO_API_KEY;
+  if (!apiKey) {
+    console.warn('DEVTO_API_KEY not set — skipping Dev.to publish');
+    return { success: false, error: 'DEVTO_API_KEY not set' };
   }
-
-  const url = `https://api.medium.com/v1/users/${MEDIUM_AUTHOR_ID}/posts`;
-  const headers = {
-    Authorization: `Bearer ${MEDIUM_ACCESS_TOKEN}`,
-    "Content-Type": "application/json",
-  };
-  const data = {
-    title: story.title,
-    contentFormat: "html",
-    content: stripBase64Images(story.content),
-    tags: story.tags,
-    publishStatus: "public",
-    notifyFollowers: true,
-  };
-
   try {
-    const response = await axios.post(url, data, { headers });
-    console.log("Story published on Medium:", response.data);
-    return { success: true, url: response.data?.data?.url };
+    const res = await axios.post(
+      'https://dev.to/api/articles',
+      {
+        article: {
+          title: story.title,
+          body_markdown: toMarkdown(story.content),
+          tags: story.tags.slice(0, 4),
+          canonical_url: canonicalUrl(story),
+          published: true,
+        },
+      },
+      { headers: { 'api-key': apiKey } }
+    );
+    return { success: true, url: res.data.url };
   } catch (error) {
     const detail = error.response?.data || error.message;
-    console.error("Error publishing story on Medium:", detail);
-    return { success: false, error: typeof detail === "object" ? JSON.stringify(detail) : detail };
+    console.warn('Dev.to publish failed:', typeof detail === 'object' ? JSON.stringify(detail) : detail);
+    return { success: false, error: String(detail) };
   }
 };
 
-// Re-publish an existing story to Medium (admin endpoint)
-const republishOnMedium = async (req, res) => {
+// Publish a story on Hashnode. Returns { success, url?, error? }
+const publishOnHashnode = async (story) => {
+  const apiKey = process.env.HASHNODE_API_KEY;
+  const publicationId = process.env.HASHNODE_PUBLICATION_ID;
+  if (!apiKey || !publicationId) {
+    console.warn('HASHNODE_API_KEY or HASHNODE_PUBLICATION_ID not set — skipping Hashnode publish');
+    return { success: false, error: 'Hashnode env vars not set' };
+  }
+  const query = `
+    mutation PublishPost($input: PublishPostInput!) {
+      publishPost(input: $input) { post { id url } }
+    }
+  `;
+  try {
+    const res = await axios.post(
+      'https://gql.hashnode.com',
+      {
+        query,
+        variables: {
+          input: {
+            title: story.title,
+            contentMarkdown: toMarkdown(story.content),
+            publicationId,
+            canonicalUrl: canonicalUrl(story),
+          },
+        },
+      },
+      { headers: { Authorization: apiKey } }
+    );
+    if (res.data.errors) {
+      const errMsg = res.data.errors.map(e => e.message).join(', ');
+      console.warn('Hashnode publish GraphQL error:', errMsg);
+      return { success: false, error: errMsg };
+    }
+    return { success: true, url: res.data?.data?.publishPost?.post?.url };
+  } catch (error) {
+    const detail = error.response?.data || error.message;
+    console.warn('Hashnode publish failed:', typeof detail === 'object' ? JSON.stringify(detail) : detail);
+    return { success: false, error: String(detail) };
+  }
+};
+
+// Cross-post an existing story to Dev.to and/or Hashnode (admin endpoint)
+const crosspostStory = async (req, res) => {
   try {
     const story = await Story.findById(req.params.id);
-    if (!story) {
-      return res.status(404).json({ message: "Story not found" });
+    if (!story) return res.status(404).json({ message: 'Story not found' });
+
+    const { platforms = [] } = req.body;
+    const results = {};
+
+    if (platforms.includes('devto') && !story.sharedOnDevTo) {
+      results.devto = await publishOnDevTo(story).catch(e => ({ success: false, error: e.message }));
+      if (results.devto.success) story.sharedOnDevTo = true;
+    }
+    if (platforms.includes('hashnode') && !story.sharedOnHashnode) {
+      results.hashnode = await publishOnHashnode(story).catch(e => ({ success: false, error: e.message }));
+      if (results.hashnode.success) story.sharedOnHashnode = true;
     }
 
-    const result = await publishOnMedium(story);
-    if (!result.success) {
-      return res.status(502).json({ message: "Failed to publish on Medium", error: result.error });
-    }
-
-    // Mark as shared
-    story.sharedOnMedium = true;
     await story.save();
-
-    res.json({ message: "Story published on Medium successfully", url: result.url });
+    res.json({ results });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -291,7 +341,7 @@ module.exports = {
   updateStory,
   deleteStory,
   toggleLike,
-  republishOnMedium,
+  crosspostStory,
   storyValidationRules,
   validateStory,
 };

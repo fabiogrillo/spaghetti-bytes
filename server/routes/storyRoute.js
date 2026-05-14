@@ -9,7 +9,7 @@ const {
   updateStory,
   deleteStory,
   toggleLike,
-  republishOnMedium,
+  crosspostStory,
   storyValidationRules,
   validateStory,
 } = require("../controllers/storyController");
@@ -18,7 +18,7 @@ const { requireAuth, requireAdmin } = require("../middleware/auth");
 // Route to get all stories
 router.get("/", getStories);
 
-// Server-side rendered HTML preview — used by Medium's "Import a story" scraper
+// Server-side rendered HTML preview for scrapers and bots
 router.get("/:id/preview", getStoryPreview);
 
 // Route to get a single story by ID
@@ -36,7 +36,7 @@ router.delete("/:id", requireAuth, requireAdmin, deleteStory);
 // Route to toggle like on a story
 router.post("/:id/like", toggleLike);
 
-// Route to re-publish an existing story to Medium (admin only)
-router.post("/:id/publish-medium", requireAuth, requireAdmin, republishOnMedium);
+// Cross-post an existing story to Dev.to and/or Hashnode (admin only)
+router.post("/:id/crosspost", requireAuth, requireAdmin, crosspostStory);
 
 module.exports = router;
