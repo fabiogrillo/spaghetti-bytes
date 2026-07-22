@@ -32,7 +32,7 @@
     "rate-limit-mongo": "^2.3.2",
     "redis": "^5.8.0",
     "rss": "^1.2.2",
-    "sharp": "^0.34.3",
+    "sharp": "^0.35.0",
     "turndown": "^7.2.4"
   },
   "devDependencies": {
