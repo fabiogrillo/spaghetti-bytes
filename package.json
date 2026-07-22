@@ -19,7 +19,7 @@
     "lighthouse": "lighthouse http://localhost:3000 --output html --view"
   },
   "dependencies": {
-    "sharp": "^0.33.2",
+    "sharp": "^0.35.0",
     "node-cache": "^5.1.2",
     "redis": "^4.6.13",
     "ioredis": "^5.3.2",
