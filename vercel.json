@@ -22,6 +22,7 @@
     { "src": "/sitemap\\.xml", "dest": "/server/server.js" },
     { "src": "/robots\\.txt", "dest": "/server/server.js" },
     { "src": "/static/(.*)", "dest": "/client/static/$1" },
+    { "src": "/([^/]+\\.(ico|png|svg|jpg|jpeg|gif|webp|webmanifest|json|txt))", "dest": "/client/$1" },
     { "src": "/(.*)", "dest": "/client/index.html" }
   ],
   "env": {
