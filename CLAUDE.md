@@ -221,7 +221,7 @@ The client was migrated from Create React App to Vite. Conventions that matter:
 - **Admin Middleware:** Always apply `requireAdmin` AFTER `requireAuth` in route chains
 - **Moderation:** New comments default to `pending` status and require admin approval
 - **Session Storage:** Uses MongoDB store (connect-mongo) for session persistence
-- **RSS Feeds:** Available at `/api/rss/feed.xml`, `/api/rss/atom.xml`, `/api/rss/feed.json`
+- **RSS Feeds:** Served at the site root, not under `/api` — `/rss.xml`, `/atom.xml`, `/feed.json`, plus `/sitemap.xml` and `/robots.txt`. They are registered directly in `server.js` and each has its own explicit entry in `vercel.json` routes; without it the SPA catch-all would swallow them.
 - **File Structure:** Never move files between client/server without updating imports and webpack configs
 
 ## Common Patterns
