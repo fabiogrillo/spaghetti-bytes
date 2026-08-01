@@ -12,7 +12,7 @@ const SEO = ({
   const siteName = 'Spaghetti Bytes';
   const defaultDescription = 'A tech blog about software engineering, machine learning, and untangling complex code problems. Written by a developer on the journey to FAANG.';
   const defaultImage = '/og-image.png'; // You should create this image
-  const siteUrl = process.env.REACT_APP_SITE_URL || 'https://spaghettibytes.blog';
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://spaghettibytes.blog';
 
   const seo = {
     title: title ? `${title} | ${siteName}` : siteName,

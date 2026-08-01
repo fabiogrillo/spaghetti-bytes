@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BiCoffee, BiHeart } from 'react-icons/bi';
 import DonationModal from './DonationModal';
 
-const PAYPAL_USERNAME = process.env.REACT_APP_PAYPAL_USERNAME;
+const PAYPAL_USERNAME = import.meta.env.VITE_PAYPAL_USERNAME;
 
 const DonationButton = ({ variant = 'floating', compact = false }) => {
     const [showModal, setShowModal] = useState(false);

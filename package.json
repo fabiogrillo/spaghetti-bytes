@@ -37,6 +37,9 @@
     "css-minimizer-webpack-plugin": "^8.0.0",
     "mini-css-extract-plugin": "^2.8.0"
   },
+  "engines": {
+    "node": "24.x"
+  },
   "devDependencies": {
     "concurrently": "^8.2.2",
     "nodemon": "^3.0.3",
