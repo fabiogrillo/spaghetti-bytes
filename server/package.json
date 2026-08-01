@@ -22,14 +22,13 @@
     "ioredis": "^5.7.0",
     "isomorphic-dompurify": "^2.26.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.22.1",
+    "mongoose": "^8.24.2",
     "multer": "^2.2.0",
     "node-cache": "^5.1.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^9.0.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "rate-limit-mongo": "^2.3.2",
     "redis": "^5.8.0",
     "rss": "^1.2.2",
     "sharp": "^0.35.0",
@@ -37,6 +36,12 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   },
   "scripts": {
     "start": "node server.js",
