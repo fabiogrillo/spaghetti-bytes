@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create axios instance with dynamic base URL
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === 'production'
+  baseURL: import.meta.env.PROD
     ? '/api'  // In production, use relative path
     : 'http://localhost:5000/api',  // In development, use full URL
   withCredentials: true,  // Important for cookies/session

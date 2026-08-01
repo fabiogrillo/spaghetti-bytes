@@ -26,9 +26,11 @@ npm run build:server         # Build only server
 
 ### Client Development (from /client directory)
 ```bash
-npm start                    # Start development server (port 3000)
-npm run build                # Create production build
-npm test                     # Run React tests
+npm start                    # Start Vite dev server (port 3000)
+npm run build                # Create production build into client/build
+npm run preview              # Serve the production build locally
+npm test                     # Run Vitest tests
+npm run analyze              # Build + open bundle treemap (build/stats.html)
 ```
 
 ### Server Development (from /server directory)
@@ -48,7 +50,7 @@ npm run lighthouse           # Run Lighthouse performance audit
 ## Architecture
 
 ### Monorepo Structure
-This is a monorepo with client (React) and server (Express) as separate packages sharing a common root. The proxy is configured in `client/package.json` to route `/api` requests to `http://localhost:5000` during development.
+This is a monorepo with client (React + Vite) and server (Express) as separate packages sharing a common root. The dev proxy routing `/api` to `http://localhost:5000` is configured in `client/vite.config.mjs`.
 
 ### Authentication System
 The application uses a **hybrid authentication system**:
@@ -182,18 +184,31 @@ Two themes implemented with Tailwind + DaisyUI:
 - MongoDB query optimization with lean() and select()
 
 **Client-side:**
-- Code splitting with React.lazy (disabled for Vercel, using direct imports)
+- Vite (Rolldown) build — production build takes well under a second
 - Image optimization with Sharp
 - Lazy loading with Intersection Observer
 - Framer Motion for optimized animations
-- Bundle analysis available via `npm run analyze`
+- Bundle analysis available via `npm run analyze` (rollup-plugin-visualizer)
+- The main chunk is ~990 kB (~308 kB gzip) and currently unsplit; `build.rolldownOptions.output` is where manual chunking would go
+
+## Client Build Tooling (Vite)
+
+The client was migrated from Create React App to Vite. Conventions that matter:
+
+- **Env vars use `import.meta.env`, not `process.env`.** Only variables prefixed `VITE_` are exposed to the bundle. Current ones: `VITE_SITE_URL`, `VITE_PAYPAL_USERNAME`. Use `import.meta.env.PROD`/`.DEV` in place of `process.env.NODE_ENV`.
+- **Files containing JSX must use the `.jsx` extension.** Vite will not parse JSX inside `.js`. Pure-JS modules (`Api.js`, `hooks/`, `utils/`) correctly stay `.js`.
+- **`index.html` lives at `client/` root**, not in `public/`, and loads the app via `<script type="module" src="/src/index.jsx">`.
+- **`build.assetsDir` is set to `static`** so output paths keep matching the `/static/(.*)` route already declared in `vercel.json`. Changing it silently breaks production asset loading while local builds still pass.
+- **`postcss.config.js` is required.** react-scripts wired Tailwind in implicitly by detecting `tailwind.config.js`; Vite does not, and without it `@apply` passes through unprocessed and the site ships nearly styleless.
+- **The config is `vite.config.mjs`**, not `.js`, because `rollup-plugin-visualizer` is ESM-only while the package itself is CommonJS.
 
 ## Testing
 
 **Client Tests:**
-- Jest + React Testing Library configured
+- Vitest + React Testing Library, config lives in `client/vite.config.mjs` under `test`
 - Run from `/client` directory: `npm test`
 - Coverage: `npm test -- --coverage`
+- `src/setupTests.js` polyfills what jsdom lacks (IntersectionObserver, ResizeObserver, matchMedia) and stubs `fetch`, since components request relative paths like `/api/stories` that Node's fetch rejects
 
 **Server Tests:**
 - Jest configuration expected but not yet implemented
@@ -201,7 +216,7 @@ Two themes implemented with Tailwind + DaisyUI:
 
 ## Important Notes
 
-- **Proxy Configuration:** In development, client proxies `/api` to `http://localhost:5000` (configured in `client/package.json`)
+- **Proxy Configuration:** In development, client proxies `/api` to `http://localhost:5000` (configured in `client/vite.config.mjs`). Note `src/Api.js` targets `http://localhost:5000/api` directly in dev, so it does not depend on the proxy.
 - **Authentication Check:** Always use `req.isAuthenticated()` or check `req.user` to verify auth status
 - **Admin Middleware:** Always apply `requireAdmin` AFTER `requireAuth` in route chains
 - **Moderation:** New comments default to `pending` status and require admin approval
