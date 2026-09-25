@@ -18,7 +18,7 @@
     "express-slow-down": "^3.0.0",
     "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
-    "image-size": "^2.0.2",
+    "image-size": "^2.0.3",
     "ioredis": "^5.7.0",
     "isomorphic-dompurify": "^2.26.0",
     "jsonwebtoken": "^9.0.2",
@@ -31,7 +31,7 @@
     "passport-local": "^1.0.0",
     "redis": "^5.8.0",
     "rss": "^1.2.2",
-    "sharp": "^0.35.0",
+    "sharp": "^0.35.4",
     "turndown": "^7.2.4"
   },
   "devDependencies": {
