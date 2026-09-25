@@ -23,7 +23,7 @@
     "isomorphic-dompurify": "^2.26.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.24.2",
-    "multer": "^2.2.0",
+    "multer": "^2.3.0",
     "node-cache": "^5.1.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^9.1.1",
